@@ -150,3 +150,8 @@ and `tmux/tmux.conf.local` — all commented inline.
   controls load/render order.
 - **Neovim plugins**: `nvim/lua/plugins/` — one file per plugin or concern,
   auto-loaded by lazy.nvim.
+
+## Operations
+
+Reload commands, updating, vendored-dependency refresh, known gotchas,
+backups, and uninstalling all live in [OPERATIONS.md](OPERATIONS.md).

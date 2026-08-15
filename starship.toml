@@ -10,13 +10,15 @@
 
 format = """
 $directory\
+$shell\
 $git_branch\
 $git_status\
-$fill\
+$package\
 $nodejs\
 $python\
 $rust\
 $golang\
+$terraform\
 $lua\
 $cmd_duration\
 $line_break\
@@ -41,10 +43,6 @@ subtext0 = "#a6adc8"
 overlay0 = "#6c7086"
 surface1 = "#45475a"
 
-[fill]
-symbol = " "
-style = "surface1"
-
 [character]
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
@@ -56,14 +54,21 @@ truncation_length = 3
 truncate_to_repo = true
 read_only = " 󰌾"
 
+# Disabled by default upstream — shows which shell you're in (zsh/bash/...),
+# muted since this repo is zsh-only day-to-day and it's context, not a flag.
+[shell]
+disabled = false
+style = "overlay0"
+format = "[$indicator]($style) "
+
 [git_branch]
 style = "mauve"
 symbol = " "
-format = "[$symbol$branch]($style) "
+format = "on [$symbol$branch]($style) "
 
 [git_status]
 style = "peach"
-format = "[$all_status$ahead_behind]($style) "
+format = "([\\[$all_status$ahead_behind\\]]($style) )"
 
 [cmd_duration]
 min_time = 2000
@@ -73,33 +78,44 @@ format = "[$duration]($style) "
 [nodejs]
 symbol = " "
 style = "green"
-format = "[$symbol$version]($style) "
+format = "via [$symbol$version]($style) "
 
 [python]
 symbol = " "
 style = "yellow"
-format = "[$symbol$version]($style) "
+format = "via [$symbol$version]($style) "
 
 [rust]
 symbol = " "
 style = "peach"
-format = "[$symbol$version]($style) "
+format = "via [$symbol$version]($style) "
 
 [golang]
 symbol = " "
 style = "sky"
-format = "[$symbol$version]($style) "
+format = "via [$symbol$version]($style) "
 
 [lua]
 symbol = " "
 style = "blue"
-format = "[$symbol$version]($style) "
+format = "via [$symbol$version]($style) "
+
+# HCL — OpenTofu/Terraform, triggered by .tf/.tfplan/.tfstate files or a
+# .terraform folder. Shows the workspace, not the version (version detection
+# is slow with a lot of provider plugins installed — see starship docs).
+[terraform]
+symbol = "💠 "
+style = "lavender"
+format = "via [$symbol$workspace]($style) "
+
+[package]
+symbol = " " # cube — same glyph as sketchybar's Homebrew badge
+style = "peach"
+format = "is [$symbol$version]($style) "
 
 [aws]
 disabled = true
 [gcloud]
 disabled = true
 [docker_context]
-disabled = true
-[package]
 disabled = true

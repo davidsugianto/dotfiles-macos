@@ -67,6 +67,13 @@ accordion-padding = 30
   # Join windows into a container
   alt-shift-g = 'join-with down'
 
+  # "Tab" the focused window with the one below it: joins them into one
+  # container, then switches that container to accordion — AeroSpace's
+  # analog of i3's tabbed layout (no true tabs, but one stacked panel you
+  # switch between with focus). Repeat alt-comma afterwards to flip
+  # horizontal/vertical stacking.
+  alt-shift-t = ['join-with down', 'layout accordion horizontal vertical']
+
   # Workspaces — switch
   alt-1 = 'workspace 1'
   alt-2 = 'workspace 2'

@@ -38,6 +38,9 @@ FORMULAE=(
   terragrunt
   ansible          # ansible-vault ships as a subcommand, not a separate package
   awscli           # this formula is AWS CLI v2
+  colima           # container runtime (Docker Desktop alternative), needs the docker CLI below
+  docker           # CLI only — no daemon; colima provides that
+  docker-compose
   python
   node             # npm ships with node
   pnpm
@@ -50,6 +53,25 @@ for formula in "${FORMULAE[@]}"; do
     ok "$formula installed"
   fi
 done
+
+# ------------------------------------------------------------------------------
+# docker-compose ships as a CLI plugin, and the plain `docker` CLI only
+# looks in a couple of hardcoded locations for plugins — Homebrew's isn't
+# one of them, so `docker compose` fails to resolve until this is set.
+# ------------------------------------------------------------------------------
+step "Pointing the docker CLI at Homebrew's compose plugin"
+DOCKER_CONFIG="$HOME/.docker/config.json"
+mkdir -p -- "$(dirname -- "$DOCKER_CONFIG")"
+[[ -f "$DOCKER_CONFIG" ]] || echo '{}' >"$DOCKER_CONFIG"
+if jq -e '(.cliPluginsExtraDirs // []) | index("/opt/homebrew/lib/docker/cli-plugins")' \
+  "$DOCKER_CONFIG" >/dev/null 2>&1; then
+  skip "docker CLI already configured for the compose plugin"
+else
+  tmp_config="$(mktemp)"
+  jq '.cliPluginsExtraDirs = ((.cliPluginsExtraDirs // []) + ["/opt/homebrew/lib/docker/cli-plugins"] | unique)' \
+    "$DOCKER_CONFIG" >"$tmp_config" && mv "$tmp_config" "$DOCKER_CONFIG"
+  ok "docker CLI configured — 'docker compose' resolves now"
+fi
 
 # ------------------------------------------------------------------------------
 # GUI apps
@@ -92,3 +114,4 @@ step "Done"
 echo "  New shell tools are on PATH now; open a new terminal to pick them up."
 echo "  Get Go itself with:  gvm install latest && gvm tools init"
 echo "  kubectl/yq/aws/tofu completions are wired in zsh/completions.zsh."
+echo "  Colima doesn't autostart — run 'colima start' to bring up the docker daemon."

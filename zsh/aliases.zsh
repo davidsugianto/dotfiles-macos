@@ -68,21 +68,29 @@ if command -v brew >/dev/null 2>&1; then
 fi
 
 # ------------------------------------------------------------------------------
-# Git shortcuts
+# git
 # ------------------------------------------------------------------------------
 alias g='git'
-alias gs='git status -sb'
+alias gs='git status --short --branch'
 alias ga='git add'
-alias gaa='git add -A'
+alias gaa='git add --all'
 alias gc='git commit'
 alias gcm='git commit -m'
-alias gp='git push'
-alias gpl='git pull'
+alias gca='git commit --amend'
 alias gco='git checkout'
+alias gcb='git checkout -b'
 alias gb='git branch'
 alias gd='git diff'
 alias gds='git diff --staged'
-alias glog='git log --oneline --graph --decorate -20'
+alias gp='git push'
+alias gpl='git pull'
+alias gf='git fetch --all --prune'
+alias gl='git log --oneline --graph --decorate -20'
+alias gll='git log --graph --pretty=format:"%C(yellow)%h%Creset %C(blue)%an%Creset %C(green)(%ar)%Creset%n  %s%n"'
+alias gst='git stash'
+alias gstp='git stash pop'
+alias gr='git restore'
+alias grs='git restore --staged'
 
 # ------------------------------------------------------------------------------
 # Aerospace / Borders / SketchyBar — reload the window-management stack
