@@ -1,0 +1,21 @@
+#!/bin/bash
+# ==============================================================================
+# JankyBorders — subtle active/inactive window outlines.
+# https://github.com/FelixKratz/JankyBorders
+#
+# Symlinked to ~/.config/borders/bordersrc by setup.sh and run automatically
+# by `brew services start borders` (see setup.sh).
+#
+# Colors are Catppuccin Mocha (0xAARRGGBB), matching sketchybar/colors.lua
+# and the WezTerm/Neovim theme so the whole desktop reads as one palette.
+# ==============================================================================
+
+options=(
+	style=round
+	width=4.0
+	hidpi=on
+	active_color=0xffcba6f7   # mauve — focused window
+	inactive_color=0xff45475a # surface1 — unfocused window
+)
+
+borders "${options[@]}"

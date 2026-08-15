@@ -1,0 +1,111 @@
+#!/usr/bin/env zsh
+# ==============================================================================
+# aliases.zsh — shorthand commands, guarded so a missing tool never breaks
+#               an interactive shell.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Modern CLI replacements
+# ------------------------------------------------------------------------------
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza -lh --icons --group-directories-first'
+  alias la='eza -lah --icons --group-directories-first'
+  alias lt='eza --tree --icons --level=2 --group-directories-first'
+fi
+
+if command -v bat >/dev/null 2>&1; then
+  alias cat='bat --paging=never --style=plain'
+  alias catn='bat --paging=never'          # cat with line numbers / syntax
+fi
+
+if command -v rg >/dev/null 2>&1; then
+  alias grep='rg'
+fi
+
+if command -v fd >/dev/null 2>&1; then
+  alias find='fd'
+fi
+
+if command -v dust >/dev/null 2>&1; then
+  alias du='dust'
+fi
+
+if command -v btop >/dev/null 2>&1; then
+  alias top='btop'
+fi
+
+if command -v nvim >/dev/null 2>&1; then
+  alias vim='nvim'
+  alias vi='nvim'
+fi
+
+if command -v yazi >/dev/null 2>&1; then
+  alias fm='yazi' # `y` is the cd-on-quit wrapper below, in functions.zsh
+fi
+
+# ------------------------------------------------------------------------------
+# Safety nets — confirm before anything destructive
+# ------------------------------------------------------------------------------
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
+
+# ------------------------------------------------------------------------------
+# Navigation
+# ------------------------------------------------------------------------------
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'          # jump to previous directory
+
+# ------------------------------------------------------------------------------
+# Homebrew
+# ------------------------------------------------------------------------------
+if command -v brew >/dev/null 2>&1; then
+  alias brewup='brew update && brew upgrade && brew cleanup'
+  alias brewls='brew list --formula && echo "---" && brew list --cask'
+fi
+
+# ------------------------------------------------------------------------------
+# Git shortcuts
+# ------------------------------------------------------------------------------
+alias g='git'
+alias gs='git status -sb'
+alias ga='git add'
+alias gaa='git add -A'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gp='git push'
+alias gpl='git pull'
+alias gco='git checkout'
+alias gb='git branch'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias glog='git log --oneline --graph --decorate -20'
+
+# ------------------------------------------------------------------------------
+# Aerospace / Borders / SketchyBar — reload the window-management stack
+# ------------------------------------------------------------------------------
+if command -v aerospace >/dev/null 2>&1; then
+  alias asr='aerospace reload-config'
+fi
+
+if command -v sketchybar >/dev/null 2>&1; then
+  alias sbr='sketchybar --reload'
+fi
+
+if command -v borders >/dev/null 2>&1; then
+  alias bdr='brew services restart borders'
+fi
+
+if command -v tmux >/dev/null 2>&1; then
+  alias tmr='tmux source-file "$HOME/.config/tmux/tmux.conf"'
+  alias ta='tmux attach'
+fi
+
+# ------------------------------------------------------------------------------
+# Misc
+# ------------------------------------------------------------------------------
+alias reload='exec zsh'
+alias path='echo -e ${PATH//:/\\n}'

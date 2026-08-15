@@ -1,0 +1,158 @@
+# : << 'EOF'
+# Oh my tmux! — local customization file for this dotfiles repo.
+# Base project: https://github.com/gpakosz/.tmux
+#
+# Never edit tmux.conf itself (setup.sh symlinks it straight from the
+# vendored clone and updates will overwrite local changes to it). Everything
+# you want to change belongs in this file — append #!important to a line if
+# you need to override something tmux.conf sets unconditionally.
+#
+# Colors are Catppuccin Mocha, matching borders/bordersrc, sketchybar/colors.lua,
+# wezterm/config/appearance.lua and nvim's colorscheme.
+
+
+# -- bindings ------------------------------------------------------------------
+
+tmux_conf_preserve_stock_bindings=false
+
+
+# -- session creation ------------------------------------------------------------
+
+tmux_conf_new_session_prompt=false
+tmux_conf_new_session_retain_current_path=false
+
+
+# -- windows & pane creation -----------------------------------------------------
+
+tmux_conf_new_window_retain_current_path=false
+tmux_conf_new_window_reconnect_ssh=false
+tmux_conf_new_pane_retain_current_path=true
+tmux_conf_new_pane_reconnect_ssh=false
+
+
+# -- display ---------------------------------------------------------------------
+
+tmux_conf_24b_colour=auto
+
+
+# -- theming — Catppuccin Mocha ---------------------------------------------------
+
+tmux_conf_theme=enabled
+
+tmux_conf_theme_colour_1="#1e1e2e"   # base       — dark background
+tmux_conf_theme_colour_2="#45475a"   # surface1   — pane borders / secondary bg
+tmux_conf_theme_colour_3="#7f849c"   # overlay1   — muted status text
+tmux_conf_theme_colour_4="#cba6f7"   # mauve      — accent (matches borders/bordersrc active_color)
+tmux_conf_theme_colour_5="#f9e2af"   # yellow     — messages / mode highlight
+tmux_conf_theme_colour_9="#89b4fa"   # blue — pane border while in copy mode
+tmux_conf_theme_colour_16="#f38ba8"  # red  — pane border while panes are synchronized
+
+# window style
+tmux_conf_theme_window_fg="default"
+tmux_conf_theme_window_bg="default"
+
+# Focused-pane highlighting paints a solid background behind the active
+# pane, which — since that's basically always the pane you're using — kills
+# WezTerm's window_background_opacity/blur for it. JankyBorders already
+# marks the focused OS-level window; the pane border color below (mauve
+# on the active pane) does the same job inside tmux without the opaque
+# wash, so this stays off.
+tmux_conf_theme_highlight_focused_pane=false
+
+tmux_conf_theme_pane_border_style=thin
+tmux_conf_theme_pane_border="$tmux_conf_theme_colour_2"
+tmux_conf_theme_pane_active_border="$tmux_conf_theme_colour_4"
+%if #{>=:#{version},3.2}
+tmux_conf_theme_pane_active_border="#{?pane_in_mode,$tmux_conf_theme_colour_9,#{?synchronize-panes,$tmux_conf_theme_colour_16,$tmux_conf_theme_colour_4}}"
+%endif
+
+tmux_conf_theme_pane_indicator="$tmux_conf_theme_colour_4"
+tmux_conf_theme_pane_active_indicator="$tmux_conf_theme_colour_4"
+
+tmux_conf_theme_message_fg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_message_bg="$tmux_conf_theme_colour_5"
+tmux_conf_theme_message_attr="bold"
+
+tmux_conf_theme_message_command_fg="$tmux_conf_theme_colour_5"
+tmux_conf_theme_message_command_bg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_message_command_attr="bold"
+
+tmux_conf_theme_mode_fg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_mode_bg="$tmux_conf_theme_colour_5"
+tmux_conf_theme_mode_attr="bold"
+
+tmux_conf_theme_status_fg="$tmux_conf_theme_colour_3"
+tmux_conf_theme_status_bg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_status_attr="none"
+
+tmux_conf_theme_terminal_title="#h ❐ #S ● #I #W"
+
+tmux_conf_theme_window_status_fg="$tmux_conf_theme_colour_3"
+tmux_conf_theme_window_status_bg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_window_status_attr="none"
+tmux_conf_theme_window_status_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
+
+# current window — mauve, matching the JankyBorders active-window color
+tmux_conf_theme_window_status_current_fg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_window_status_current_bg="$tmux_conf_theme_colour_4"
+tmux_conf_theme_window_status_current_attr="bold"
+tmux_conf_theme_window_status_current_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
+
+tmux_conf_theme_window_status_activity_fg="default"
+tmux_conf_theme_window_status_activity_bg="default"
+tmux_conf_theme_window_status_activity_attr="underscore"
+
+tmux_conf_theme_window_status_bell_fg="$tmux_conf_theme_colour_5"
+tmux_conf_theme_window_status_bell_bg="default"
+tmux_conf_theme_window_status_bell_attr="blink,bold"
+
+tmux_conf_theme_window_status_last_fg="$tmux_conf_theme_colour_4"
+tmux_conf_theme_window_status_last_bg="$tmux_conf_theme_colour_2"
+tmux_conf_theme_window_status_last_attr="none"
+
+# No separators — single flat segment on each side, nothing to divide.
+tmux_conf_theme_left_separator_main=""
+tmux_conf_theme_left_separator_sub=""
+tmux_conf_theme_right_separator_main=""
+tmux_conf_theme_right_separator_sub=""
+
+# Left: session name only. Right: a clock, plus remote hostname when
+# you're actually SSH'd somewhere (the one thing SketchyBar can't tell you).
+tmux_conf_theme_status_left=" #S "
+tmux_conf_theme_status_right=" %H:%M#{?hostname_ssh, · #{hostname_ssh} ,} "
+
+tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_4"
+tmux_conf_theme_status_left_bg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_status_left_attr="bold"
+
+tmux_conf_theme_status_right_fg="$tmux_conf_theme_colour_3"
+tmux_conf_theme_status_right_bg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_status_right_attr="none"
+
+
+# -- clipboard ---------------------------------------------------------------
+
+# macOS ships pbcopy, so this works without installing anything extra.
+tmux_conf_copy_to_os_clipboard=true
+
+
+# -- urlscan -------------------------------------------------------------------
+
+tmux_conf_urlscan_options="--compact --dedupe"
+
+
+# -- user customizations -------------------------------------------------------
+
+set -g history-limit 10000
+
+# start with mouse mode enabled — click to select panes/windows, drag to
+# resize, scroll wheel to scroll.
+set -g mouse on
+
+# vi-style copy mode and command prompt navigation, to match Neovim.
+set -g status-keys vi
+set -g mode-keys vi
+
+# Prefix stays the tmux default (C-b): WezTerm's own leader is C-a
+# (see wezterm/config/keys.lua) — reusing C-a here would mean WezTerm
+# intercepts it before tmux ever sees the keystroke.

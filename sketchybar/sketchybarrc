@@ -1,0 +1,7 @@
+#!/usr/bin/env lua
+-- ==============================================================================
+-- sketchybarrc — entry point. Everything else is plain Lua, loaded via SbarLua.
+-- https://github.com/FelixKratz/SbarLua
+-- ==============================================================================
+
+require("init")

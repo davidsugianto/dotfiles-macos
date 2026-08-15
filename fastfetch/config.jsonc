@@ -1,0 +1,37 @@
+// fastfetch — system info shown on new (top-level) shells.
+// https://github.com/fastfetch-cli/fastfetch/wiki/Configuration
+//
+// Deliberately doesn't hardcode any colors: fastfetch's key labels use the
+// terminal's ANSI palette, and WezTerm is set to Catppuccin Mocha
+// (see wezterm/config/appearance.lua), so this automatically matches
+// everything else without duplicating the palette here.
+//
+// Symlinked to ~/.config/fastfetch by setup.sh. Regenerate a fuller
+// reference with `fastfetch --gen-config-full` if you want to see every
+// available option.
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "small",
+    "padding": { "top": 1, "left": 2 }
+  },
+  "display": {
+    "separator": "  "
+  },
+  "modules": [
+    "title",
+    "separator",
+    "os",
+    "kernel",
+    "uptime",
+    "packages",
+    "shell",
+    "terminal",
+    "wm",
+    "cpu",
+    "memory",
+    "disk",
+    "break",
+    "colors"
+  ]
+}

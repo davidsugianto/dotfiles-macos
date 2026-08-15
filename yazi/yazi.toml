@@ -1,0 +1,18 @@
+#:schema https://yazi-rs.github.io/schemas/yazi.json
+# ==============================================================================
+# yazi.toml — only the settings that differ from yazi's built-in defaults.
+# https://yazi-rs.github.io/docs/configuration/overview
+#
+# No theme.toml here on purpose: yazi's default theme keys off the
+# terminal's ANSI palette (blue/green/magenta/etc), and WezTerm is set to
+# Catppuccin Mocha (see wezterm/config/appearance.lua) — same trick as
+# fastfetch/config.jsonc, one less palette to keep in sync by hand.
+#
+# Symlinked to ~/.config/yazi by setup.sh.
+# ==============================================================================
+
+[mgr]
+sort_by        = "alphabetical"
+sort_dir_first = true
+show_hidden    = true
+linemode       = "size"

@@ -1,0 +1,14 @@
+# ==============================================================================
+# .gitconfig-personal — loaded for repos under ~/Artifacts/labs/ (see the
+# includeIf in .gitconfig). Symlinked to ~/.gitconfig-personal by setup.sh.
+# ==============================================================================
+
+[user]
+  email = davidmufc98@gmail.com
+  name = davidsugianto
+
+[core]
+  sshCommand = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/personal.david.sugianto.pem"
+
+[url "git@github.com:davidsugianto"]
+  insteadOf = https://github.com/davidsugianto

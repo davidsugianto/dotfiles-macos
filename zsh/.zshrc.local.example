@@ -1,0 +1,12 @@
+# ==============================================================================
+# .zshrc.local.example — machine-specific overrides.
+#
+# Copy this file to ~/.zshrc.local (it is git-ignored) and put anything here
+# that shouldn't live in the shared dotfiles repo: work-specific PATH
+# entries, API tokens loaded from a secrets manager, per-machine aliases,
+# etc. It is sourced last, so anything here wins.
+# ==============================================================================
+
+# export PATH="$HOME/work/bin:$PATH"
+# export SOME_API_TOKEN="..."
+# alias workvpn="sudo openconnect vpn.example.com"

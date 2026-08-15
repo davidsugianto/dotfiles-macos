@@ -1,0 +1,12 @@
+# Machine-specific shell overrides (see zsh/.zshrc.local.example)
+.zshrc.local
+
+# macOS
+.DS_Store
+
+# Editor/tool caches that shouldn't be committed if ever created here
+*.swp
+.direnv/
+
+# Claude Code session state (not part of the dotfiles themselves)
+.claude/

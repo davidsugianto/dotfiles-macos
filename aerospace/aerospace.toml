@@ -1,0 +1,119 @@
+# ==============================================================================
+# AeroSpace — i3-style tiling window manager for macOS.
+# Docs: https://nikitabobko.github.io/AeroSpace/guide
+#
+# Symlinked to ~/.config/aerospace/aerospace.toml by setup.sh.
+# ==============================================================================
+
+# config-version 2 enables newer behaviors (e.g. explicit persistent-workspaces).
+config-version = 2
+
+# Start AeroSpace on login and reload this file automatically when it changes.
+start-at-login = true
+after-startup-command = []
+after-login-command = []
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# Notify SketchyBar whenever the focused workspace changes so the bar's
+# workspace indicator stays in sync. See sketchybar/items/aerospace.lua.
+exec-on-workspace-change = [
+  '/bin/bash', '-c',
+  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE',
+]
+
+# ------------------------------------------------------------------------------
+# Layout
+# ------------------------------------------------------------------------------
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+accordion-padding = 30
+
+[gaps]
+  inner.horizontal = 8
+  inner.vertical = 8
+  outer.left = 8
+  outer.right = 8
+  outer.top = 16   # extra breathing room below the floating SketchyBar pill
+  outer.bottom = 8
+
+# ------------------------------------------------------------------------------
+# Keybindings — i3-style: alt as the primary modifier, vim-style hjkl for
+# focus/move, numbers for workspaces.
+# ------------------------------------------------------------------------------
+[mode.main.binding]
+  # Focus movement (vim-style)
+  alt-h = 'focus left'
+  alt-j = 'focus down'
+  alt-k = 'focus up'
+  alt-l = 'focus right'
+
+  # Move the focused window
+  alt-shift-h = 'move left'
+  alt-shift-j = 'move down'
+  alt-shift-k = 'move up'
+  alt-shift-l = 'move right'
+
+  # Resize the focused window
+  alt-minus = 'resize smart -50'
+  alt-equal = 'resize smart +50'
+
+  # Layouts
+  alt-slash = 'layout tiles horizontal vertical'
+  alt-comma = 'layout accordion horizontal vertical'
+  alt-f = 'fullscreen'
+  alt-shift-space = 'layout floating tiling'
+
+  # Join windows into a container
+  alt-shift-g = 'join-with down'
+
+  # Workspaces — switch
+  alt-1 = 'workspace 1'
+  alt-2 = 'workspace 2'
+  alt-3 = 'workspace 3'
+  alt-4 = 'workspace 4'
+  alt-5 = 'workspace 5'
+  alt-6 = 'workspace 6'
+  alt-7 = 'workspace 7'
+  alt-8 = 'workspace 8'
+  alt-9 = 'workspace 9'
+
+  # Workspaces — move the focused window and follow it
+  alt-shift-1 = ['move-node-to-workspace 1', 'workspace 1']
+  alt-shift-2 = ['move-node-to-workspace 2', 'workspace 2']
+  alt-shift-3 = ['move-node-to-workspace 3', 'workspace 3']
+  alt-shift-4 = ['move-node-to-workspace 4', 'workspace 4']
+  alt-shift-5 = ['move-node-to-workspace 5', 'workspace 5']
+  alt-shift-6 = ['move-node-to-workspace 6', 'workspace 6']
+  alt-shift-7 = ['move-node-to-workspace 7', 'workspace 7']
+  alt-shift-8 = ['move-node-to-workspace 8', 'workspace 8']
+  alt-shift-9 = ['move-node-to-workspace 9', 'workspace 9']
+
+  # Jump to the previously focused workspace
+  alt-tab = 'workspace-back-and-forth'
+
+  # Monitor focus (multi-monitor setups)
+  alt-shift-comma = 'focus-monitor left'
+  alt-shift-period = 'focus-monitor right'
+
+  # Enter resize mode for repeated fine-tuning without holding modifiers
+  alt-r = 'mode resize'
+
+  # Reload config
+  alt-shift-c = 'reload-config'
+
+[mode.resize.binding]
+  h = 'resize width -50'
+  j = 'resize height +50'
+  k = 'resize height -50'
+  l = 'resize width +50'
+  enter = 'mode main'
+  esc = 'mode main'
+
+# ------------------------------------------------------------------------------
+# Per-app rules — extend this list as you find apps that should always land
+# on a specific workspace or float by default.
+# ------------------------------------------------------------------------------
+[[on-window-detected]]
+  if.app-id = 'com.apple.systempreferences'
+  run = 'layout floating'

@@ -1,0 +1,18 @@
+# ==============================================================================
+# .gitconfig-work — loaded for repos under ~/Artifacts/work/ (see the
+# includeIf in .gitconfig). Symlinked to ~/.gitconfig-work by setup.sh.
+#
+# Currently identical to .gitconfig-personal (same email/name/SSH key) other
+# than the org URL rewrite below — split these once a separate work
+# email/SSH key exists.
+# ==============================================================================
+
+[user]
+  email = davidmufc98@gmail.com
+  name = davidsugianto
+
+[core]
+  sshCommand = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/personal.david.sugianto.pem"
+
+[url "git@github.com:cekataiofficial"]
+  insteadOf = https://github.com/cekataiofficial
