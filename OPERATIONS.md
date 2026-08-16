@@ -20,6 +20,157 @@ package.
 | zsh | `exec zsh` (alias: `reload`) |
 | Starship | Auto-reloads on next prompt draw |
 
+## Modifying configs
+
+Where to make changes for the three tools people customize most often, and
+how to validate them live afterwards (per this repo's convention — don't
+just edit and assume correct).
+
+### AeroSpace
+
+- Keybindings live in `aerospace/aerospace.toml` under `[mode.main.binding]`
+  (normal mode) and `[mode.resize.binding]` (the `alt-r` resize mode). Add a
+  line like `alt-x = 'some-command'`.
+- Workspace bindings come in pairs — `alt-N = 'workspace N'` (switch) and
+  `alt-shift-N = ['move-node-to-workspace N', 'workspace N']` (move-and-follow).
+  Add both halves if you add a new workspace number, or you'll get a
+  switch with no matching move.
+- Per-app rules (float/pin an app, send it to a workspace) go in
+  `[[on-window-detected]]` blocks near the bottom of the file.
+- Reload: auto-reloads on save, or `aerospace reload-config`. Validate with
+  `aerospace list-workspaces --monitor all` or by actually triggering the
+  new binding — don't just eyeball the TOML.
+- Remember: `#` for comments, not `--` (see Known gotchas below).
+
+### tmux
+
+- Never edit `tmux.conf` itself — it's symlinked straight from the vendored
+  oh-my-tmux clone and gets overwritten on refresh. All local changes go in
+  `tmux/tmux.conf.local`. Append `#!important` to a line if you need to
+  override something `tmux.conf` sets unconditionally.
+- The top of `tmux.conf.local` sets oh-my-tmux's `tmux_conf_*` variables
+  (theme, colors, behavior toggles) — prefer setting one of those over raw
+  tmux commands if oh-my-tmux already exposes it.
+- Custom keybindings or anything oh-my-tmux doesn't expose as a variable go
+  under the `-- user customizations --` section at the bottom, in plain
+  tmux syntax (`set -g ...`, `bind ...`).
+- Reload: `tmux source-file ~/.config/tmux/tmux.conf` (alias `tmr`) — only
+  affects already-running sessions, new sessions pick it up automatically.
+  Validate by triggering the binding or checking `tmux show-options -g` in
+  a live session.
+
+### Neovim
+
+- Keymaps not tied to a specific plugin: `nvim/lua/config/keymaps.lua`.
+  Plugin-specific keymaps live inside that plugin's own spec file in
+  `nvim/lua/plugins/`, not in `keymaps.lua`.
+- New plugin: add a spec table to an existing file in `nvim/lua/plugins/`,
+  or a new file — lazy.nvim auto-loads every file that returns a spec from
+  that directory (see `nvim/lua/config/lazy.lua`). Run `:Lazy sync` to
+  install it.
+- New LSP server: add its name to `ensure_installed` in the
+  `mason-lspconfig.nvim` block of `nvim/lua/plugins/lsp.lua`, then restart
+  Neovim — mason installs it automatically. Give it non-default settings
+  via `vim.lsp.config("<server>", { ... })` in that same file's `config`
+  function (see the `lua_ls` example already there).
+- Reload: `:source $MYVIMRC` picks up `lua/config/*.lua` edits; plugin spec
+  changes (new plugin, changed `opts`) need `:Lazy sync`, not just a
+  reload. Validate with `:LspInfo` / `:Lazy` or by actually triggering the
+  new keymap, not just by re-reading the file.
+
+## Keybinding reference
+
+Current bindings as configured in this repo (not upstream defaults). If you
+add/change a binding per "Modifying configs" above, update the matching
+table here too — it drifts otherwise.
+
+### AeroSpace
+
+Modifier is `alt` throughout. Defined in `aerospace/aerospace.toml`.
+
+| Key | Action |
+|---|---|
+| `alt-h/j/k/l` | Focus left/down/up/right |
+| `alt-shift-h/j/k/l` | Move focused window left/down/up/right |
+| `alt-minus` / `alt-equal` | Resize smaller/larger |
+| `alt-slash` | Layout: tiles |
+| `alt-comma` | Layout: accordion |
+| `alt-f` | Fullscreen |
+| `alt-shift-space` | Toggle floating/tiling |
+| `alt-shift-g` | Join focused window with the one below into a container |
+| `alt-shift-t` | "Tab" with window below (join + accordion) |
+| `alt-1`…`alt-9` | Switch to workspace 1–9 |
+| `alt-shift-1`…`alt-shift-9` | Move focused window to workspace 1–9 and follow |
+| `alt-tab` | Jump to previously focused workspace |
+| `alt-shift-,` / `alt-shift-.` | Focus previous/next monitor |
+| `alt-r` | Enter resize mode |
+| `alt-shift-c` | Reload config |
+
+Resize mode (after `alt-r`): `h`/`l` width, `j`/`k` height, `enter`/`esc` back to main mode.
+
+### tmux
+
+Prefix is `C-b` (unchanged tmux default). Defined via oh-my-tmux
+(`~/.local/share/tmux/oh-my-tmux/.tmux.conf`, vendored) plus overrides in
+`tmux/tmux.conf.local`. `<prefix>` below means `C-b` first, then the key;
+`-n` means no prefix needed.
+
+| Key | Action |
+|---|---|
+| `<prefix> r` | Reload config |
+| `<prefix> e` | Edit `tmux.conf.local` in `$EDITOR`, reload on save |
+| `<prefix> -` / `_` | Split pane vertically/horizontally |
+| `<prefix> h/j/k/l` | Move to pane left/down/up/right (repeatable) |
+| `<prefix> H/J/K/L` | Resize pane (repeatable) |
+| `<prefix> >` / `<` | Swap pane with next/previous |
+| `<prefix> +` | Maximize/restore current pane |
+| `<prefix> C-h` / `C-l` | Previous/next window (repeatable) |
+| `<prefix> C-S-h` / `C-S-l` | Swap window with previous/next |
+| `<prefix> Tab` | Jump to last active window |
+| `<prefix> 0` | Select window at index 10 |
+| `<prefix> BTab` | Switch to last session |
+| `<prefix> C-c` | New session |
+| `<prefix> C-f` | Find/switch session by name |
+| `<prefix> Enter` | Enter copy mode (vi-style: `v` select, `C-v` rectangle, `y` copy+exit, `H`/`L` line start/end, `Esc` cancel) |
+| `<prefix> m` | Toggle mouse on/off |
+| `<prefix> b` / `p` / `P` | List / paste / choose paste buffer |
+| `<prefix> F` | Open pane's CWD in fpp |
+| `-n C-a` | Pass literal `C-a` through to shell (tmux prefix stays `C-b`; `C-a` is WezTerm's leader) |
+| `-n C-l` | Clear screen + scrollback |
+
+Standard unmodified tmux defaults still apply (`<prefix> c` new window,
+`<prefix> ,` rename, `<prefix> %`/`"` split, `<prefix> d` detach, `<prefix> z`
+zoom, `<prefix> :` command prompt, `<prefix> ?` list all keys).
+
+### Neovim
+
+Leader is `<space>` (`nvim/lua/config/options.lua`). Global keymaps in
+`nvim/lua/config/keymaps.lua`; plugin keymaps live next to their plugin spec.
+
+| Key | Action | Source |
+|---|---|---|
+| `<C-h/j/k/l>` | Focus window left/down/up/right | `config/keymaps.lua` |
+| `<C-Up/Down/Left/Right>` | Resize split | `config/keymaps.lua` |
+| `<S-l>` / `<S-h>` | Next/previous buffer | `config/keymaps.lua` |
+| `<leader>bd` | Delete buffer | `config/keymaps.lua` |
+| `<esc>` | Clear search highlight | `config/keymaps.lua` |
+| `<leader>w` / `<leader>q` | Save / quit | `config/keymaps.lua` |
+| `<leader>e` | Toggle file explorer (Neo-tree) | `plugins/explorer.lua` |
+| `<leader>ff/fg/fb/fh/fr` | Telescope: find files / grep / buffers / help / recent files | `plugins/telescope.lua` |
+| `]h` / `[h` | Next/previous git hunk | `plugins/git.lua` |
+| `<leader>hp/hs/hr` | Preview/stage/reset git hunk | `plugins/git.lua` |
+| `gd` / `gr` | Go to definition / references | `plugins/lsp.lua` (buffer-local, on `LspAttach`) |
+| `K` | Hover docs | `plugins/lsp.lua` |
+| `<leader>rn` | Rename symbol | `plugins/lsp.lua` |
+| `<leader>ca` | Code action | `plugins/lsp.lua` |
+| `<leader>e` | Line diagnostics | `plugins/lsp.lua` (buffer-local, on `LspAttach`) |
+
+**Known conflict:** `<leader>e` is bound twice — globally to Neo-tree toggle
+(`plugins/explorer.lua`) and buffer-locally to line diagnostics on
+`LspAttach` (`plugins/lsp.lua`). The buffer-local one wins in any buffer
+with an LSP client attached, so `<leader>e` opens diagnostics there instead
+of toggling the explorer. Not yet reconciled — rebind one if it bites you.
+
 ## Updating everything
 
 ```sh
