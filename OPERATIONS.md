@@ -68,11 +68,25 @@ just edit and assume correct).
   or a new file — lazy.nvim auto-loads every file that returns a spec from
   that directory (see `nvim/lua/config/lazy.lua`). Run `:Lazy sync` to
   install it.
-- New LSP server: add its name to `ensure_installed` in the
+- New LSP server: add its lspconfig name (not the mason package name — see
+  `:h mason-lspconfig-server-map` if the two differ, e.g. `ts_ls` vs
+  `typescript-language-server`) to `ensure_installed` in the
   `mason-lspconfig.nvim` block of `nvim/lua/plugins/lsp.lua`, then restart
-  Neovim — mason installs it automatically. Give it non-default settings
-  via `vim.lsp.config("<server>", { ... })` in that same file's `config`
+  Neovim in a **real interactive session** (see the headless gotcha below)
+  — mason installs it automatically. Give it non-default settings via
+  `vim.lsp.config("<server>", { ... })` in that same file's `config`
   function (see the `lua_ls` example already there).
+- New formatter: add it to `formatters_by_ft` in `nvim/lua/plugins/formatting.lua`
+  (conform.nvim) — the tool itself also needs adding to `ensure_installed`
+  in `nvim/lua/plugins/mason-tools.lua` unless it's the same binary an LSP
+  server already ships. Format-on-save is on by default; `<leader>cf`
+  formats manually. `:ConformInfo` shows what resolved for the current
+  buffer.
+- New linter: add it to `linters_by_ft` in `nvim/lua/plugins/linting.lua`
+  (nvim-lint) — same `mason-tools.lua` caveat as formatters. Only add a
+  linter here if the filetype's LSP server doesn't already surface the same
+  diagnostics (Python/JS/TS deliberately skip this — ruff/eslint's LSP
+  diagnostics already cover it).
 - Reload: `:source $MYVIMRC` picks up `lua/config/*.lua` edits; plugin spec
   changes (new plugin, changed `opts`) need `:Lazy sync`, not just a
   reload. Validate with `:LspInfo` / `:Lazy` or by actually triggering the
@@ -151,11 +165,15 @@ Leader is `<space>` (`nvim/lua/config/options.lua`). Global keymaps in
 |---|---|---|
 | `<C-h/j/k/l>` | Focus window left/down/up/right | `config/keymaps.lua` |
 | `<C-Up/Down/Left/Right>` | Resize split | `config/keymaps.lua` |
-| `<S-l>` / `<S-h>` | Next/previous buffer | `config/keymaps.lua` |
-| `<leader>bd` | Delete buffer | `config/keymaps.lua` |
 | `<esc>` | Clear search highlight | `config/keymaps.lua` |
 | `<leader>w` / `<leader>q` | Save / quit | `config/keymaps.lua` |
-| `<leader>e` | Toggle file explorer (Neo-tree) | `plugins/explorer.lua` |
+| `<leader>e` | Toggle file explorer (Neo-tree, auto-opens on startup too) | `plugins/explorer.lua` |
+| `<S-l>` / `<S-h>` | Next/previous buffer | `plugins/bufferline.lua` |
+| `<leader>bp` | Pick buffer | `plugins/bufferline.lua` |
+| `<leader>bd` | Delete buffer | `plugins/bufferline.lua` |
+| `<leader>;` | Pick symbol in winbar breadcrumb | `plugins/winbar.lua` |
+| `[;` / `];` | Go to / select start of enclosing context | `plugins/winbar.lua` |
+| `<leader>cf` | Format buffer (also runs automatically on save) | `plugins/formatting.lua` |
 | `<leader>ff/fg/fb/fh/fr` | Telescope: find files / grep / buffers / help / recent files | `plugins/telescope.lua` |
 | `]h` / `[h` | Next/previous git hunk | `plugins/git.lua` |
 | `<leader>hp/hs/hr` | Preview/stage/reset git hunk | `plugins/git.lua` |
@@ -179,6 +197,10 @@ brew update && brew upgrade   # alias: brewup
 
 Then, separately (these don't move with `brew upgrade`):
 - **Neovim plugins**: open nvim, `:Lazy sync`
+- **Neovim's mason-managed LSP servers**: `:Mason`, then `U` to update all
+  (or `u` on one line for just that server)
+- **Neovim's mason-managed formatters/linters** (stylua, shfmt, prettier,
+  golangci-lint, tflint, shellcheck, yamllint): `:MasonToolsUpdate`
 - **Go itself** (if you installed it): `gvm upgrade && gvm install latest`
 - **tmux/SketchyBar/oh-my-tmux vendored code**: see below, these are frozen at whatever commit `setup.sh` last cloned
 
@@ -248,6 +270,31 @@ resurface after a Homebrew self-update resets trust state), re-run
   correctly-written glyph back to the assistant is also unreliable. Hit
   this in this repo's `starship.toml`; `sketchybar/icons.lua` already used
   Lua-style `\u{XXXX}` escapes for exactly this reason.
+- **This repo deliberately uses OpenTofu (`tofu`), never HashiCorp's
+  `terraform` CLI** (BSL license — see the DevOps toolchain table in
+  README). conform.nvim's bundled `terraform_fmt` formatter hardcodes the
+  `terraform` binary, so `nvim/lua/plugins/formatting.lua` defines its own
+  `tofu_fmt` formatter (`tofu fmt` via stdin) instead of using the bundled
+  one. Anything added later that shells out to Terraform tooling should do
+  the same — point at `tofu`, not `terraform`. `terraform-ls` (the LSP
+  binary mason installs) is fine as-is; the license concern is about the
+  CLI, not the language server.
+- **`mason-lspconfig`'s `ensure_installed` auto-install is a no-op under
+  `nvim --headless`** — an intentional guard in the plugin itself
+  (`platform.is_headless`), not a bug. Headless mode also doesn't reliably
+  fire the `VimEnter` autocmd that opens Neo-tree/dropbar's winbar on
+  startup. Verify any LSP or startup-UI change in this repo via a real
+  interactive session — `tmux new-session -d -s <name> "nvim ..."`, then
+  `tmux capture-pane -p` — not headless `-c` command chains.
+- **gopls needs a newer Go than gvm's active version can sometimes hit an
+  unreachable toolchain-download error**: if `:MasonLog` shows `gopls@vX
+  requires go >= Y; switching to goY` followed by a network failure
+  fetching the Go toolchain, that's `GOTOOLCHAIN=auto` trying to
+  self-upgrade and failing — fix it at the source with `gvm install <Y>`
+  (this repo's actual Go version manager) rather than pinning an older
+  gopls. Note gvm and mason.nvim are two independent Go-tool managers here
+  (gvm's own `gvm tools init` also installs gopls/golangci-lint) — nothing
+  deduplicates between them.
 
 ## Backups
 

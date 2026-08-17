@@ -17,7 +17,7 @@ system.
 | [SketchyBar](https://github.com/FelixKratz/SketchyBar) | Status bar, configured in Lua | Live workspace indicator wired to AeroSpace's events, plus clock/battery/wifi/volume |
 | [WezTerm](https://wezterm.org) | GPU-accelerated terminal | Fast, scriptable in Lua, tmux-style pane splitting built in |
 | [tmux](https://github.com/gpakosz/.tmux) ("Oh my tmux!") | Terminal multiplexer | Sessions that survive an SSH drop or a WezTerm restart; same vim-style pane navigation as everywhere else |
-| [Neovim](https://neovim.io) | Primary text editor | LSP, Treesitter, fuzzy finding — a lean lazy.nvim setup, not a distro |
+| [Neovim](https://neovim.io) | Primary text editor | Full IDE layout (file tree, tab bar, breadcrumbs) with LSP/format/lint for Lua, Bash, C/C++, Go, Node/TS/JS, Python, YAML, JSON, and Terraform — hand-assembled via lazy.nvim, not a pre-packaged distro |
 | [Starship](https://starship.rs) | Shell prompt | Fast, minimal, easy to theme |
 | [fastfetch](https://github.com/fastfetch-cli/fastfetch) | System info on new shells | Quick at-a-glance host/CPU/memory summary, colored via the terminal's own theme |
 | [yazi](https://yazi-rs.github.io) | Terminal file manager | Fast, vim-style navigation, image previews; `y` opens it and `cd`s your shell to wherever you navigated |
@@ -48,6 +48,30 @@ development-tools.sh  Optional DevOps toolchain (see below) — layered on top o
 
 Each tool's folder is self-contained — open it, and everything relevant to
 that tool is inside.
+
+## Prerequisites
+
+A completely fresh Mac has neither `git` nor a compiler — both come from
+Xcode's Command Line Tools, which `git clone` below needs first:
+
+```sh
+xcode-select --install
+```
+
+This pops a GUI installer dialog — click through it (there's no silent
+flag). Already installed? `xcode-select -p` prints a path instead of
+erroring, so you can skip straight to Install.
+
+[Homebrew](https://brew.sh) is the only other thing this setup depends on,
+but there's no separate step for it — `setup.sh` checks for it and installs
+it automatically (`brew` already on PATH? it just skips ahead). Install it
+yourself first only if you'd rather review
+[Homebrew's install script](https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)
+before running it, or already manage it separately:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
 ## Install
 
@@ -91,7 +115,7 @@ toolchain that not everyone using this repo needs:
 |---|---|
 | [VS Code](https://code.visualstudio.com) | Editor, for the times a full IDE beats Neovim |
 | [gvm](https://gvm.sh) | Go version manager — installed via its own installer (no Homebrew formula exists), `gvm install latest` to get Go itself |
-| [OpenTofu](https://opentofu.org) / [Terragrunt](https://terragrunt.gruntwork.io) | Infrastructure as code |
+| [OpenTofu](https://opentofu.org) / [Terragrunt](https://terragrunt.gruntwork.io) | Infrastructure as code — used deliberately instead of HashiCorp's `terraform` CLI (BSL license); Neovim's Terraform formatter is wired to `tofu fmt` for the same reason |
 | [Ansible](https://www.ansible.com) | Config management (`ansible-vault` ships as a subcommand) |
 | [kubectl](https://kubernetes.io/docs/reference/kubectl/) / [kubectx](https://github.com/ahmetb/kubectx) | Kubernetes CLI + fast context/namespace switching (`kubectx`/`kubens`) |
 | [Freelens](https://freelens.app) | Kubernetes IDE — open-source Lens fork |
@@ -103,6 +127,13 @@ toolchain that not everyone using this repo needs:
 `kubectl`, `yq`, `tofu`, and `aws` completions are wired into
 `zsh/completions.zsh` automatically once those binaries are on PATH — no
 extra setup.
+
+**Neovim's language coverage needs this script too.** `setup.sh` alone gets
+you LSP/format/lint for Lua, Bash, and C/C++. Go, Node/TS/JS, Python, and
+Terraform additionally need `go` (via `gvm install latest`, above), `node`,
+and `python` on PATH before Neovim can install their language servers —
+without them, Mason logs a failed install for just those servers (`:Mason`
+or `:MasonLog` to check) and everything else keeps working.
 
 ## git identity switching
 
@@ -149,7 +180,9 @@ and `tmux/tmux.conf.local` — all commented inline.
 - **Bar items**: `sketchybar/items/` — one file per item, `items/init.lua`
   controls load/render order.
 - **Neovim plugins**: `nvim/lua/plugins/` — one file per plugin or concern,
-  auto-loaded by lazy.nvim.
+  auto-loaded by lazy.nvim. New LSP server → `plugins/lsp.lua`'s
+  `ensure_installed`; new formatter → `plugins/formatting.lua`'s
+  `formatters_by_ft`; new linter → `plugins/linting.lua`'s `linters_by_ft`.
 
 ## Operations
 
