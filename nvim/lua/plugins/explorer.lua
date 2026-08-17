@@ -11,7 +11,11 @@ return {
     "nvim-tree/nvim-web-devicons",
     "MunifTanjim/nui.nvim",
   },
-  cmd = "Neotree",
+  -- lazy = false so the tree is loaded (and shown, via the VimEnter
+  -- autocmd below) at startup rather than only on first toggle/command —
+  -- gives the "always-docked sidebar" IDE layout instead of an on-demand
+  -- panel.
+  lazy = false,
   keys = {
     { "<leader>e", "<cmd>Neotree toggle<CR>", desc = "Toggle file explorer" },
   },
@@ -21,6 +25,15 @@ return {
       follow_current_file = { enabled = true },
       hijack_netrw_behavior = "open_current",
     },
-    window = { width = 32 },
+    window = { width = 32, position = "left" },
   },
+  config = function(_, opts)
+    require("neo-tree").setup(opts)
+    vim.api.nvim_create_autocmd("VimEnter", {
+      once = true,
+      callback = function()
+        require("neo-tree.command").execute({ action = "show", position = "left" })
+      end,
+    })
+  end,
 }

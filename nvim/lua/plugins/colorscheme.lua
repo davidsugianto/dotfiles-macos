@@ -16,6 +16,7 @@ return {
       treesitter = true,
       native_lsp = { enabled = true },
       which_key = true,
+      bufferline = true,
     },
   },
   config = function(_, opts)

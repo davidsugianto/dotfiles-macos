@@ -77,6 +77,7 @@ FORMULAE=(
   gh
   lua
   tmux
+  wget # required by Mason's clangd installer (Neovim's C/C++ LSP) — no curl fallback
   zsh-autosuggestions
   zsh-syntax-highlighting
   zsh-history-substring-search

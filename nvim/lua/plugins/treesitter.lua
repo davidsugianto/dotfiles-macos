@@ -12,7 +12,8 @@ local ensure_installed = {
   "markdown", "markdown_inline",
   "json", "toml", "yaml",
   "python", "javascript", "typescript", "tsx",
-  "go", "rust",
+  "go", "rust", "c", "cpp",
+  "terraform", "hcl", "dockerfile",
 }
 
 return {
