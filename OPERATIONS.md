@@ -233,6 +233,21 @@ resurface after a Homebrew self-update resets trust state), re-run
   `font = "sketchybar-app-font:Regular:12.0"`, not
   `font = { family = "..." }` — the table form silently renders literal
   `:app_name:` text instead of the icon glyph.
+- **A Claude Code session typing a literal Nerd Font Private-Use-Area glyph
+  into a file via Write/Edit can silently drop the character**, with no
+  error — the file ends up with an empty `""`/`[]` where the icon should
+  be. Affects the older 3-byte BMP PUA range (U+E000–U+F8FF: Powerline
+  separators U+E0B0–U+E0B7, Devicons/FontAwesome icons like git-branch
+  U+E725 or Node.js U+E718). Newer 4-byte Supplementary-PUA-A icons
+  (Material Design Icons, used elsewhere in `starship.toml`'s
+  `[os.symbols]`/`[time]`) are *not* affected. Workaround: write it as a
+  TOML `\uXXXX` escape (4 hex digits, no braces) instead of the literal
+  character — verify with
+  `python3 -c "import tomllib; print(tomllib.load(open('starship.toml','rb')))"`
+  or a hexdump, not by eyeballing the file, since displaying a
+  correctly-written glyph back to the assistant is also unreliable. Hit
+  this in this repo's `starship.toml`; `sketchybar/icons.lua` already used
+  Lua-style `\u{XXXX}` escapes for exactly this reason.
 
 ## Backups
 

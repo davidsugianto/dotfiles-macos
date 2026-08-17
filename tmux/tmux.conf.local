@@ -44,6 +44,7 @@ tmux_conf_theme_colour_2="#45475a"   # surface1   — pane borders / secondary b
 tmux_conf_theme_colour_3="#7f849c"   # overlay1   — muted status text
 tmux_conf_theme_colour_4="#cba6f7"   # mauve      — accent (matches borders/bordersrc active_color)
 tmux_conf_theme_colour_5="#f9e2af"   # yellow     — messages / mode highlight
+tmux_conf_theme_colour_6="#f5e0dc"   # rosewater  — active-window pill (matches WezTerm's cursor color)
 tmux_conf_theme_colour_9="#89b4fa"   # blue — pane border while in copy mode
 tmux_conf_theme_colour_16="#f38ba8"  # red  — pane border while panes are synchronized
 
@@ -92,9 +93,11 @@ tmux_conf_theme_window_status_bg="$tmux_conf_theme_colour_1"
 tmux_conf_theme_window_status_attr="none"
 tmux_conf_theme_window_status_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
 
-# current window — mauve, matching the JankyBorders active-window color
+# current window — rosewater pink, matching WezTerm's cursor color. Pane
+# borders (above) stay mauve, matching JankyBorders' active-window color —
+# this is a deliberate, tmux-only accent, not a full-theme swap.
 tmux_conf_theme_window_status_current_fg="$tmux_conf_theme_colour_1"
-tmux_conf_theme_window_status_current_bg="$tmux_conf_theme_colour_4"
+tmux_conf_theme_window_status_current_bg="$tmux_conf_theme_colour_6"
 tmux_conf_theme_window_status_current_attr="bold"
 tmux_conf_theme_window_status_current_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
 
@@ -106,15 +109,19 @@ tmux_conf_theme_window_status_bell_fg="$tmux_conf_theme_colour_5"
 tmux_conf_theme_window_status_bell_bg="default"
 tmux_conf_theme_window_status_bell_attr="blink,bold"
 
-tmux_conf_theme_window_status_last_fg="$tmux_conf_theme_colour_4"
+tmux_conf_theme_window_status_last_fg="$tmux_conf_theme_colour_6"
 tmux_conf_theme_window_status_last_bg="$tmux_conf_theme_colour_2"
 tmux_conf_theme_window_status_last_attr="none"
 
-# No separators — single flat segment on each side, nothing to divide.
-tmux_conf_theme_left_separator_main=""
-tmux_conf_theme_left_separator_sub=""
-tmux_conf_theme_right_separator_main=""
-tmux_conf_theme_right_separator_sub=""
+# Powerline chevron (U+E0B0) between window pills — same separator
+# glyph as the starship prompt. Written here as the actual character
+# (not a \uXXXX escape) since oh-my-tmux's _decode_unicode_escapes
+# only fires on a literal backslash-u pattern — see OPERATIONS.md's
+# Nerd Font PUA gotcha for why raw glyphs are risky to type directly.
+tmux_conf_theme_left_separator_main=""
+tmux_conf_theme_left_separator_sub="|"
+tmux_conf_theme_right_separator_main=""
+tmux_conf_theme_right_separator_sub="|"
 
 # Left: session name only. Right: a clock, plus remote hostname when
 # you're actually SSH'd somewhere (the one thing SketchyBar can't tell you).

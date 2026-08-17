@@ -1,31 +1,44 @@
 # ==============================================================================
-# Starship prompt — minimal, single-line, Catppuccin Mocha colors to match
-# WezTerm/Neovim/SketchyBar/JankyBorders.
+# Starship prompt — Catppuccin Mocha powerline: connected pill segments
+# (os/user → directory → git → runtime versions → time), matching
+# WezTerm/Neovim/SketchyBar/JankyBorders' theme.
 # https://starship.rs/config/
+#
+# Requires a Nerd Font (already the default in wezterm/config/fonts.lua) for
+# the powerline separator glyphs and module icons to render correctly.
 #
 # Symlinked to ~/.config/starship.toml by setup.sh.
 # ==============================================================================
 
 "$schema" = 'https://starship.rs/config-schema.json'
 
+palette = "catppuccin_mocha"
+
 format = """
+[](fg:red)\
+$os\
+$username\
+[](bg:peach fg:red)\
 $directory\
-$shell\
+[](bg:green fg:peach)\
 $git_branch\
 $git_status\
-$package\
+[](bg:teal fg:green)\
 $nodejs\
 $python\
 $rust\
 $golang\
-$terraform\
 $lua\
+$terraform\
+$package\
+[](bg:lavender fg:teal)\
+$time\
+[](fg:lavender)\
 $cmd_duration\
 $line_break\
 $character"""
 
 add_newline = true
-palette = "catppuccin_mocha"
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
@@ -42,76 +55,85 @@ text = "#cdd6f4"
 subtext0 = "#a6adc8"
 overlay0 = "#6c7086"
 surface1 = "#45475a"
+crust = "#11111b"
 
 [character]
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
 vimcmd_symbol = "[❮](mauve)"
 
+[os]
+disabled = false
+style = "bg:red fg:crust"
+
+[os.symbols]
+Macos = "󰀵"
+
+[username]
+show_always = true
+style_user = "bg:red fg:crust"
+style_root = "bg:red fg:crust"
+format = "[ $user ]($style)"
+
 [directory]
-style = "blue bold"
-truncation_length = 3
+style = "bg:peach fg:crust"
+format = "[ $path ]($style)"
+truncation_length = 1
 truncate_to_repo = true
+truncation_symbol = "…/"
 read_only = " 󰌾"
 
-# Disabled by default upstream — shows which shell you're in (zsh/bash/...),
-# muted since this repo is zsh-only day-to-day and it's context, not a flag.
-[shell]
-disabled = false
-style = "overlay0"
-format = "[$indicator]($style) "
-
 [git_branch]
-style = "mauve"
-symbol = " "
-format = "on [$symbol$branch]($style) "
+style = "bg:green fg:crust"
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "peach"
-format = "([\\[$all_status$ahead_behind\\]]($style) )"
+style = "bg:green fg:crust"
+format = "[($all_status$ahead_behind )]($style)"
 
 [cmd_duration]
 min_time = 2000
 style = "overlay0"
-format = "[$duration]($style) "
+format = " [$duration]($style) "
 
 [nodejs]
-symbol = " "
-style = "green"
-format = "via [$symbol$version]($style) "
+style = "bg:teal fg:crust"
+format = "[ $symbol($version) ]($style)"
 
 [python]
-symbol = " "
-style = "yellow"
-format = "via [$symbol$version]($style) "
+style = "bg:teal fg:crust"
+format = "[ $symbol($version) ]($style)"
 
 [rust]
-symbol = " "
-style = "peach"
-format = "via [$symbol$version]($style) "
+style = "bg:teal fg:crust"
+format = "[ $symbol($version) ]($style)"
 
 [golang]
-symbol = " "
-style = "sky"
-format = "via [$symbol$version]($style) "
+style = "bg:teal fg:crust"
+format = "[ $symbol($version) ]($style)"
 
 [lua]
-symbol = " "
-style = "blue"
-format = "via [$symbol$version]($style) "
+style = "bg:teal fg:crust"
+format = "[ $symbol($version) ]($style)"
 
 # HCL — OpenTofu/Terraform, triggered by .tf/.tfplan/.tfstate files or a
 # .terraform folder. Shows the workspace, not the version (version detection
 # is slow with a lot of provider plugins installed — see starship docs).
 [terraform]
-symbol = "💠 "
-style = "lavender"
-format = "via [$symbol$workspace]($style) "
+symbol = "💠"
+style = "bg:teal fg:crust"
+format = "[ $symbol( $workspace) ]($style)"
 
 [package]
-symbol = " " # cube — same glyph as sketchybar's Homebrew badge
-style = "peach"
-format = "is [$symbol$version]($style) "
+symbol = "" # cube — same glyph as sketchybar's Homebrew badge (sketchybar/icons.lua)
+style = "bg:teal fg:crust"
+format = "[ $symbol( $version) ]($style)"
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:lavender fg:crust"
+format = "[ 󰥔 $time ]($style)"
 
 [aws]
 disabled = true

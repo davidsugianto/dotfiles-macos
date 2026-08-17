@@ -36,7 +36,16 @@ function M.apply_to_config(config)
   config.macos_window_background_blur = 20
 
   config.cursor_blink_rate = 0
-  config.default_cursor_style = "SteadyBlock"
+  config.default_cursor_style = "SteadyBar"
+
+  -- Rosewater (Catppuccin Mocha's pale pink) cursor, explicit rather than
+  -- relying on the builtin scheme — matches the rest of the repo's
+  -- hand-rolled-hex-values convention.
+  config.colors = {
+    cursor_bg = "#f5e0dc",
+    cursor_border = "#f5e0dc",
+    cursor_fg = "#1e1e2e",
+  }
 
   config.enable_scroll_bar = false
 end
