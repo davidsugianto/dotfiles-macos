@@ -15,52 +15,29 @@ so this file stays a snapshot of what's in flight, not an ever-growing log.
 ## Repo state as of last update
 
 - Remote: `github.com/davidsugianto/dotfiles-macos` (public). Local `main`
-  is even with `origin/main` through commit `79737e7` — nothing below has
-  been pushed.
-- **Uncommitted changes** (repo convention: only commit when asked) — a
-  multi-session push turning Neovim into a full IDE, plus the doc/install
-  updates to match:
-  - `nvim/lua/plugins/explorer.lua`, `bufferline.lua` (new),
-    `winbar.lua` (new), `colorscheme.lua` — Neo-tree now auto-opens on
-    startup docked left, bufferline tab bar added, dropbar.nvim breadcrumb
-    winbar added.
-  - `nvim/lua/plugins/lsp.lua`, `treesitter.lua`, `formatting.lua` (new),
-    `linting.lua` (new), `mason-tools.lua` (new) — full LSP/format/lint for
-    Lua, Bash, C/C++, Go, Node/TS/JS, Python, YAML, JSON, Terraform. All
-    verified installed and attaching correctly via real interactive tmux
-    sessions (see OPERATIONS.md's headless-mode gotcha for why not
-    headless).
-  - `nvim/lua/config/keymaps.lua` — buffer-cycling keymaps moved into
-    `plugins/bufferline.lua`, removed the duplicates here.
-  - `setup.sh` — added `wget` to the base formula list (mason's clangd
-    installer hard-requires it, no curl fallback; this was missing and
-    would silently fail clangd installs on a fresh clone).
-  - `README.md`, `OPERATIONS.md` — updated to describe the IDE setup, the
-    OpenTofu-not-Terraform / Go-runtime prerequisites for the new language
-    servers, the current keybinding table, and the new gotchas below. Also
-    added a `## Prerequisites` section ahead of Install: `xcode-select
-    --install` (Command Line Tools) is the actual first step on a
-    completely fresh Mac — `git clone` (the first command Install itself
-    tells you to run) doesn't work without it. Homebrew is documented there
-    too, but as optional/FYI, not a required manual step — `setup.sh`
-    already installs it automatically if missing, so telling readers to
-    install it by hand would've contradicted that.
-  - This is intended as a finalized, coherent state — not mid-refactor.
-- System-level changes made on **this machine** to support the above (not
-  tracked in git, so a fresh machine won't have them until it hits the same
-  wall and needs the same fix — `wget` is now in `setup.sh` so that part
-  self-heals, but Go's version doesn't):
-  - Installed Go 1.26.6 via `gvm` and made it active (gopls needs it;
+  is even with `origin/main` through commit `9745e0b` — pushed, working
+  tree clean, nothing in flight.
+- What landed in the last two commits (`cd7c554`, `9745e0b`): turned
+  Neovim into a full IDE — Neo-tree (auto-opens on startup, docked left),
+  bufferline tab bar, dropbar.nvim breadcrumb winbar, and mason-managed
+  LSP/format/lint for Lua, Bash, C/C++, Go, Node/TS/JS, Python, YAML,
+  JSON, and Terraform (Terraform tooling targets `tofu`, not `terraform` —
+  see OPERATIONS.md's gotcha). `setup.sh` gained a `wget` dependency
+  (mason's clangd installer needs it) and a `## Prerequisites` section
+  (Xcode Command Line Tools, Homebrew as optional/FYI). Full detail is in
+  `git log -p cd7c554 9745e0b` / the commit messages themselves — not
+  worth re-duplicating here now that it's shipped; see OPERATIONS.md for
+  the permanent version (keybindings, gotchas, update commands).
+- System-level changes made on **this machine** that git doesn't track (a
+  fresh machine won't have them until it hits the same wall and fixes it
+  the same way — `wget` now self-heals via `setup.sh`, but the Go version
+  doesn't):
+  - Go 1.26.6 installed via `gvm` and made active (gopls needs it;
     go1.25.0 is still installed too — `gvm use 1.25.0` to switch back).
-  - Installed `wget` via brew directly (now redundant with the `setup.sh`
-    change above, just documenting that this machine already has it).
 
 ## Open items / unanswered questions
 
-- None currently open. Everything from this session's language-support work
-  landed and was verified; the docs were updated to match. Next natural
-  step, if the user wants it, is committing — ask first per this repo's
-  convention.
+- None currently open.
 
 ## Standing conventions this repo follows
 
