@@ -93,6 +93,43 @@ alias gr='git restore'
 alias grs='git restore --staged'
 
 # ------------------------------------------------------------------------------
+# kubectl
+# ------------------------------------------------------------------------------
+if command -v kubectl >/dev/null 2>&1; then
+  alias k='kubectl'
+  alias kg='kubectl get'
+  alias kgp='kubectl get pods'
+  alias kgpw='kubectl get pods -o wide'
+  alias kgs='kubectl get svc'
+  alias kgd='kubectl get deployments'
+  alias kga='kubectl get all'
+  alias kgn='kubectl get nodes'
+  alias kgns='kubectl get namespaces'
+  alias kd='kubectl describe'
+  alias kdp='kubectl describe pod'
+  alias kds='kubectl describe svc'
+  alias kdd='kubectl describe deployment'
+  alias kl='kubectl logs'
+  alias klf='kubectl logs -f'
+  alias ke='kubectl exec -it'
+  alias kaf='kubectl apply -f'
+  alias kdf='kubectl delete -f'
+  alias kdel='kubectl delete'
+  alias krr='kubectl rollout restart'
+  alias krs='kubectl rollout status'
+  alias kgc='kubectl config get-contexts'
+  alias kuc='kubectl config use-context'
+fi
+
+if command -v kubectx >/dev/null 2>&1; then
+  alias kctx='kubectx'
+fi
+
+if command -v kubens >/dev/null 2>&1; then
+  alias kns='kubens'
+fi
+
+# ------------------------------------------------------------------------------
 # Aerospace / Borders / SketchyBar — reload the window-management stack
 # ------------------------------------------------------------------------------
 if command -v aerospace >/dev/null 2>&1; then

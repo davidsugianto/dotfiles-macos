@@ -45,9 +45,21 @@ unset tool generator
 
 fpath=("$ZSH_COMPLETION_CACHE" $fpath)
 
-# Re-index completions picked up above. Cheap relative to a full compinit
-# security audit, which already ran earlier in .zshrc.
-autoload -Uz compinit && compinit -C
+# Register the completions generated above. NOTE: this deliberately does NOT
+# call `compinit -C` again — `compinit` was already run once in .zshrc, and a
+# second call (even with -C) re-sources the on-disk completion dump wholesale
+# and silently drops entries for tools that weren't in that dump when it was
+# last written (kubectl and docker were observed disappearing this way).
+# Each generated script embeds its own `compdef _<tool> <tool>` call, so
+# sourcing it directly registers it in $_comps without touching the dump.
+local f
+for f in "$ZSH_COMPLETION_CACHE"/_*(N); do
+  source "$f"
+done
+unset f
+
+# Extend generated completions to short aliases (see zsh/aliases.zsh).
+command -v kubectl >/dev/null 2>&1 && compdef k=kubectl
 
 # ------------------------------------------------------------------------------
 # "complete -C" style completions — terraform/tofu and awscli generate their
