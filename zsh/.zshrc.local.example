@@ -10,3 +10,7 @@
 # export PATH="$HOME/work/bin:$PATH"
 # export SOME_API_TOKEN="..."
 # alias workvpn="sudo openconnect vpn.example.com"
+
+# --- opencode / office LLM gateway -----------------------------------------
+# Read by the "cekat" provider in opencode/opencode.json (repo-tracked).
+# export CEKAT_API_KEY="sk-..."

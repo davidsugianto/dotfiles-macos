@@ -30,6 +30,14 @@ fi
 
 export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 
+# Homebrew's gcloud-cli cask only symlinks gcloud/gsutil/bq into PATH — extra
+# components installed via `gcloud components install` (e.g.
+# gke-gcloud-auth-plugin, required for kubectl to auth against GKE) land here
+# instead and need this directory added manually, per the cask's own caveat.
+if [[ -d /opt/homebrew/share/google-cloud-sdk/bin ]]; then
+  export PATH="/opt/homebrew/share/google-cloud-sdk/bin:$PATH"
+fi
+
 # ------------------------------------------------------------------------------
 # History
 # ------------------------------------------------------------------------------

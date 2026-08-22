@@ -31,6 +31,7 @@ step "Installing DevOps CLI tools"
 FORMULAE=(
   kubernetes-cli   # kubectl
   kubectx          # also installs kubens
+  k9s
   lazygit
   jq
   yq
@@ -92,6 +93,19 @@ for cask in "${CASKS[@]}"; do
 done
 
 # ------------------------------------------------------------------------------
+# gke-gcloud-auth-plugin — kubectl needs this to authenticate against GKE
+# clusters; client-go dropped its built-in GCP auth provider, so GKE now
+# requires this plugin (gcloud SDK 363.0.0+ / GKE 1.26+).
+# ------------------------------------------------------------------------------
+step "Installing gke-gcloud-auth-plugin"
+if command -v gke-gcloud-auth-plugin >/dev/null 2>&1; then
+  skip "gke-gcloud-auth-plugin already installed"
+else
+  gcloud components install gke-gcloud-auth-plugin --quiet
+  ok "gke-gcloud-auth-plugin installed"
+fi
+
+# ------------------------------------------------------------------------------
 # gvm — Go version manager. https://gvm.sh
 # Installed via its own installer rather than Homebrew (no formula for it);
 # GVM_NO_MODIFY=1 stops the installer from editing ~/.zshrc itself — the
@@ -115,3 +129,4 @@ echo "  New shell tools are on PATH now; open a new terminal to pick them up."
 echo "  Get Go itself with:  gvm install latest && gvm tools init"
 echo "  kubectl/yq/aws/tofu completions are wired in zsh/completions.zsh."
 echo "  Colima doesn't autostart — run 'colima start' to bring up the docker daemon."
+echo "  'gcloud auth login' + 'gcloud container clusters get-credentials' set up kubectl for GKE."

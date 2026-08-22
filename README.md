@@ -23,7 +23,7 @@ system.
 | [yazi](https://yazi-rs.github.io) | Terminal file manager | Fast, vim-style navigation, image previews; `y` opens it and `cd`s your shell to wherever you navigated |
 | [htop](https://htop.dev) / [btop](https://github.com/aristocratos/btop) | Process monitors | `htop` for the classic view, `btop` (aliased over `top`) for the fuller dashboard — kept both since they cover different moments |
 | [Claude Code](https://claude.com/product/claude-code) | AI coding agent CLI | `claude` in any project directory |
-| [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story |
+| [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story; themed Catppuccin Mocha (transparent), matching WezTerm/Neovim/k9s (`opencode/`); also configured with a custom "cekat" provider (office LLM gateway) — its API key is read from `$CEKAT_API_KEY`, set in the git-ignored `~/.zshrc.local`, never committed |
 | git + [delta](https://dandavison.github.io/delta) | Version control, syntax-highlighted diffs | Identity/SSH key auto-switches by directory — see below |
 | zsh (no framework) | Shell | Organized, commented, no oh-my-zsh overhead — installed via Homebrew for a newer version than the one macOS ships |
 
@@ -38,6 +38,8 @@ tmux/          tmux.conf.local — customization layer for the vendored "Oh my t
 nvim/          Neovim config (lazy.nvim)
 fastfetch/     System info shown on new top-level shells
 yazi/          Terminal file manager config
+k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
+opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
@@ -118,10 +120,11 @@ toolchain that not everyone using this repo needs:
 | [OpenTofu](https://opentofu.org) / [Terragrunt](https://terragrunt.gruntwork.io) | Infrastructure as code — used deliberately instead of HashiCorp's `terraform` CLI (BSL license); Neovim's Terraform formatter is wired to `tofu fmt` for the same reason |
 | [Ansible](https://www.ansible.com) | Config management (`ansible-vault` ships as a subcommand) |
 | [kubectl](https://kubernetes.io/docs/reference/kubectl/) / [kubectx](https://github.com/ahmetb/kubectx) | Kubernetes CLI + fast context/namespace switching (`kubectx`/`kubens`) |
+| [k9s](https://k9scli.io) | Terminal Kubernetes UI — themed Catppuccin Mocha (transparent), matching WezTerm/Neovim (`k9s/`) |
 | [Freelens](https://freelens.app) | Kubernetes IDE — open-source Lens fork |
 | [lazygit](https://github.com/jesseduffield/lazygit) | Terminal git UI |
 | [jq](https://jqlang.org) / [yq](https://github.com/mikefarah/yq) | JSON / YAML processors |
-| [Google Cloud CLI](https://cloud.google.com/cli) / [AWS CLI v2](https://aws.amazon.com/cli) | `gcloud`/`gsutil`/`bq` and `aws` |
+| [Google Cloud CLI](https://cloud.google.com/cli) / [AWS CLI v2](https://aws.amazon.com/cli) | `gcloud`/`gsutil`/`bq` and `aws` — `gke-gcloud-auth-plugin` is installed alongside gcloud (`kubectl` needs it to auth against GKE clusters) |
 | [Python](https://www.python.org) / [Node](https://nodejs.org) / [pnpm](https://pnpm.io) | Runtimes — `npm` ships with Node |
 
 `kubectl`, `yq`, `tofu`, and `aws` completions are wired into

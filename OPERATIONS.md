@@ -286,6 +286,38 @@ resurface after a Homebrew self-update resets trust state), re-run
   startup. Verify any LSP or startup-UI change in this repo via a real
   interactive session — `tmux new-session -d -s <name> "nvim ..."`, then
   `tmux capture-pane -p` — not headless `-c` command chains.
+- **Never call `compinit` a second time in `zsh/completions.zsh`** — it used
+  to run `compinit -C` there (after adding `$ZSH_COMPLETION_CACHE` to
+  `fpath`) to pick up the newly-generated completion scripts. That silently
+  re-sources the on-disk completion dump from `.zshrc`'s earlier full
+  `compinit` call and drops any tool not already in that (possibly stale)
+  dump — `kubectl` and `docker` completions were observed vanishing this way
+  while `gh`/`git` survived, with no error printed. Fixed by sourcing each
+  generated `$ZSH_COMPLETION_CACHE/_<tool>` file directly instead (each one
+  embeds its own `compdef _<tool> <tool>` call, so it self-registers without
+  touching the dump). If completions for a tool in `_completion_generators`
+  silently stop working, check that this file hasn't grown a second
+  `compinit` call before assuming the generator itself is broken.
+- **Homebrew's `gcloud-cli` cask only symlinks `gcloud`/`gsutil`/`bq`** into
+  `/opt/homebrew/bin`. Anything installed afterwards via
+  `gcloud components install` (e.g. `gke-gcloud-auth-plugin`, which
+  `kubectl` needs to auth against GKE) lands in
+  `/opt/homebrew/share/google-cloud-sdk/bin` instead and won't resolve on
+  PATH — this is the cask's own documented caveat (`brew info --cask
+  gcloud-cli`), not a bug. `.zshrc` adds that directory to PATH (guarded on
+  it existing) specifically so newly-installed components work without
+  another manual PATH edit.
+- **Never symlink a tool's whole config directory in `setup.sh` if that
+  tool writes its own runtime state into it** — k9s does this (auto-creates
+  `aliases.yaml`, `hotkeys.yaml`, `plugins.yaml`, `jumps.yaml` on demand),
+  and opencode does too (`opencode.jsonc`, `.gitignore`, session/auth
+  state). Symlinking the whole dir means those land straight in this
+  git-tracked repo the moment the tool runs — silently, no error, easy to
+  miss until `git status` shows a file that appeared on its own. Instead,
+  symlink only the specific file(s)/subdir(s) this repo actually owns
+  (`k9s/config.yaml` + `k9s/skins/`, `opencode/tui.json` +
+  `opencode/themes/` + `opencode/opencode.json`) into the real
+  `~/.config/<tool>` directory, and leave the rest of that directory alone.
 - **gopls needs a newer Go than gvm's active version can sometimes hit an
   unreachable toolchain-download error**: if `:MasonLog` shows `gopls@vX
   requires go >= Y; switching to goY` followed by a network failure

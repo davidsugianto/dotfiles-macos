@@ -1,0 +1,10 @@
+# ==============================================================================
+# config.yaml — k9s settings.
+# Transparent Catppuccin Mocha, matching WezTerm's translucent window
+# (wezterm/config/appearance.lua) and Neovim's colorscheme
+# (nvim/lua/plugins/colorscheme.lua) — the terminal's own blur/opacity shows
+# through instead of k9s painting an opaque background.
+# ==============================================================================
+k9s:
+  ui:
+    skin: catppuccin-mocha-transparent
