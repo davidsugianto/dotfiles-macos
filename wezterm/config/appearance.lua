@@ -32,7 +32,7 @@ function M.apply_to_config(config)
 
   -- Subtle translucency to match the restrained desktop aesthetic; set to
   -- 1.0 if your GPU/battery would rather not blur.
-  config.window_background_opacity = 0.96
+  config.window_background_opacity = 0.85
   config.macos_window_background_blur = 20
 
   config.cursor_blink_rate = 0
