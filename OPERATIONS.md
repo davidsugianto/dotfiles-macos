@@ -119,6 +119,12 @@ Modifier is `alt` throughout. Defined in `aerospace/aerospace.toml`.
 | `alt-shift-,` / `alt-shift-.` | Focus previous/next monitor |
 | `alt-r` | Enter resize mode |
 | `alt-shift-c` | Reload config |
+| `alt-shift-w` | Launch WezTerm |
+| `alt-shift-b` | Launch Zen Browser |
+| `alt-shift-v` | Launch VS Code |
+| `alt-shift-s` | Launch Slack |
+| `alt-shift-f` | Launch Freelens |
+| `alt-shift-p` | Launch Spotify |
 
 Resize mode (after `alt-r`): `h`/`l` width, `j`/`k` height, `enter`/`esc` back to main mode.
 

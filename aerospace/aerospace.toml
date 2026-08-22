@@ -109,6 +109,14 @@ accordion-padding = 30
   # Reload config
   alt-shift-c = 'reload-config'
 
+  # App launchers
+  alt-shift-w = ['exec-and-forget open -a WezTerm']
+  alt-shift-b = ['exec-and-forget open -a Zen']
+  alt-shift-v = ['exec-and-forget open -a "Visual Studio Code"']
+  alt-shift-s = ['exec-and-forget open -a Slack']
+  alt-shift-f = ['exec-and-forget open -a Freelens']
+  alt-shift-p = ['exec-and-forget open -a Spotify']
+
 [mode.resize.binding]
   h = 'resize width -50'
   j = 'resize height +50'
