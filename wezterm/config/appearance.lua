@@ -13,7 +13,7 @@ function M.apply_to_config(config)
     "JetBrainsMono Nerd Font",
     "SF Mono",
   })
-  config.font_size = 13.5
+  config.font_size = 11
   config.line_height = 1.1
 
   -- Minimal chrome: no native title bar, no fat tab bar when there's only
