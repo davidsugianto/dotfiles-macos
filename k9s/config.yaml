@@ -8,3 +8,7 @@
 k9s:
   ui:
     skin: catppuccin-mocha-transparent
+  logger:
+    # Wrap long log lines onto new lines instead of truncating/scrolling
+    # horizontally off-screen (toggle at runtime with 'w' in the logs view).
+    textWrap: true

@@ -49,3 +49,9 @@ opt.completeopt = { "menu", "menuone", "noselect" }
 opt.pumheight = 12
 
 opt.mouse = "a"
+
+-- Folding — treesitter provides the fold expr (plugins/treesitter.lua), but
+-- leaves foldlevel at its 0 default, which closes every fold on open (e.g.
+-- Terragrunt HCL collapsing to "N lines: include {..."). Start files fully
+-- unfolded; za/zc/zM etc. still work manually.
+opt.foldlevelstart = 99

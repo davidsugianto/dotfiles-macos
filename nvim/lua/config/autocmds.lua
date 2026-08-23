@@ -30,3 +30,44 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
   command = [[%s/\s\+$//e]],
 })
+
+-- Neovim's persistent-undo filenames are the buffer's absolute path with
+-- every '/' turned into '%' (see :h undodir) — no truncation. This user's
+-- terragrunt trees nest deep enough (org/env/folder/project/...) that the
+-- escaped name routinely exceeds APFS's 255-byte filename limit, which
+-- fails with E828 on every save. For those paths only, skip the native
+-- undofile and persist under a fixed-length sha256 hash instead.
+local function undo_path_too_long(path)
+  return path ~= "" and #path > 240
+end
+
+local function hashed_undo_file(path)
+  local dir = vim.split(vim.o.undodir, ",")[1]
+  return dir .. "/hashed-" .. vim.fn.sha256(path)
+end
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+  group = augroup,
+  callback = function(args)
+    local path = vim.api.nvim_buf_get_name(args.buf)
+    if vim.bo[args.buf].buftype ~= "" or not undo_path_too_long(path) then
+      return
+    end
+    vim.bo[args.buf].undofile = false
+    local undo_file = hashed_undo_file(path)
+    if vim.fn.filereadable(undo_file) == 1 then
+      vim.cmd("silent! rundo " .. vim.fn.fnameescape(undo_file))
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufWritePost", {
+  group = augroup,
+  callback = function(args)
+    local path = vim.api.nvim_buf_get_name(args.buf)
+    if vim.bo[args.buf].buftype ~= "" or not undo_path_too_long(path) then
+      return
+    end
+    vim.cmd("silent! wundo! " .. vim.fn.fnameescape(hashed_undo_file(path)))
+  end,
+})
