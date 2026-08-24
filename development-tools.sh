@@ -35,6 +35,7 @@ FORMULAE=(
   lazygit
   jq
   yq
+  grpcurl
   opentofu         # tofu — Terraform-compatible, open source
   terragrunt
   ansible          # ansible-vault ships as a subcommand, not a separate package
