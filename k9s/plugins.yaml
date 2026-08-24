@@ -1,0 +1,29 @@
+# ==============================================================================
+# plugins.yaml — custom k9s keybindings that shell out to external tools.
+# Symlinked to ~/.config/k9s/plugins.yaml by setup.sh.
+# https://k9scli.io/topics/plugins/
+# ==============================================================================
+plugins:
+  # Split a new WezTerm pane under the current one, in the current working
+  # directory, ready to run kubectl (apply, etc.) against whatever context/
+  # namespace k9s is currently pointed at — k9s writes its active context
+  # back to ~/.kube/config on every switch, so a plain `kubectl` in the new
+  # pane already targets it; this just saves alt-tabbing to a terminal.
+  wezterm-pane:
+    shortCut: Ctrl-T
+    confirm: false
+    description: "New WezTerm pane (current context)"
+    scopes:
+      - all
+    command: wezterm
+    background: true
+    args:
+      - cli
+      - split-pane
+      - --bottom
+      - --percent
+      - "30"
+      - --
+      - zsh
+      - -ic
+      - 'echo "context: $(kubectl config current-context)  namespace: $(kubectl config view --minify -o jsonpath="{..namespace}")"; exec zsh'
