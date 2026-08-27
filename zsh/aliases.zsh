@@ -150,6 +150,19 @@ if command -v tmux >/dev/null 2>&1; then
 fi
 
 # ------------------------------------------------------------------------------
+# Colima — container runtime (Docker Desktop alternative)
+# vz + virtiofs is the fast path on Apple Silicon (replaces the default
+# qemu+sshfs, which is noticeably slower to boot and for filesystem I/O);
+# 2 CPU / 2GiB / 20GB is a light footprint, plenty for local dev/testing.
+# ------------------------------------------------------------------------------
+if command -v colima >/dev/null 2>&1; then
+  alias cstart='colima start --cpu 2 --memory 2 --disk 20 --vm-type vz --mount-type virtiofs'
+  alias cstop='colima stop'
+  alias crestart='colima restart'
+  alias cstatus='colima status'
+fi
+
+# ------------------------------------------------------------------------------
 # Misc
 # ------------------------------------------------------------------------------
 alias reload='exec zsh'
