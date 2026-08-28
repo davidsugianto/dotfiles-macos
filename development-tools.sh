@@ -81,8 +81,9 @@ fi
 step "Installing GUI apps (casks)"
 CASKS=(
   visual-studio-code
-  gcloud-cli   # gcloud, gsutil, bq
-  freelens     # open-source Lens fork — Kubernetes IDE
+  gcloud-cli         # gcloud, gsutil, bq
+  freelens           # open-source Lens fork — Kubernetes IDE
+  dbeaver-community  # database desktop client
 )
 for cask in "${CASKS[@]}"; do
   if brew list --cask "$cask" &>/dev/null; then
