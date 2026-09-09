@@ -85,6 +85,8 @@ CASKS=(
   gcloud-cli         # gcloud, gsutil, bq
   freelens           # open-source Lens fork — Kubernetes IDE
   dbeaver-community  # database desktop client
+  httpie-desktop     # GUI companion to the `http`/`https` CLI above
+  apidog             # API development platform — design, mock, test, doc
 )
 for cask in "${CASKS[@]}"; do
   if brew list --cask "$cask" &>/dev/null; then
