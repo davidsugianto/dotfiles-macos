@@ -36,6 +36,7 @@ FORMULAE=(
   jq
   yq
   grpcurl
+  httpie           # `http`/`https` — friendlier curl for API testing
   opentofu         # tofu — Terraform-compatible, open source
   terragrunt
   ansible          # ansible-vault ships as a subcommand, not a separate package
