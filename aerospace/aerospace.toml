@@ -116,6 +116,7 @@ accordion-padding = 30
   alt-shift-s = ['exec-and-forget open -a Slack']
   alt-shift-f = ['exec-and-forget open -a Freelens']
   alt-shift-p = ['exec-and-forget open -a Spotify']
+  alt-shift-o = ['exec-and-forget open -a Obsidian']
 
 [mode.resize.binding]
   h = 'resize width -50'

@@ -104,6 +104,7 @@ CASKS=(
   slack
   thebrowsercompany-dia
   zen
+  obsidian
 )
 for cask in "${CASKS[@]}"; do
   if brew list --cask "$cask" &>/dev/null; then
