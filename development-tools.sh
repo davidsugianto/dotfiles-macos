@@ -32,6 +32,7 @@ FORMULAE=(
   kubernetes-cli   # kubectl
   kubectx          # also installs kubens
   k9s
+  helm
   lazygit
   jq
   yq
@@ -56,6 +57,19 @@ for formula in "${FORMULAE[@]}"; do
     ok "$formula installed"
   fi
 done
+
+# ------------------------------------------------------------------------------
+# helm-diff — https://github.com/databus23/helm-diff
+# Helm 4's plugin installer verifies provenance by default; helm-diff doesn't
+# publish a signature, so it refuses without --verify=false.
+# ------------------------------------------------------------------------------
+step "Installing helm-diff plugin"
+if helm plugin list 2>/dev/null | grep -q '^diff'; then
+  skip "helm-diff already installed"
+else
+  helm plugin install --verify=false https://github.com/databus23/helm-diff
+  ok "helm-diff installed"
+fi
 
 # ------------------------------------------------------------------------------
 # docker-compose ships as a CLI plugin, and the plain `docker` CLI only

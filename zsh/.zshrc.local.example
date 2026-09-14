@@ -11,6 +11,7 @@
 # export SOME_API_TOKEN="..."
 # alias workvpn="sudo openconnect vpn.example.com"
 
-# --- opencode / office LLM gateway -----------------------------------------
-# Read by the "cekat" provider in opencode/opencode.json (repo-tracked).
+# --- office LLM gateway (Cekat) ---------------------------------------------
+# Read by the "cekat" provider in opencode/opencode.json and omp/models.yml
+# (both repo-tracked).
 # export CEKAT_API_KEY="sk-..."

@@ -38,22 +38,22 @@ fi
 # ------------------------------------------------------------------------------
 # Packages
 # ------------------------------------------------------------------------------
+# Homebrew's tap-trust gate blocks loading formulae/casks from third-party
+# taps until explicitly trusted — and it validates every formula/cask in a
+# tap at tap-time, so an *untrusted* tap fails that validation and the whole
+# `brew tap` call errors out and rolls back, rather than just refusing the
+# one formula later. Trust each tap before tapping it, not after.
+step "Trusting third-party Homebrew taps used by this repo"
+brew trust --tap FelixKratz/formulae nikitabobko/tap anomalyco/tap can1357/tap stablyai/orca >/dev/null
+ok "Trusted"
+
 step "Tapping custom Homebrew repositories"
 brew tap FelixKratz/formulae
 brew tap nikitabobko/tap
 brew tap anomalyco/tap
+brew tap can1357/tap      # omp — coding agent CLI
+brew tap stablyai/orca    # Orca — agent development environment (ADE)
 ok "Taps ready"
-
-# Homebrew's tap-trust gate blocks installing/running formulae or casks from
-# third-party taps until explicitly trusted. Trust only the specific
-# formulae/casks this repo actually uses (narrower than trusting the whole
-# tap, per Homebrew's own recommendation) rather than the tools themselves
-# breaking mid-run with "Refusing to load ... from untrusted tap".
-step "Trusting third-party tap formulae/casks used by this repo"
-brew trust --formula felixkratz/formulae/borders felixkratz/formulae/sketchybar >/dev/null
-brew trust --formula anomalyco/tap/opencode >/dev/null
-brew trust --cask nikitabobko/tap/aerospace >/dev/null
-ok "Trusted"
 
 step "Installing command-line tools"
 FORMULAE=(
@@ -84,6 +84,7 @@ FORMULAE=(
   FelixKratz/formulae/borders
   FelixKratz/formulae/sketchybar
   anomalyco/tap/opencode
+  can1357/tap/omp # coding agent CLI, used inside Orca's ADE below
 )
 for formula in "${FORMULAE[@]}"; do
   if brew list --formula "$formula" &>/dev/null; then
@@ -101,6 +102,7 @@ CASKS=(
   font-jetbrains-mono-nerd-font
   font-sketchybar-app-font
   claude-code
+  stablyai/orca/orca # ADE — orchestrates omp/Claude Code/etc. across parallel worktrees
   slack
   thebrowsercompany-dia
   zen
@@ -209,6 +211,13 @@ link "$DOTFILES_DIR/btop/themes"     "$HOME/.config/btop/themes"
 link "$DOTFILES_DIR/opencode/tui.json"      "$HOME/.config/opencode/tui.json"
 link "$DOTFILES_DIR/opencode/themes"        "$HOME/.config/opencode/themes"
 link "$DOTFILES_DIR/opencode/opencode.json" "$HOME/.config/opencode/opencode.json"
+# omp reads its settings from ~/.omp/agent/config.yml, not the XDG config dir
+# (that path is legacy, not $XDG_CONFIG_HOME-based, unless `omp config
+# init-xdg` has been run — this repo hasn't opted into that).
+link "$DOTFILES_DIR/omp/config.yml" "$HOME/.omp/agent/config.yml"
+# models.yml defines the custom "cekat" provider (office LiteLLM gateway),
+# same $CEKAT_API_KEY as opencode's provider — see zsh/.zshrc.local.example.
+link "$DOTFILES_DIR/omp/models.yml" "$HOME/.omp/agent/models.yml"
 link "$DOTFILES_DIR/starship.toml"   "$HOME/.config/starship.toml"
 link "$OH_MY_TMUX_DIR/.tmux.conf"    "$HOME/.config/tmux/tmux.conf"
 link "$DOTFILES_DIR/tmux/tmux.conf.local" "$HOME/.config/tmux/tmux.conf.local"

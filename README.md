@@ -24,6 +24,8 @@ system.
 | [htop](https://htop.dev) / [btop](https://github.com/aristocratos/btop) | Process monitors | `htop` for the classic view, `btop` (aliased over `top`) for the fuller dashboard — kept both since they cover different moments |
 | [Claude Code](https://claude.com/product/claude-code) | AI coding agent CLI | `claude` in any project directory |
 | [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story; themed Catppuccin Mocha (transparent), matching WezTerm/Neovim/k9s (`opencode/`); also configured with a custom "cekat" provider (office LLM gateway) — its API key is read from `$CEKAT_API_KEY`, set in the git-ignored `~/.zshrc.local`, never committed |
+| [omp](https://omp.sh) | AI coding agent CLI | Another alternative agent (`omp`) — subagents, plan mode, LSP/DAP wired in; installed via `can1357/tap/omp`; per-role model config (`omp/`) picks Sonnet 5 by default, Haiku 4.5 for smol/commit tasks, Opus 5 (high) for slow/plan; web search tries Anthropic's native tool first (already authenticated, no extra key), then free keyless fallbacks (duckduckgo, startpage, google); also configured with the same custom "cekat" provider (office LiteLLM gateway) as opencode — `omp/models.yml`, same `$CEKAT_API_KEY` env var |
+| [Orca](https://www.onorca.dev) | Agent Development Environment (ADE) | Desktop app for running Claude Code/opencode/omp in parallel, each in its own isolated git worktree, with diffs viewable side by side; installed via `stablyai/orca/orca` |
 | git + [delta](https://dandavison.github.io/delta) | Version control, syntax-highlighted diffs | Identity/SSH key auto-switches by directory — see below |
 | zsh (no framework) | Shell | Organized, commented, no oh-my-zsh overhead — installed via Homebrew for a newer version than the one macOS ships |
 | [Obsidian](https://obsidian.md) | Knowledge base / notes | Local-first Markdown notes; launch shortcut `alt+shift+o` (see [aerospace/aerospace.toml](aerospace/aerospace.toml)) |
@@ -41,6 +43,7 @@ fastfetch/     System info shown on new top-level shells
 yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider), linked to ~/.omp/agent/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
