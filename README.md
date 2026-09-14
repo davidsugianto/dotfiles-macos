@@ -24,7 +24,7 @@ system.
 | [htop](https://htop.dev) / [btop](https://github.com/aristocratos/btop) | Process monitors | `htop` for the classic view, `btop` (aliased over `top`) for the fuller dashboard — kept both since they cover different moments |
 | [Claude Code](https://claude.com/product/claude-code) | AI coding agent CLI | `claude` in any project directory |
 | [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story; themed Catppuccin Mocha (transparent), matching WezTerm/Neovim/k9s (`opencode/`); also configured with a custom "cekat" provider (office LLM gateway) — its API key is read from `$CEKAT_API_KEY`, set in the git-ignored `~/.zshrc.local`, never committed |
-| [omp](https://omp.sh) | AI coding agent CLI | Another alternative agent (`omp`) — subagents, plan mode, LSP/DAP wired in; installed via `can1357/tap/omp`; per-role model config (`omp/`) picks Sonnet 5 by default, Haiku 4.5 for smol/commit tasks, Opus 5 (high) for slow/plan; web search tries Anthropic's native tool first (already authenticated, no extra key), then free keyless fallbacks (duckduckgo, startpage, google); also configured with the same custom "cekat" provider (office LiteLLM gateway) as opencode — `omp/models.yml`, same `$CEKAT_API_KEY` env var |
+| [omp](https://omp.sh) | AI coding agent CLI | Another alternative agent (`omp`, aka "Oh My Pi") — subagents, plan mode, LSP/DAP wired in; installed via `can1357/tap/omp`; per-role model config (`omp/`) picks Sonnet 5 by default, Haiku 4.5 for smol/commit tasks, Opus 5 (high) for slow/plan; themed Catppuccin (transparent status line), matching WezTerm/Neovim/k9s/opencode; web search tries Anthropic's native tool first (already authenticated, no extra key), then free keyless fallbacks (duckduckgo, startpage, google); also configured with the same custom "cekat" provider (office LiteLLM gateway) as opencode — `omp/models.yml`, same `$CEKAT_API_KEY` env var |
 | [Orca](https://www.onorca.dev) | Agent Development Environment (ADE) | Desktop app for running Claude Code/opencode/omp in parallel, each in its own isolated git worktree, with diffs viewable side by side; installed via `stablyai/orca/orca` |
 | git + [delta](https://dandavison.github.io/delta) | Version control, syntax-highlighted diffs | Identity/SSH key auto-switches by directory — see below |
 | zsh (no framework) | Shell | Organized, commented, no oh-my-zsh overhead — installed via Homebrew for a newer version than the one macOS ships |
@@ -130,7 +130,7 @@ toolchain that not everyone using this repo needs:
 | [Freelens](https://freelens.app) | Kubernetes IDE — open-source Lens fork |
 | [lazygit](https://github.com/jesseduffield/lazygit) | Terminal git UI |
 | [jq](https://jqlang.org) / [yq](https://github.com/mikefarah/yq) | JSON / YAML processors |
-| [Google Cloud CLI](https://cloud.google.com/cli) / [AWS CLI v2](https://aws.amazon.com/cli) | `gcloud`/`gsutil`/`bq` and `aws` — `gke-gcloud-auth-plugin` is installed alongside gcloud (`kubectl` needs it to auth against GKE clusters) |
+| [Google Cloud CLI](https://cloud.google.com/cli) / [AWS CLI v2](https://aws.amazon.com/cli) | `gcloud`/`gsutil`/`bq` and `aws` — `gke-gcloud-auth-plugin` is installed alongside gcloud (`kubectl` needs it to auth against GKE clusters); AWS has two SSO profiles (`cekataiofficial`/`personal`) that auto-switch by directory, same pattern as git identity — see below |
 | [Python](https://www.python.org) / [Node](https://nodejs.org) / [pnpm](https://pnpm.io) | Runtimes — `npm` ships with Node |
 | [HTTPie](https://httpie.io) | `http`/`https` CLI (friendlier curl) plus the [HTTPie for Desktop](https://httpie.io/product) GUI companion |
 | [Apidog](https://apidog.com) | API development platform — design, mock, test, and document APIs in one GUI app |
@@ -166,6 +166,24 @@ in both identity files sets `StrictHostKeyChecking=no`, which skips SSH host
 key verification (accepts any host key without prompting or checking
 `known_hosts`). That's weaker than the default and was already the case
 before this repo — tighten it if you'd rather have the prompt back.
+
+## AWS profile switching
+
+`zsh/functions.zsh` sets `AWS_PROFILE` automatically based on directory, via
+a `chpwd` hook — same directory split as git identity above:
+
+| Directory | AWS profile | Used for |
+|---|---|---|
+| `~/Artifacts/work/cekataiofficial/` | `cekataiofficial` | Work AWS account |
+| `~/Artifacts/labs/` | `personal` | Personal AWS account |
+
+Outside both trees `AWS_PROFILE` is unset rather than left stale, so `aws`
+commands fail closed instead of silently hitting the wrong account. Both
+profiles authenticate via AWS SSO (IAM Identity Center) — set up once per
+machine with `aws configure sso --profile cekataiofficial` and
+`aws configure sso --profile personal` (interactive; not part of `setup.sh`
+since it needs a browser login), then re-auth per session with
+`aws sso login --profile <name>` when the cached SSO token expires.
 
 ## Keybindings at a glance
 

@@ -62,6 +62,26 @@ serve() {
   python3 -m http.server "$port"
 }
 
+# AWS profile auto-switch by directory, mirroring git/.gitconfig's
+# includeIf identity switching (see README "git identity switching"):
+# work repos use the "cekataiofficial" SSO profile, personal repos use
+# "personal". Unset outside both trees rather than leaving a stale
+# profile active, so commands fail closed instead of silently hitting
+# the wrong account.
+_aws_profile_by_dir() {
+  case "$PWD" in
+    "$HOME"/Artifacts/work/cekataiofficial|"$HOME"/Artifacts/work/cekataiofficial/*)
+      export AWS_PROFILE=cekataiofficial ;;
+    "$HOME"/Artifacts/labs|"$HOME"/Artifacts/labs/*)
+      export AWS_PROFILE=personal ;;
+    *)
+      unset AWS_PROFILE ;;
+  esac
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _aws_profile_by_dir
+_aws_profile_by_dir
+
 # yazi: `y` opens the file manager, and cds the shell to wherever you
 # navigated to on quit (press q). Official wrapper, see
 # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
