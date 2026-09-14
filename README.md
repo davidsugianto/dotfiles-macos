@@ -26,6 +26,7 @@ system.
 | [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story; themed Catppuccin Mocha (transparent), matching WezTerm/Neovim/k9s (`opencode/`); also configured with a custom "cekat" provider (office LLM gateway) — its API key is read from `$CEKAT_API_KEY`, set in the git-ignored `~/.zshrc.local`, never committed |
 | git + [delta](https://dandavison.github.io/delta) | Version control, syntax-highlighted diffs | Identity/SSH key auto-switches by directory — see below |
 | zsh (no framework) | Shell | Organized, commented, no oh-my-zsh overhead — installed via Homebrew for a newer version than the one macOS ships |
+| [Obsidian](https://obsidian.md) | Knowledge base / notes | Local-first Markdown notes; launch shortcut `alt+shift+o` (see [aerospace/aerospace.toml](aerospace/aerospace.toml)) |
 
 ## Repo structure
 
@@ -126,6 +127,8 @@ toolchain that not everyone using this repo needs:
 | [jq](https://jqlang.org) / [yq](https://github.com/mikefarah/yq) | JSON / YAML processors |
 | [Google Cloud CLI](https://cloud.google.com/cli) / [AWS CLI v2](https://aws.amazon.com/cli) | `gcloud`/`gsutil`/`bq` and `aws` — `gke-gcloud-auth-plugin` is installed alongside gcloud (`kubectl` needs it to auth against GKE clusters) |
 | [Python](https://www.python.org) / [Node](https://nodejs.org) / [pnpm](https://pnpm.io) | Runtimes — `npm` ships with Node |
+| [HTTPie](https://httpie.io) | `http`/`https` CLI (friendlier curl) plus the [HTTPie for Desktop](https://httpie.io/product) GUI companion |
+| [Apidog](https://apidog.com) | API development platform — design, mock, test, and document APIs in one GUI app |
 
 `kubectl`, `yq`, `tofu`, and `aws` completions are wired into
 `zsh/completions.zsh` automatically once those binaries are on PATH — no
