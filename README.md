@@ -91,14 +91,15 @@ cd ~/dotfiles-macos
 1. Installs Homebrew if it's missing.
 2. Installs every formula/cask this repo needs (window management stack,
    WezTerm, Neovim, Starship, modern CLI tools, yazi, htop, fastfetch,
-   Claude Code, opencode, a Nerd Font).
+   Claude Code, opencode, omp, Orca, a Nerd Font).
 3. Builds [SbarLua](https://github.com/FelixKratz/SbarLua), the Lua API
    SketchyBar's config is written against, and vendors
    [Oh my tmux!](https://github.com/gpakosz/.tmux) into
    `~/.local/share/tmux/oh-my-tmux`.
-4. Symlinks each folder into `~/.config/<tool>` (and `.zshrc`/
-   `starship.toml` to their expected locations) — existing files in the
-   way are backed up to `~/.dotfiles-backup/<timestamp>/`, never deleted.
+4. Symlinks each folder into `~/.config/<tool>` (`.zshrc`/`starship.toml`
+   to their expected locations, `omp/` to `~/.omp/agent/` since omp
+   doesn't use an XDG config path) — existing files in the way are
+   backed up to `~/.dotfiles-backup/<timestamp>/`, never deleted.
 5. Copies `zsh/.zshrc.local.example` to `~/.zshrc.local` on first run
    (git-ignored — put machine-specific overrides there).
 6. Hides the native macOS menu bar (`defaults write NSGlobalDomain
@@ -125,6 +126,7 @@ toolchain that not everyone using this repo needs:
 | [Ansible](https://www.ansible.com) | Config management (`ansible-vault` ships as a subcommand) |
 | [kubectl](https://kubernetes.io/docs/reference/kubectl/) / [kubectx](https://github.com/ahmetb/kubectx) | Kubernetes CLI + fast context/namespace switching (`kubectx`/`kubens`) |
 | [k9s](https://k9scli.io) | Terminal Kubernetes UI — themed Catppuccin Mocha (transparent), matching WezTerm/Neovim (`k9s/`) |
+| [Helm](https://helm.sh) + [helm-diff](https://github.com/databus23/helm-diff) | Kubernetes package manager + `helm diff upgrade`/`helm diff rollback` plugin (previews changes before applying) |
 | [Freelens](https://freelens.app) | Kubernetes IDE — open-source Lens fork |
 | [lazygit](https://github.com/jesseduffield/lazygit) | Terminal git UI |
 | [jq](https://jqlang.org) / [yq](https://github.com/mikefarah/yq) | JSON / YAML processors |

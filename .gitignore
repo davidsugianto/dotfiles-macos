@@ -10,3 +10,7 @@
 
 # Claude Code session state (not part of the dotfiles themselves)
 .claude/
+
+# omp creates this lock file next to config.yml/models.yml at runtime
+# (it resolves the symlink and writes beside the real file) — not config
+omp/*.lock
