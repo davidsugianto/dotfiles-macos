@@ -22,6 +22,19 @@ if not icon_map_ok then
   icon_map = {}
 end
 
+-- Local overrides for apps sketchybar-app-font doesn't ship a dedicated
+-- glyph for yet. Applied on top of the vendored map so they survive its
+-- re-download by setup.sh. Keyed the same way as icon_map.lua: exact
+-- app-name string (as AeroSpace reports it) -> font ligature name.
+local icon_overrides = {
+  -- Orca (onorca.dev) has no glyph in the font yet; ":dolphin:" is the
+  -- closest cetacean icon it ships (the font's KDE Dolphin glyph).
+  ["Orca"] = ":dolphin:",
+}
+for app, glyph in pairs(icon_overrides) do
+  icon_map[app] = glyph
+end
+
 local WORKSPACE_COUNT = 9
 local workspaces = {}
 local bracket_members = {}
