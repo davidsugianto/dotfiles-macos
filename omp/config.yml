@@ -16,6 +16,11 @@ defaultThinkingLevel: auto
 theme:
   dark: catppuccin
   light: catppuccin
+# Nerd Font glyphs for path/git/thinking-level icons (folder, branch, per-level
+# icon incl. a fire icon on "max") — matches the reference powerline screenshot.
+# Requires the terminal to actually have a Nerd Font active (WezTerm already
+# does, per this repo's wezterm/ config).
+symbolPreset: nerd
 # Mode badges (Plan/Goal/Vibe/Loop, plus the Fast ⚡ suffix on the model
 # segment) are part of the built-in "mode" status-line segment, which the
 # "default" preset below already includes — no extension needed to see them.
@@ -25,7 +30,10 @@ goal:
   statusInFooter: true
 statusLine:
   transparent: true
-  contextLine: percentage
+  contextLine: embedded
+  # Explicit "· max" thinking-level suffix (with the nerd-font fire icon)
+  # instead of fusing it into a single icon on the model badge.
+  compactThinkingLevel: false
   segmentOptions:
     path:
       abbreviate: true
