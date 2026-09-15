@@ -16,5 +16,19 @@ defaultThinkingLevel: auto
 theme:
   dark: catppuccin
   light: catppuccin
+# Mode badges (Plan/Goal/Vibe/Loop, plus the Fast ⚡ suffix on the model
+# segment) are part of the built-in "mode" status-line segment, which the
+# "default" preset below already includes — no extension needed to see them.
+# This just turns on the token-budget suffix ("used/budget") on the Goal
+# badge specifically; everything else needs no extra config.
+goal:
+  statusInFooter: true
 statusLine:
   transparent: true
+  contextLine: percentage
+  segmentOptions:
+    path:
+      abbreviate: true
+      maxLength: 20
+      stripWorkPrefix: true
+  preset: default

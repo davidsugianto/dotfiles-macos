@@ -44,7 +44,7 @@ fi
 # `brew tap` call errors out and rolls back, rather than just refusing the
 # one formula later. Trust each tap before tapping it, not after.
 step "Trusting third-party Homebrew taps used by this repo"
-brew trust --tap FelixKratz/formulae nikitabobko/tap anomalyco/tap can1357/tap stablyai/orca >/dev/null
+brew trust --tap FelixKratz/formulae nikitabobko/tap anomalyco/tap can1357/tap stablyai/orca oven-sh/bun >/dev/null
 ok "Trusted"
 
 step "Tapping custom Homebrew repositories"
@@ -53,7 +53,7 @@ brew tap nikitabobko/tap
 brew tap anomalyco/tap
 brew tap can1357/tap      # omp — coding agent CLI
 brew tap stablyai/orca    # Orca — agent development environment (ADE)
-ok "Taps ready"
+brew tap oven-sh/bun      # bun — JS runtime required by omp's plugin manager (omp/model-profiles below)
 
 step "Installing command-line tools"
 FORMULAE=(
@@ -85,6 +85,7 @@ FORMULAE=(
   FelixKratz/formulae/sketchybar
   anomalyco/tap/opencode
   can1357/tap/omp # coding agent CLI, used inside Orca's ADE below
+  oven-sh/bun/bun # JS runtime `omp plugin install` shells out to
 )
 for formula in "${FORMULAE[@]}"; do
   if brew list --formula "$formula" &>/dev/null; then
@@ -218,6 +219,10 @@ link "$DOTFILES_DIR/omp/config.yml" "$HOME/.omp/agent/config.yml"
 # models.yml defines the custom "cekat" provider (office LiteLLM gateway),
 # same $CEKAT_API_KEY as opencode's provider — see zsh/.zshrc.local.example.
 link "$DOTFILES_DIR/omp/models.yml" "$HOME/.omp/agent/models.yml"
+# model-profiles/*.yml are switched between at runtime with `/profile <name>`
+# (omp-model-profiles plugin, installed below) — kept in this repo so both
+# profiles are versioned next to the models.yml provider they reference.
+link "$DOTFILES_DIR/omp/model-profiles" "$HOME/.omp/model-profiles"
 link "$DOTFILES_DIR/starship.toml"   "$HOME/.config/starship.toml"
 link "$OH_MY_TMUX_DIR/.tmux.conf"    "$HOME/.config/tmux/tmux.conf"
 link "$DOTFILES_DIR/tmux/tmux.conf.local" "$HOME/.config/tmux/tmux.conf.local"
@@ -229,6 +234,20 @@ link "$DOTFILES_DIR/tmux/tmux.conf.local" "$HOME/.tmux.conf.local"
 link "$DOTFILES_DIR/git/.gitconfig"          "$HOME/.gitconfig"
 link "$DOTFILES_DIR/git/.gitconfig-personal" "$HOME/.gitconfig-personal"
 link "$DOTFILES_DIR/git/.gitconfig-work"     "$HOME/.gitconfig-work"
+
+# ------------------------------------------------------------------------------
+# omp-model-profiles — https://github.com/rezhajulio/omp-model-profiles
+# `/profile personal-labs` / `/profile work-cekataiofficial` switch modelRoles
+# in-session (see omp/model-profiles/). Installed via omp's own npm-backed
+# plugin manager, which shells out to bun (tapped/installed above).
+# ------------------------------------------------------------------------------
+step "Installing omp-model-profiles plugin"
+if omp plugin list 2>/dev/null | grep -q 'omp-model-profiles'; then
+  skip "omp-model-profiles already installed"
+else
+  omp plugin install github:rezhajulio/omp-model-profiles
+  ok "omp-model-profiles installed"
+fi
 
 step "Setting up personal/work workspace directories"
 mkdir -p "$HOME/Artifacts/labs" "$HOME/Artifacts/work"
