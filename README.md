@@ -25,7 +25,7 @@ system.
 | [Claude Code](https://claude.com/product/claude-code) | AI coding agent CLI | `claude` in any project directory |
 | [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story; themed Catppuccin Mocha (transparent), matching WezTerm/Neovim/k9s (`opencode/`); also configured with a custom "cekat" provider (office LLM gateway) — its API key is read from `$CEKAT_API_KEY`, set in the git-ignored `~/.zshrc.local`, never committed |
 | [omp](https://omp.sh) | AI coding agent CLI | Another alternative agent (`omp`, aka "Oh My Pi") — subagents, plan mode, LSP/DAP wired in; installed via `can1357/tap/omp`; per-role model config (`omp/`) picks Sonnet 5 by default, Haiku 4.5 for smol/commit tasks, Opus 5 (high) for slow/plan; themed Catppuccin (transparent status line), matching WezTerm/Neovim/k9s/opencode; web search tries Anthropic's native tool first (already authenticated, no extra key), then free keyless fallbacks (duckduckgo, startpage, google); also configured with the same custom "cekat" provider (office LiteLLM gateway) as opencode — `omp/models.yml`, same `$CEKAT_API_KEY` env var |
-| [Orca](https://www.onorca.dev) | Agent Development Environment (ADE) | Desktop app for running Claude Code/opencode/omp in parallel, each in its own isolated git worktree, with diffs viewable side by side; installed via `stablyai/orca/orca` |
+| [Orca](https://www.onorca.dev) | Agent Development Environment (ADE) | Desktop app for running Claude Code/opencode/omp in parallel, each in its own isolated git worktree, with diffs viewable side by side; installed via `stablyai/orca/orca`; default tab agent set to `omp` so new tabs use the internal "cekat" LLM gateway by default, personal Claude Code still one command away — see below |
 | git + [delta](https://dandavison.github.io/delta) | Version control, syntax-highlighted diffs | Identity/SSH key auto-switches by directory — see below |
 | zsh (no framework) | Shell | Organized, commented, no oh-my-zsh overhead — installed via Homebrew for a newer version than the one macOS ships |
 | [Obsidian](https://obsidian.md) | Knowledge base / notes | Local-first Markdown notes; launch shortcut `alt+shift+o` (see [aerospace/aerospace.toml](aerospace/aerospace.toml)) |
@@ -184,6 +184,27 @@ machine with `aws configure sso --profile cekataiofficial` and
 `aws configure sso --profile personal` (interactive; not part of `setup.sh`
 since it needs a browser login), then re-auth per session with
 `aws sso login --profile <name>` when the cached SSO token expires.
+
+## Orca agent defaults
+
+Orca has no config file of its own to track in this repo — all its settings
+live in one Electron app-state blob
+(`~/Library/Application Support/orca/profiles/local-default/orca-data.json`)
+that also holds live session/account state, so it's deliberately **not**
+symlinked here (unlike `omp/`/`opencode/`). Orca just spawns whichever CLI
+you point it at, so "multiple models" comes for free from those CLIs' own
+provider config:
+
+- `settings.defaultTuiAgent` is set to `omp`, so a new Orca tab opens omp by
+  default — which already has the "cekat" office LLM gateway wired in
+  (`omp/models.yml`, same as `opencode/opencode.json`).
+- Personal Claude Code is still available any time, just not the default:
+  `orca terminal create --worktree active --command "claude"`, or pick
+  Claude from Orca's agent picker.
+
+If Orca is reinstalled or its app data is reset, redo this by hand (with
+the Orca app quit first): flip `settings.defaultTuiAgent` from `"claude"`
+to `"omp"` in the file above.
 
 ## Keybindings at a glance
 
