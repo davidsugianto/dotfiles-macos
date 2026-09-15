@@ -23,6 +23,12 @@ export VISUAL="nvim"
 export PAGER="less"
 export LANG="en_US.UTF-8"
 
+# omp-statusline-titanium plugin (~/.omp/plugins) only repaints segments
+# while the active theme matches this var; our omp theme is catppuccin
+# (see dotfiles-macos/omp/config.yml), not the plugin's titanium-dracula
+# default, so it must be pointed here explicitly.
+export OMP_STATUSLINE_THEME="catppuccin"
+
 # Homebrew (Apple Silicon default prefix; no-op if already on PATH).
 if [[ -x /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
