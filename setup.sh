@@ -108,6 +108,7 @@ CASKS=(
   thebrowsercompany-dia
   zen
   obsidian
+  spotify
 )
 for cask in "${CASKS[@]}"; do
   if brew list --cask "$cask" &>/dev/null; then

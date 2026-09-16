@@ -12,6 +12,7 @@ require("items.aerospace")
 require("items.front_app")
 
 require("items.cpu")
+require("items.spotify")
 require("items.volume")
 require("items.battery")
 

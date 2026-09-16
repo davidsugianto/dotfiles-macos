@@ -25,6 +25,7 @@ return {
   clock = "\u{f017}", -- clock
   apple = "\u{f8ff}", -- Apple logo
   grid = "\u{f00a}",  -- th (app grid, used next to the front-app name)
+  spotify = "\u{f1bc}", -- spotify (brand)
   cpu = "\u{f2db}",   -- microchip
   package = "\u{f1b2}", -- cube (brew-outdated badge)
   menu = {
