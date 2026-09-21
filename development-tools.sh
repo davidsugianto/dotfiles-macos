@@ -32,6 +32,7 @@ FORMULAE=(
   kubernetes-cli   # kubectl
   kubectx          # also installs kubens
   k9s
+  nklmilojevic/sofka/sofka # sofka — Kubernetes TUI, k9s alternative
   helm
   lazygit
   jq

@@ -1,0 +1,21 @@
+# ==============================================================================
+# config.toml — sofka settings.
+# Catppuccin Mocha, matching WezTerm's translucent window
+# (wezterm/config/appearance.lua), Neovim's colorscheme
+# (nvim/lua/plugins/colorscheme.lua), and k9s (k9s/config.yaml). `background`
+# is left at its default (false), so the terminal's own opacity/blur shows
+# through instead of sofka painting an opaque background.
+# ==============================================================================
+default_resource = "pods"
+
+[skin]
+name = "catppuccin-mocha"
+
+# ------------------------------------------------------------------------------
+# NODE is a built-in pod column, but sofka only shows it in wide mode (`w`)
+# by default. Re-declaring it without `wide` overlays the curated view and
+# makes it always visible — which GKE node each pod is scheduled on.
+# ------------------------------------------------------------------------------
+[[views."v1/pods".columns]]
+name = "NODE"
+builtin = "NODE"

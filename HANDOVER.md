@@ -87,7 +87,7 @@ fix noted last below, which is still uncommitted.
   fonts, tap-trust for third-party casks/formulae). Has a known gotcha
   (see project memory `dotfiles_macos_project.md`) — check before editing.
 - `development-tools.sh` — optional DevOps layer on top of setup.sh
-  (kubectl, k9s, helm, terraform tooling, etc. + a separate GUI-apps
+  (kubectl, k9s, sofka, helm, terraform tooling, etc. + a separate GUI-apps
   CASKS array for dev tools like VS Code, Freelens, DBeaver). Idempotent,
   safe to re-run.
 - `aerospace/aerospace.toml` — window manager config; app-launch shortcuts
