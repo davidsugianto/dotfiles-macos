@@ -212,6 +212,7 @@ link "$DOTFILES_DIR/k9s/plugins.yaml" "$HOME/.config/k9s/plugins.yaml"
 # state (plugins/, catalogs.toml, journal files) into its config dir, so the
 # whole directory is never symlinked wholesale (see OPERATIONS.md).
 link "$DOTFILES_DIR/sofka/config.toml" "$HOME/.config/sofka/config.toml"
+link "$DOTFILES_DIR/sofka/sofka-pane"  "$HOME/.local/bin/sofka-pane"
 link "$DOTFILES_DIR/btop/btop.conf"  "$HOME/.config/btop/btop.conf"
 link "$DOTFILES_DIR/btop/themes"     "$HOME/.config/btop/themes"
 link "$DOTFILES_DIR/opencode/tui.json"      "$HOME/.config/opencode/tui.json"

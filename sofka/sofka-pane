@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Open a WezTerm pane whose kubectl/helm helpers target Sofka's active context.
+set -euo pipefail
+
+context=$1
+namespace=$2
+
+exec wezterm cli split-pane \
+  --bottom \
+  --percent 30 \
+  -- \
+  env "SOFKA_CONTEXT=$context" "SOFKA_NAMESPACE=$namespace" \
+  zsh -ic 'printf "Sofka context: %s  namespace: %s\n" "$SOFKA_CONTEXT" "$SOFKA_NAMESPACE"; printf "k … runs kubectl against this context/namespace; helm … does the same.\n"; exec zsh -i'

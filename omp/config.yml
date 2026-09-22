@@ -1,10 +1,4 @@
 setupVersion: 2
-providers:
-  webSearchOrder:
-    - anthropic
-    - duckduckgo
-    - startpage
-    - google
 modelRoles:
   default: anthropic/claude-sonnet-5
   smol: anthropic/claude-haiku-4-5
@@ -12,27 +6,17 @@ modelRoles:
   plan: anthropic/claude-opus-5:high
   commit: anthropic/claude-haiku-4-5
   task: anthropic/claude-sonnet-5
+  web: anthropic/claude-haiku-4-5
 defaultThinkingLevel: auto
 theme:
   dark: catppuccin
   light: catppuccin
-# Nerd Font glyphs for path/git/thinking-level icons (folder, branch, per-level
-# icon incl. a fire icon on "max") — matches the reference powerline screenshot.
-# Requires the terminal to actually have a Nerd Font active (WezTerm already
-# does, per this repo's wezterm/ config).
 symbolPreset: nerd
-# Mode badges (Plan/Goal/Vibe/Loop, plus the Fast ⚡ suffix on the model
-# segment) are part of the built-in "mode" status-line segment, which the
-# "default" preset below already includes — no extension needed to see them.
-# This just turns on the token-budget suffix ("used/budget") on the Goal
-# badge specifically; everything else needs no extra config.
 goal:
   statusInFooter: true
 statusLine:
   transparent: true
   contextLine: embedded
-  # Explicit "· max" thinking-level suffix (with the nerd-font fire icon)
-  # instead of fusing it into a single icon on the model badge.
   compactThinkingLevel: false
   segmentOptions:
     path:
@@ -40,3 +24,34 @@ statusLine:
       maxLength: 20
       stripWorkPrefix: true
   preset: default
+retry:
+  fallbackChains:
+    web:
+      - web/duckduckgo
+      - web/startpage
+      - web/google
+      - web/parallel
+      - web/perplexity
+      - google/gemini-2.5-flash
+      - google-antigravity/gemini-2.5-flash
+      - openai-codex/gpt-5.6-luna
+      - openai-codex/gpt-5.6
+      - openai-codex/gpt-5.5
+      - xai/grok-4.5
+      - xai-oauth/grok-4.5
+      - web/zai
+      - web/exa
+      - web/tinyfish
+      - web/jina
+      - web/kagi
+      - web/tavily
+      - web/firecrawl
+      - web/brave
+      - web/kimi
+      - web/synthetic
+      - web/ollama
+      - web/searxng
+      - web/ecosia
+      - web/mojeek
+      - web/public
+extendedContext: true

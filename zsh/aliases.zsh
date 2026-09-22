@@ -121,6 +121,14 @@ if command -v kubectl >/dev/null 2>&1; then
   alias kuc='kubectl config use-context'
 fi
 
+# A terminal opened from Sofka (Ctrl-T) exports these values. Functions trump
+# aliases here so existing `k`/`helm` habits use the inspected context and
+# namespace without mutating the kubeconfig's current-context.
+if [[ -n ${SOFKA_CONTEXT:-} ]]; then
+  kubectl() { command kubectl --context "$SOFKA_CONTEXT" --namespace "$SOFKA_NAMESPACE" "$@"; }
+  helm() { command helm --kube-context "$SOFKA_CONTEXT" --namespace "$SOFKA_NAMESPACE" "$@"; }
+fi
+
 if command -v kubectx >/dev/null 2>&1; then
   alias kctx='kubectx'
 fi

@@ -19,3 +19,19 @@ name = "catppuccin-mocha"
 [[views."v1/pods".columns]]
 name = "NODE"
 builtin = "NODE"
+
+# ------------------------------------------------------------------------------
+# Ctrl-T opens a bottom WezTerm pane. The Sofka placeholders are passed as
+# whole arguments; sofka-pane exports them before launching interactive zsh.
+# The zsh wrappers below make kubectl/helm inherit that context and namespace.
+# ------------------------------------------------------------------------------
+[[plugins]]
+key = "ctrl-t"
+name = "Sofka terminal"
+palette = "terminal"
+command = "sofka-pane"
+args = ["$CONTEXT", "$NAMESPACE"]
+target = "context"
+mutating = false
+output = "background"
+requires = ["wezterm", "zsh", "sofka-pane"]
