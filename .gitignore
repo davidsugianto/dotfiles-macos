@@ -14,3 +14,7 @@
 # omp creates this lock file next to config.yml/models.yml at runtime
 # (it resolves the symlink and writes beside the real file) — not config
 omp/*.lock
+
+# pi likely does the same beside its symlinked settings.json/models.json —
+# not confirmed, ignored preemptively so a lock file never lands in-repo.
+pi/*.lock

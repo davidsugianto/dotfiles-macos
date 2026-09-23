@@ -1,0 +1,77 @@
+# Personal roles — Anthropic direct (personal subscription/API key), same
+# default/smol/slow/plan/commit/task/web tiering as
+# dotfiles-macos/omp/model-profiles/personal-labs.yml: Sonnet 5 for
+# everyday driving, Haiku 4.5 for cheap/high-volume roles, Opus 5 (high)
+# for anything that needs to think hard.
+#
+# This is the pi-model-roles extension's config file
+# (~/.pi/agent/extensions/pi-model-roles/config.yaml) — deploy it with
+# `pi-roles personal` (dotfiles-macos/pi/scripts/pi-roles), not a symlink;
+# see that script and OPERATIONS.md for why. Run /reload in any open pi
+# session afterwards.
+#
+# Model IDs below are best-effort — pi-model-roles rejects "inherit" for
+# custom roles, so each one needs an exact provider/id pair. Verify against
+# the model picker in `/model-roles settings` after `/login`, and correct
+# if the catalog uses different exact IDs.
+version: 1
+enabled: true
+selectorTimeoutMs: 8000
+selectorContext: conversation
+roles:
+  default:
+    model: inherit
+    effort: inherit
+  smol:
+    description: >-
+      Use for small, well-specified, low-risk edits or lookups with an
+      explicit outcome and no design decision — typos, renames, formatting,
+      one-line fixes, short factual questions.
+    model:
+      provider: anthropic
+      id: claude-haiku-4-5
+    effort: off
+  slow:
+    description: >-
+      Use for hard, ambiguous, or high-risk problems that need deep
+      multi-step reasoning — tricky bugs, unclear requirements, security or
+      correctness review, architecture trade-offs.
+    model:
+      provider: anthropic
+      id: claude-opus-5
+    effort: high
+  plan:
+    description: >-
+      Use when the task is to produce a plan, design, or strategy before any
+      code changes — breaking down multi-step work, evaluating approaches,
+      writing an implementation plan.
+    model:
+      provider: anthropic
+      id: claude-opus-5
+    effort: high
+  commit:
+    description: >-
+      Use when the task is to write or summarize a commit message, PR
+      description, or changelog entry from a diff — no code changes
+      requested.
+    model:
+      provider: anthropic
+      id: claude-haiku-4-5
+    effort: off
+  task:
+    description: >-
+      Use for ordinary delegated implementation work with a clear,
+      well-scoped outcome — the default driver for everyday coding tasks
+      that are neither trivial lookups nor open-ended design problems.
+    model:
+      provider: anthropic
+      id: claude-sonnet-5
+    effort: medium
+  web:
+    description: >-
+      Use when the task is primarily researching or summarizing information
+      from the web rather than editing code.
+    model:
+      provider: anthropic
+      id: claude-haiku-4-5
+    effort: off

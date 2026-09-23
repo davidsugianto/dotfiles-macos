@@ -19,6 +19,7 @@ package.
 | Neovim | Restart, or `:source $MYVIMRC` for `lua/config/*` changes. Plugin spec changes need `:Lazy sync` |
 | zsh | `exec zsh` (alias: `reload`) |
 | Starship | Auto-reloads on next prompt draw |
+| pi | `/reload` inside pi for `settings.json`/`models.json`/profile edits; `pi-roles personal\|work` then `/reload` for a model-roles switch (not a live watcher) |
 
 ## Modifying configs
 
@@ -324,6 +325,30 @@ resurface after a Homebrew self-update resets trust state), re-run
   (`k9s/config.yaml` + `k9s/skins/`, `opencode/tui.json` +
   `opencode/themes/` + `opencode/opencode.json`) into the real
   `~/.config/<tool>` directory, and leave the rest of that directory alone.
+- **`pi-model-roles` rejects saving through a symlinked `config.yaml`**
+  (its own recovery table calls out "symlinks ... may require manual
+  repair before the menu can save"). That's why `pi/model-roles/*.yaml`
+  are deployed with a plain `cp` (`pi/scripts/pi-roles`, see README "pi
+  model-role switching"), unlike every other pi/omp config in this repo,
+  which is symlinked straight from the source of truth.
+- **`pi/extensions/subagents-pi/` is vendored, not fetched** — it isn't
+  published to npm (its own README briefly claimed otherwise; the npm
+  registry says 404 — trust the registry). `setup.sh`'s `pi install
+  "$DOTFILES_DIR/pi/extensions/subagents-pi"` just registers this repo's
+  copy as a local package; it never pulls from
+  [luongnv89/pi-extensions](https://github.com/luongnv89/pi-extensions).
+  Re-vendor by hand (re-fetch `extensions/subagents-pi/` from that repo,
+  overwrite the files here) if upstream changes.
+- **`pi install <local-path>` stores a path relative to `~/.pi/agent`,
+  not to this repo's `pi/` directory** — even though `pi/settings.json`
+  is what's actually symlinked to `~/.pi/agent/settings.json`. Verified by
+  installing `subagents-pi` here: the recorded value was
+  `../../Artifacts/labs/src/dotfiles-macos/pi/extensions/subagents-pi`,
+  i.e. relative to the symlink's own path, not its target. This round-trips
+  correctly as long as `setup.sh` (which recomputes the absolute path
+  every run) is what installs it on each machine — don't assume the
+  committed `packages` entry in `pi/settings.json` is portable on its own
+  if this repo ever gets cloned to a different `$HOME`-relative location.
 - **gopls needs a newer Go than gvm's active version can sometimes hit an
   unreachable toolchain-download error**: if `:MasonLog` shows `gopls@vX
   requires go >= Y; switching to goY` followed by a network failure
@@ -365,4 +390,7 @@ find ~ -maxdepth 3 -type l -lname "*/oh-my-tmux/*" -delete
 
 Then restore whatever `setup.sh` backed up from `~/.dotfiles-backup/`, and
 `brew uninstall`/`brew uninstall --cask` anything you don't want to keep —
-`setup.sh` never uninstalls packages on its own.
+`setup.sh` never uninstalls packages on its own. `pi-model-roles`'s
+`config.yaml` is copied, not symlinked, so it survives this cleanup on
+disk; delete `~/.pi/agent/extensions/pi-model-roles/config.yaml` by hand
+if you want it gone too.

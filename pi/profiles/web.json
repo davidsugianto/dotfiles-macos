@@ -1,0 +1,7 @@
+{
+  "name": "web",
+  "label": "🌐 Web",
+  "description": "Research/summarize information from the web rather than editing code.",
+  "model": { "provider": "anthropic", "model": "claude-haiku-4-5" },
+  "sessionName": "Web"
+}

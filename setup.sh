@@ -85,6 +85,7 @@ FORMULAE=(
   FelixKratz/formulae/sketchybar
   anomalyco/tap/opencode
   can1357/tap/omp # coding agent CLI, used inside Orca's ADE below
+  pi-coding-agent # coding agent CLI omp/oh-my-pi builds on — per-role model/theme/profile config in pi/
   oven-sh/bun/bun # JS runtime `omp plugin install` shells out to
 )
 for formula in "${FORMULAE[@]}"; do
@@ -229,6 +230,27 @@ link "$DOTFILES_DIR/omp/models.yml" "$HOME/.omp/agent/models.yml"
 # (omp-model-profiles plugin, installed below) — kept in this repo so both
 # profiles are versioned next to the models.yml provider they reference.
 link "$DOTFILES_DIR/omp/model-profiles" "$HOME/.omp/model-profiles"
+# pi reads its settings from the agent directory, ~/.pi/agent, by default.
+# Only the two files this repo owns are symlinked (not the whole
+# directory) — pi writes its own runtime state into ~/.pi/agent too
+# (auth.json, extensions/ package checkouts, sessions/), same reasoning as
+# the k9s/opencode note in OPERATIONS.md's "Known gotchas".
+link "$DOTFILES_DIR/pi/settings.json" "$HOME/.pi/agent/settings.json"
+# Keep all locally vendored Pi themes available across machines. Pi discovers
+# JSON files from ~/.pi/agent/themes, while its other runtime state remains
+# outside the dotfiles repository.
+link "$DOTFILES_DIR/pi/themes" "$HOME/.pi/agent/themes"
+# models.json defines the same custom "cekat" provider (office LiteLLM
+# gateway) as omp/models.yml and opencode/opencode.json, same
+# $CEKAT_API_KEY — see zsh/.zshrc.local.example.
+link "$DOTFILES_DIR/pi/models.json" "$HOME/.pi/agent/models.json"
+# profiles/*.json are switched between at runtime with `/profile <name>`
+# (pi-profile extension, installed below) — one profile per model role
+# (default/smol/slow/plan/commit/task/web) plus personal-labs/
+# work-cekataiofficial account switches, kept in this repo so they're
+# versioned next to the models.json provider they reference.
+link "$DOTFILES_DIR/pi/profiles" "$HOME/.pi/profiles"
+link "$DOTFILES_DIR/pi/scripts/pi-roles" "$HOME/.local/bin/pi-roles"
 link "$DOTFILES_DIR/starship.toml"   "$HOME/.config/starship.toml"
 link "$OH_MY_TMUX_DIR/.tmux.conf"    "$HOME/.config/tmux/tmux.conf"
 link "$DOTFILES_DIR/tmux/tmux.conf.local" "$HOME/.config/tmux/tmux.conf.local"
@@ -253,6 +275,48 @@ if omp plugin list 2>/dev/null | grep -q 'omp-model-profiles'; then
 else
   omp plugin install github:rezhajulio/omp-model-profiles
   ok "omp-model-profiles installed"
+fi
+
+# ------------------------------------------------------------------------------
+# pi packages — role-based model routing and instant profile switching.
+# https://github.com/spksoft/pi-model-roles, https://github.com/Eddie0521/pi-profile.
+# Themes from luongnv89/pi-extensions are vendored under pi/themes and linked
+# above, so they do not need package installation.
+# Installed via pi's own package manager, which writes the declaration back
+# into the symlinked pi/settings.json (same idea as `omp plugin install`
+# above writing into omp's config).
+# ------------------------------------------------------------------------------
+step "Installing pi packages"
+PI_PACKAGES=(
+  "pi-model-roles:git:github.com/spksoft/pi-model-roles"
+  "pi-profile:npm:pi-profile"
+  "catppuccin-pi-coding-agent:git:github.com/XYenon/catppuccin-pi-coding-agent"
+  "statusline-pi:npm:statusline-pi"
+  "timestamp-pi:npm:timestamp-pi"
+  "pi-subagents:npm:@tintinweb/pi-subagents"
+  "subagents-pi:$DOTFILES_DIR/pi/extensions/subagents-pi"
+)
+for entry in "${PI_PACKAGES[@]}"; do
+  needle="${entry%%:*}"
+  pkg_source="${entry#*:}"
+  if pi list 2>/dev/null | grep -q "$needle"; then
+    skip "$needle already installed"
+  else
+    pi install "$pkg_source"
+    ok "$needle installed"
+  fi
+done
+
+# pi-model-roles refuses to save through a symlinked config.yaml, so its
+# config is deployed with a plain copy instead of `link` — see
+# pi/scripts/pi-roles for why. Only seed it if nothing is there yet, so a
+# re-run never clobbers a live switch to the work profile.
+step "Deploying default pi-model-roles config (personal)"
+if [[ -f "$HOME/.pi/agent/extensions/pi-model-roles/config.yaml" ]]; then
+  skip "pi-model-roles config already deployed (pi-roles personal|work to switch)"
+else
+  "$DOTFILES_DIR/pi/scripts/pi-roles" personal
+  ok "personal-labs model roles deployed"
 fi
 
 step "Setting up personal/work workspace directories"

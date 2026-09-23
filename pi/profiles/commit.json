@@ -1,0 +1,7 @@
+{
+  "name": "commit",
+  "label": "📝 Commit",
+  "description": "Write commit messages, PR descriptions, and changelog entries from a diff.",
+  "model": { "provider": "anthropic", "model": "claude-haiku-4-5" },
+  "sessionName": "Commit"
+}

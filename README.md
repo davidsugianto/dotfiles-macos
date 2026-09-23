@@ -25,6 +25,7 @@ system.
 | [Claude Code](https://claude.com/product/claude-code) | AI coding agent CLI | `claude` in any project directory |
 | [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story; themed Catppuccin Mocha (transparent), matching WezTerm/Neovim/k9s (`opencode/`); also configured with a custom "cekat" provider (office LLM gateway) — its API key is read from `$CEKAT_API_KEY`, set in the git-ignored `~/.zshrc.local`, never committed |
 | [omp](https://omp.sh) | AI coding agent CLI | Another alternative agent (`omp`, aka "Oh My Pi") — subagents, plan mode, LSP/DAP wired in; installed via `can1357/tap/omp`; per-role model config (`omp/`) picks Sonnet 5 by default, Haiku 4.5 for smol/commit tasks, Opus 5 (high) for slow/plan; themed Catppuccin (transparent status line), matching WezTerm/Neovim/k9s/opencode; web search tries Anthropic's native tool first (already authenticated, no extra key), then free keyless fallbacks (duckduckgo, startpage, google); also configured with the same custom "cekat" provider (office LiteLLM gateway) as opencode — `omp/models.yml`, same `$CEKAT_API_KEY` env var; [omp-model-profiles](https://github.com/rezhajulio/omp-model-profiles) plugin (installed via `omp plugin install`, needs `bun`) adds `/profile personal-labs` (the Anthropic roles above) and `/profile work-cekataiofficial` (internal GPT-5.6 Sol/Terra/Luna via the cekat gateway — Sol for slow/plan, Terra for default/task, Luna for smol/commit) to switch the whole role set in-session — `omp/model-profiles/` |
+| [pi](https://pi.dev) | AI coding agent CLI | The minimal upstream agent `omp`/"Oh My Pi" builds on; installed via `brew install pi-coding-agent`; task-based model routing across the same default/smol/slow/plan/commit/task/web split as `omp/`, via the [pi-model-roles](https://github.com/spksoft/pi-model-roles) extension (`pi/model-roles/`, deployed with `pi-roles personal\|work`, not symlinked — see below); instant `/profile <name>` switching via [pi-profile](https://github.com/Eddie0521/pi-profile) (`pi/profiles/`, one profile per role plus `personal-labs`/`work-cekataiofficial`); Catppuccin Mocha Mauve by default plus eight vendored switchable themes from [pi-extensions](https://github.com/luongnv89/pi-extensions) (`pi/themes/`); also configured with the same custom "cekat" provider as opencode/omp — `pi/models.json`, same `$CEKAT_API_KEY` env var |
 | [Orca](https://www.onorca.dev) | Agent Development Environment (ADE) | Desktop app for running Claude Code/opencode/omp in parallel, each in its own isolated git worktree, with diffs viewable side by side; installed via `stablyai/orca/orca`; launch shortcut `alt+shift+r` (see [aerospace/aerospace.toml](aerospace/aerospace.toml)); default tab agent set to `omp` so new tabs use the internal "cekat" LLM gateway by default, personal Claude Code still one command away — see below |
 | git + [delta](https://dandavison.github.io/delta) | Version control, syntax-highlighted diffs | Identity/SSH key auto-switches by directory — see below |
 | zsh (no framework) | Shell | Organized, commented, no oh-my-zsh overhead — installed via Homebrew for a newer version than the one macOS ships |
@@ -44,6 +45,7 @@ yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + model-profiles/*.yml (personal-labs, work-cekataiofficial), linked to ~/.omp/agent/ and ~/.omp/model-profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, work-cekataiofficial) + profiles/*.json + extensions/subagents-pi/ (vendored, not on npm), linked to ~/.pi/agent/ and ~/.pi/profiles/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
@@ -91,26 +93,40 @@ cd ~/dotfiles-macos
 1. Installs Homebrew if it's missing.
 2. Installs every formula/cask this repo needs (window management stack,
    WezTerm, Neovim, Starship, modern CLI tools, yazi, htop, fastfetch,
-   Claude Code, opencode, omp, bun, Orca, a Nerd Font).
+   Claude Code, opencode, omp, pi, bun, Orca, a Nerd Font).
 3. Builds [SbarLua](https://github.com/FelixKratz/SbarLua), the Lua API
    SketchyBar's config is written against, and vendors
    [Oh my tmux!](https://github.com/gpakosz/.tmux) into
    `~/.local/share/tmux/oh-my-tmux`.
 4. Symlinks each folder into `~/.config/<tool>` (`.zshrc`/`starship.toml`
-   to their expected locations, `omp/config.yml`+`omp/models.yml` to
-   `~/.omp/agent/` since omp doesn't use an XDG config path, and
-   `omp/model-profiles/` to `~/.omp/model-profiles/`) — existing files in
-   the way are backed up to `~/.dotfiles-backup/<timestamp>/`, never deleted.
+   to their expected locations; `omp/config.yml`+`omp/models.yml` to
+   `~/.omp/agent/` and `pi/settings.json`+`pi/models.json` to
+   `~/.pi/agent/`, since neither agent uses an XDG config path; and
+   `omp/model-profiles/`+`pi/profiles/` to `~/.omp/model-profiles/`+
+   `~/.pi/profiles/`) — existing files in the way are backed up to
+   `~/.dotfiles-backup/<timestamp>/`, never deleted.
 5. Installs the [omp-model-profiles](https://github.com/rezhajulio/omp-model-profiles)
    plugin via `omp plugin install` (needs `bun`, tapped/installed in step 2)
+ +
    so `/profile personal-labs` and `/profile work-cekataiofficial` are
    available inside omp.
-6. Copies `zsh/.zshrc.local.example` to `~/.zshrc.local` on first run
+6. Installs pi's [pi-model-roles](https://github.com/spksoft/pi-model-roles),
+   [pi-profile](https://github.com/Eddie0521/pi-profile),
+   [Catppuccin](https://github.com/XYenon/catppuccin-pi-coding-agent), and the
+   eight vendored switchable themes in `pi/themes/` from
+   [pi-extensions](https://github.com/luongnv89/pi-extensions),
+   [statusline-pi/timestamp-pi](https://github.com/luongnv89/pi-extensions),
+   and [pi-subagents](https://github.com/tintinweb/pi-subagents) packages via
+   `pi install`, plus the vendored `pi/extensions/subagents-pi/` fleet panel
+   from a local path, then deploys the personal-labs model-roles config
+   (see "pi model-role switching" and "pi status & subagent extensions"
+   below).
+7. Copies `zsh/.zshrc.local.example` to `~/.zshrc.local` on first run
    (git-ignored — put machine-specific overrides there).
-7. Hides the native macOS menu bar (`defaults write NSGlobalDomain
+8. Hides the native macOS menu bar (`defaults write NSGlobalDomain
    _HIHideMenuBar -bool true`, no SIP involved) so SketchyBar is the only
    bar on screen — log out/in if it's still visible afterwards.
-8. Starts AeroSpace, Borders, and SketchyBar.
+9. Starts AeroSpace, Borders, and SketchyBar.
 
 It's idempotent — re-run it any time after pulling changes.
 
@@ -190,6 +206,76 @@ machine with `aws configure sso --profile cekataiofficial` and
 `aws configure sso --profile personal` (interactive; not part of `setup.sh`
 since it needs a browser login), then re-auth per session with
 `aws sso login --profile <name>` when the cached SSO token expires.
+
+## pi model-role switching
+
+`pi/` mirrors `omp/`'s modelRoles concept using two vanilla-`pi` extensions,
+since `pi` itself has no built-in role system:
+
+| Mechanism | Extension | What it does |
+|---|---|---|
+| Automatic task routing | [pi-model-roles](https://github.com/spksoft/pi-model-roles) | Classifies each submitted task and auto-picks its model/effort from `~/.pi/agent/extensions/pi-model-roles/config.yaml` — the `default`/`smol`/`slow`/`plan`/`commit`/`task`/`web` split, same tiering as `omp/config.yml` |
+| Manual identity switch | [pi-profile](https://github.com/Eddie0521/pi-profile) | `/profile <name>` inside pi — one profile per role (`pi/profiles/`) plus `personal-labs`/`work-cekataiofficial` account switches |
+
+Swapping the whole personal/work role set (the `pi-model-roles` equivalent
+of omp's `/profile personal-labs` / `/profile work-cekataiofficial`) needs a
+shell command, not a slash command: `pi-model-roles` refuses to save through
+a symlinked `config.yaml`, so `pi/model-roles/*.yaml` are copied into place
+rather than linked.
+
+```sh
+pi-roles personal   # Anthropic direct — the global default
+pi-roles work        # cekat gateway (office GPT-5.6 Luna/Terra/Sol)
+```
+
+Run `/reload` in every open `pi` session afterwards — `pi-model-roles` has
+no file watcher. `pi-roles` is a plain script (`pi/scripts/pi-roles`,
+linked to `~/.local/bin/pi-roles`), so `git diff` in this repo always shows
+exactly which role set is checked in as the machine default.
+
+## Cekat model tool-call routing
+
+The Cekat LiteLLM gateway rejects function-tool requests for `azure_ai/gpt-6-luna`
+and `azure_ai/gpt-6-sol` on `/v1/chat/completions`: LiteLLM attaches a
+server-side `reasoning_effort` value, even when the client omits it. Setting
+`compat.supportsReasoningEffort: false` or sending `reasoning_effort: "none"`
+does not avoid this gateway behavior. Route these two models through the
+Responses API instead by setting `api: openai-responses` on their model entries
+in both `pi/models.json` and `omp/models.yml`. Keep the provider default as
+`openai-completions` for the other models.
+
+The pi model catalog reloads when `/model` is opened; use `/reload` in open
+sessions if needed. After changing pi model-role sets with `pi-roles work` or
+`pi-roles personal`, run `/reload` in each open session to load the copied role
+config.
+
+## pi status & subagent extensions
+
+All from [luongnv89/pi-extensions](https://github.com/luongnv89/pi-extensions)
+(MIT):
+
+| Extension | What you get | Source |
+|---|---|---|
+| [statusline-pi](https://github.com/luongnv89/pi-extensions/tree/main/extensions/statusline-pi) | Footer: git branch/changed files, PR number, session cost, CPU/MEM, context tokens/%, tok/s, model | npm |
+| [timestamp-pi](https://github.com/luongnv89/pi-extensions/tree/main/extensions/timestamp-pi) | Timestamp under every message + a prompt-cache TTL countdown in the footer | npm |
+| [@tintinweb/pi-subagents](https://github.com/tintinweb/pi-subagents) | Orchestration engine — spawning, FleetView, the `Agent` tool | npm |
+| [subagents-pi](pi/extensions/subagents-pi) | Fleet metrics panel (context, TPS, model, thinking) per managed subagent — companion to the extension above | **vendored**, not on npm |
+
+`subagents-pi` isn't published to npm (confirmed against the npm registry,
+not just its own README, which briefly claimed otherwise) — its own
+install instructions are a local path into a clone of its monorepo. That
+doesn't survive `setup.sh`'s idempotent re-runs on its own, so the exact
+upstream `extensions/subagents-pi/` directory is vendored straight into
+this repo (`pi/extensions/subagents-pi/`, byte-identical to upstream) and
+installed as a local package: `pi install <path>`. Pi stores that as a
+path relative to `~/.pi/agent` (not to this repo's `pi/` directory, even
+though `settings.json` is symlinked there) — portable as long as
+`setup.sh` (which recomputes it) runs on every machine, not just a
+`git pull`. Re-sync the vendored copy by hand if upstream changes; nothing
+here pulls updates automatically.
+
+Toggle commands once installed: `/statusline-pi`, `/statusline-refresh`,
+`/timestamp-pi`, `/subagents-pi`, `/subagents-pi-refresh`.
 
 ## Orca agent defaults
 

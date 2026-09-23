@@ -17,9 +17,9 @@
         "azure_ai/gpt-5.3-codex": { "name": "GPT-5.3 Codex" },
         "azure_ai/gpt-5.4-mini": { "name": "GPT-5.4 Mini" },
         "azure_ai/gpt-5.5": { "name": "GPT-5.5" },
-        "azure_ai/gpt-5.6-luna": { "name": "GPT-5.6 Luna" },
+        "azure_ai/gpt-6-luna": { "name": "GPT-6 Luna" },
         "azure_ai/gpt-5.6-terra": { "name": "GPT-5.6 Terra" },
-        "azure_ai/gpt-5.6-sol": { "name": "GPT-5.6 Sol" },
+        "azure_ai/gpt-6-sol": { "name": "GPT-6 Sol" },
         "azure_ai/kimi-k2.6": { "name": "Kimi K2.6" },
         "azure_ai/deepseek-v4-flash": { "name": "DeepSeek V4 Flash" },
         "azure_ai/deepseek-v4-pro": { "name": "DeepSeek V4 Pro" }

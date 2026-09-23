@@ -1,0 +1,6 @@
+{
+  "name": "default",
+  "label": "🧭 Default",
+  "description": "Baseline identity — no model override, uses pi's configured default (settings.json).",
+  "sessionName": "Default"
+}

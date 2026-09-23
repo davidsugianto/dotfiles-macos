@@ -1,0 +1,7 @@
+{
+  "name": "personal-labs",
+  "label": "🧑‍💻 Personal (Anthropic)",
+  "description": "Personal Anthropic subscription/API key — everyday driver, matches the personal-labs model-roles set.",
+  "model": { "provider": "anthropic", "model": "claude-sonnet-5", "thinkingLevel": "medium" },
+  "sessionName": "Personal"
+}

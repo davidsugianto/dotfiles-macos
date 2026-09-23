@@ -1,0 +1,74 @@
+# Work roles — routes through the internal cekat LiteLLM gateway
+# (../models.json, $CEKAT_API_KEY) using the three internal GPT-5.6
+# deployments, tiered by capability like dotfiles-macos/omp's work profile:
+#   Luna  = fast/small  -> smol, commit (cheap, high-volume roles)
+#   Terra = balanced     -> default, task (everyday driver)
+#   Sol   = deep/large   -> slow, plan (thinking-heavy work, high effort)
+#
+# Deploy with `pi-roles work` (dotfiles-macos/pi/scripts/pi-roles), not a
+# symlink — see that script and OPERATIONS.md. Run /reload afterwards.
+#
+# No `web` role here, unlike personal-labs.yaml: omp's own
+# work-cekataiofficial.yml profile also skips it (no distinct
+# search-tier deployment on the office gateway) and, being a *layered*
+# omp/model-profiles override, silently falls back to config.yml's global
+# `web` role (Anthropic Haiku) when active. pi-model-roles has no such
+# layering — this file is the *entire* role set while active, so a task
+# that would classify as "web" instead falls through to "default" (Terra)
+# here. Add an explicit `web` role below if that's not the behavior you
+# want while on the work gateway.
+version: 1
+enabled: true
+selectorTimeoutMs: 8000
+selectorContext: conversation
+roles:
+  default:
+    model:
+      provider: cekat
+      id: azure_ai/gpt-5.6-terra
+    effort: off
+  smol:
+    description: >-
+      Use for small, well-specified, low-risk edits or lookups with an
+      explicit outcome and no design decision — typos, renames, formatting,
+      one-line fixes, short factual questions.
+    model:
+      provider: cekat
+      id: azure_ai/gpt-6-luna
+    effort: off
+  slow:
+    description: >-
+      Use for hard, ambiguous, or high-risk problems that need deep
+      multi-step reasoning — tricky bugs, unclear requirements, security or
+      correctness review, architecture trade-offs.
+    model:
+      provider: cekat
+      id: azure_ai/gpt-6-sol
+    effort: high
+  plan:
+    description: >-
+      Use when the task is to produce a plan, design, or strategy before any
+      code changes — breaking down multi-step work, evaluating approaches,
+      writing an implementation plan.
+    model:
+      provider: cekat
+      id: azure_ai/gpt-6-sol
+    effort: high
+  commit:
+    description: >-
+      Use when the task is to write or summarize a commit message, PR
+      description, or changelog entry from a diff — no code changes
+      requested.
+    model:
+      provider: cekat
+      id: azure_ai/gpt-6-luna
+    effort: off
+  task:
+    description: >-
+      Use for ordinary delegated implementation work with a clear,
+      well-scoped outcome — the default driver for everyday coding tasks
+      that are neither trivial lookups nor open-ended design problems.
+    model:
+      provider: cekat
+      id: azure_ai/gpt-5.6-terra
+    effort: off

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# pi-roles — copy a pi-model-roles config from this repo into place.
+#
+# pi-model-roles refuses to save through a symlinked config.yaml (see its
+# own recovery table: "Symlinks ... may require manual repair before the
+# menu can save"), so this repo can't just `ln -s` the role file the way
+# omp/model-profiles/ is linked wholesale. Instead the two variants live
+# in ../model-roles/ as the source of truth and get copied into place on
+# demand, same idea as omp's `/profile personal-labs` /
+# `/profile work-cekataiofficial` but a plain copy instead of a live
+# in-session command (pi-model-roles has no such command).
+#
+# Usage: pi-roles personal | pi-roles work
+#
+# After switching, run /reload in every open pi session (or restart it) to
+# pick up the new file — pi-model-roles has no file watcher.
+# ==============================================================================
+set -euo pipefail
+
+DOTFILES_PI_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &>/dev/null && pwd)"
+DEST="$HOME/.pi/agent/extensions/pi-model-roles/config.yaml"
+
+case "${1:-}" in
+  personal | personal-labs)
+    SRC="$DOTFILES_PI_DIR/model-roles/personal-labs.yaml"
+    ;;
+  work | work-cekataiofficial)
+    SRC="$DOTFILES_PI_DIR/model-roles/work-cekataiofficial.yaml"
+    ;;
+  *)
+    echo "usage: pi-roles <personal|work>" >&2
+    exit 1
+    ;;
+esac
+
+mkdir -p -- "$(dirname -- "$DEST")"
+cp -- "$SRC" "$DEST"
+echo "pi-roles: deployed $SRC -> $DEST"
+echo "pi-roles: run /reload in any open pi session to pick it up."

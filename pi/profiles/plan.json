@@ -1,0 +1,7 @@
+{
+  "name": "plan",
+  "label": "🗺️ Plan",
+  "description": "Planning/design mode — produce a plan or strategy before touching code.",
+  "model": { "provider": "anthropic", "model": "claude-opus-5", "thinkingLevel": "high" },
+  "sessionName": "Plan"
+}

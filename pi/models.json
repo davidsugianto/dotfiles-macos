@@ -1,0 +1,33 @@
+{
+  "providers": {
+    "cekat": {
+      "baseUrl": "https://llm.cekat.id/v1",
+      "apiKey": "$CEKAT_API_KEY",
+      "api": "openai-completions",
+      "models": [
+        { "id": "anthropic/claude-opus-4.8", "name": "Claude Opus 4.8" },
+        { "id": "anthropic/claude-sonnet-5", "name": "Claude Sonnet 5" },
+        { "id": "anthropic/claude-fable-5", "name": "Claude Fable 5" },
+        { "id": "anthropic/claude-haiku-4.5", "name": "Claude Haiku 4.5" },
+        { "id": "anthropic/claude-sonnet-4.6", "name": "Claude Sonnet 4.6" },
+        { "id": "azure_ai/gpt-5.3-codex", "name": "GPT-5.3 Codex" },
+        { "id": "azure_ai/gpt-5.4-mini", "name": "GPT-5.4 Mini" },
+        { "id": "azure_ai/gpt-5.5", "name": "GPT-5.5" },
+        {
+          "id": "azure_ai/gpt-6-luna",
+          "name": "GPT-6 Luna",
+          "api": "openai-responses"
+        },
+        { "id": "azure_ai/gpt-5.6-terra", "name": "GPT-5.6 Terra" },
+        {
+          "id": "azure_ai/gpt-6-sol",
+          "name": "GPT-6 Sol",
+          "api": "openai-responses"
+        },
+        { "id": "azure_ai/kimi-k2.6", "name": "Kimi K2.6" },
+        { "id": "azure_ai/deepseek-v4-flash", "name": "DeepSeek V4 Flash" },
+        { "id": "azure_ai/deepseek-v4-pro", "name": "DeepSeek V4 Pro" }
+      ]
+    }
+  }
+}

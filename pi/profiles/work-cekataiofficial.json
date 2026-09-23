@@ -1,0 +1,7 @@
+{
+  "name": "work-cekataiofficial",
+  "label": "🏢 Work (cekat gateway)",
+  "description": "Office LiteLLM gateway (cekat) — internal GPT-5.6 Terra deployment, matches the work-cekataiofficial model-roles set.",
+  "model": { "provider": "cekat", "model": "azure_ai/gpt-5.6-terra" },
+  "sessionName": "Work"
+}

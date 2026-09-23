@@ -1,0 +1,7 @@
+{
+  "name": "task",
+  "label": "🔨 Task",
+  "description": "Everyday delegated implementation work — the default driver for well-scoped coding tasks.",
+  "model": { "provider": "anthropic", "model": "claude-sonnet-5", "thinkingLevel": "medium" },
+  "sessionName": "Task"
+}

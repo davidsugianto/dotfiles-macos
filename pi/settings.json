@@ -1,0 +1,16 @@
+{
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-sonnet-5",
+  "defaultThinkingLevel": "medium",
+  "theme": "synthwave-84",
+  "packages": [
+    "git:github.com/spksoft/pi-model-roles",
+    "npm:pi-profile",
+    "git:github.com/XYenon/catppuccin-pi-coding-agent",
+    "npm:statusline-pi",
+    "npm:timestamp-pi",
+    "npm:@tintinweb/pi-subagents",
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/subagents-pi"
+  ],
+  "lastChangelogVersion": "0.86.1"
+}

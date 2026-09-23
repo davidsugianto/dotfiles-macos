@@ -1,6 +1,6 @@
 setupVersion: 2
 modelRoles:
-  default: anthropic/claude-sonnet-5
+  default: cekat/azure_ai/gpt-5.6-terra
   smol: anthropic/claude-haiku-4-5
   slow: anthropic/claude-opus-5:high
   plan: anthropic/claude-opus-5:high
@@ -55,3 +55,5 @@ retry:
       - web/mojeek
       - web/public
 extendedContext: true
+dev:
+  autoqaConsent: granted

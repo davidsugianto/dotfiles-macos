@@ -1,0 +1,7 @@
+{
+  "name": "smol",
+  "label": "🐣 Smol",
+  "description": "Fast/cheap model for small, low-risk edits and lookups.",
+  "model": { "provider": "anthropic", "model": "claude-haiku-4-5" },
+  "sessionName": "Smol"
+}

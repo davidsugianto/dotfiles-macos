@@ -81,6 +81,31 @@ fix noted last below, which is still uncommitted.
   `.gitignore`. **This fix itself is not yet committed** — do that
   before/with the next commit.
 
+## 2026-09-23: Cekat function-tool routing
+
+Fixed tool-call failures for `azure_ai/gpt-6-luna` and `azure_ai/gpt-6-sol` in
+both pi and omp. The Cekat LiteLLM gateway rejects tool calls on
+`/v1/chat/completions` when it attaches its server-side `reasoning_effort`,
+including when the client omits that field. Client-side
+`compat.supportsReasoningEffort: false` and `reasoning_effort: "none"` did not
+resolve it. Per-model `api: openai-responses` routes Luna and Sol through
+`/v1/responses`; the provider default remains `openai-completions` for the
+other models. Do not replace this with provider-level API routing, which would
+change the transport for every Cekat model.
+
+Changed `pi/models.json` and `omp/models.yml`; removed the ineffective omp
+`modelOverrides` workaround and corrected the work-profile comment. The pi
+models file is symlinked live to `~/.pi/agent/models.json`; the pi-model-roles
+config is separately copied, not symlinked.
+
+Validation completed with live tool calls: pi Luna and Sol each passed single
+and sequential two-command bash tool calls; pi Terra passed a regression tool
+call. Omp Luna and Sol each passed a bash tool call. JSON/YAML syntax and the
+pi models symlink were checked. `pi-roles work` was deployed and compared with
+the repository role file, then the original `personal-labs` role config was
+restored and compared. Open pi sessions may need `/reload` to pick up a role
+config switch; model catalog changes reload when `/model` is opened.
+
 ## Repo structure notes (for a fresh session with no memory)
 
 - `setup.sh` — base install (Homebrew, taps, general CLI + GUI apps/fonts,
