@@ -57,3 +57,5 @@ retry:
 extendedContext: true
 dev:
   autoqaConsent: granted
+browser:
+  relay: true

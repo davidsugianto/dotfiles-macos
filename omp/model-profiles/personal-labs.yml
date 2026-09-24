@@ -1,11 +1,11 @@
-# Personal profile — Anthropic direct (personal subscription/API key), same
-# tiering already used as the global default in ../config.yml: Sonnet 5 for
-# everyday driving, Haiku 4.5 for cheap/high-volume roles, Opus 5 (high) for
-# anything that needs to think hard. Switch to this with `/profile personal-labs`.
+# Personal profile — Anthropic direct (personal subscription/API key). Default
+# is Opus 5.5 with no thinking suffix, so it follows `defaultThinkingLevel: auto`
+# from ../config.yml; Haiku 4.5 for cheap/high-volume roles. Switch to this
+# with `/profile personal-labs`.
 modelRoles:
-  default: anthropic/claude-sonnet-5
+  default: anthropic/claude-opus-5-5
   smol: anthropic/claude-haiku-4-5
-  slow: anthropic/claude-opus-5:high
-  plan: anthropic/claude-opus-5:high
+  slow: anthropic/claude-opus-5-5:high
+  plan: anthropic/claude-opus-5-5:high
   commit: anthropic/claude-haiku-4-5
   task: anthropic/claude-sonnet-5
