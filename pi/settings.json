@@ -10,7 +10,8 @@
     "npm:statusline-pi",
     "npm:timestamp-pi",
     "npm:@tintinweb/pi-subagents",
-    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/subagents-pi"
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/subagents-pi",
+    "npm:pi-mcp-adapter"
   ],
   "lastChangelogVersion": "0.86.1"
 }

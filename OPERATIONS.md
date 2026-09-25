@@ -19,7 +19,8 @@ package.
 | Neovim | Restart, or `:source $MYVIMRC` for `lua/config/*` changes. Plugin spec changes need `:Lazy sync` |
 | zsh | `exec zsh` (alias: `reload`) |
 | Starship | Auto-reloads on next prompt draw |
-| pi | `/reload` inside pi for `settings.json`/`models.json`/profile edits; `pi-roles personal\|work` then `/reload` for a model-roles switch (not a live watcher) |
+| pi | `/reload` inside pi for `settings.json`/`models.json`/`mcp.json`/profile edits; `pi-roles personal\|work` then `/reload` for a model-roles switch (not a live watcher) |
+| omp MCP | `/mcp reload` inside omp after editing `omp/mcp.json`; after changing the Datadog site host, also `/mcp unauth datadog` then `/mcp reauth datadog` |
 
 ## Modifying configs
 

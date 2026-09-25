@@ -44,8 +44,8 @@ fastfetch/     System info shown on new top-level shells
 yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + model-profiles/*.yml (personal-labs, work-cekataiofficial), linked to ~/.omp/agent/ and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, work-cekataiofficial) + profiles/*.json + extensions/subagents-pi/ (vendored, not on npm), linked to ~/.pi/agent/ and ~/.pi/profiles/
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog MCP server) + model-profiles/*.yml (personal-labs, work-cekataiofficial), linked to ~/.omp/agent/ and ~/.omp/model-profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp.json (Datadog MCP server, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, work-cekataiofficial) + profiles/*.json + extensions/subagents-pi/ (vendored, not on npm), linked to ~/.pi/agent/ and ~/.pi/profiles/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
@@ -99,8 +99,9 @@ cd ~/dotfiles-macos
    [Oh my tmux!](https://github.com/gpakosz/.tmux) into
    `~/.local/share/tmux/oh-my-tmux`.
 4. Symlinks each folder into `~/.config/<tool>` (`.zshrc`/`starship.toml`
-   to their expected locations; `omp/config.yml`+`omp/models.yml` to
-   `~/.omp/agent/` and `pi/settings.json`+`pi/models.json` to
+   to their expected locations; `omp/config.yml`+`omp/models.yml`+
+   `omp/mcp.json` to `~/.omp/agent/` and
+   `pi/settings.json`+`pi/models.json`+`pi/mcp.json` to
    `~/.pi/agent/`, since neither agent uses an XDG config path; and
    `omp/model-profiles/`+`pi/profiles/` to `~/.omp/model-profiles/`+
    `~/.pi/profiles/`) — existing files in the way are backed up to
@@ -116,11 +117,12 @@ cd ~/dotfiles-macos
    eight vendored switchable themes in `pi/themes/` from
    [pi-extensions](https://github.com/luongnv89/pi-extensions),
    [statusline-pi/timestamp-pi](https://github.com/luongnv89/pi-extensions),
-   and [pi-subagents](https://github.com/tintinweb/pi-subagents) packages via
-   `pi install`, plus the vendored `pi/extensions/subagents-pi/` fleet panel
-   from a local path, then deploys the personal-labs model-roles config
-   (see "pi model-role switching" and "pi status & subagent extensions"
-   below).
+   [pi-subagents](https://github.com/tintinweb/pi-subagents), and
+   [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) packages
+   via `pi install`, plus the vendored `pi/extensions/subagents-pi/` fleet
+   panel from a local path, then deploys the personal-labs model-roles config
+   (see "pi model-role switching", "pi status & subagent extensions", and
+   "Datadog MCP" below).
 7. Copies `zsh/.zshrc.local.example` to `~/.zshrc.local` on first run
    (git-ignored — put machine-specific overrides there).
 8. Hides the native macOS menu bar (`defaults write NSGlobalDomain
@@ -276,6 +278,41 @@ here pulls updates automatically.
 
 Toggle commands once installed: `/statusline-pi`, `/statusline-refresh`,
 `/timestamp-pi`, `/subagents-pi`, `/subagents-pi-refresh`.
+
+## Datadog MCP
+
+omp and pi both talk to Datadog's hosted
+[MCP server](https://docs.datadoghq.com/mcp_server/setup/) (logs, metrics,
+traces, monitors, incidents, dashboards) over Streamable HTTP, defined as a
+`datadog` server in `omp/mcp.json` (→ `~/.omp/agent/mcp.json`, native omp
+MCP) and `pi/mcp.json` (→ `~/.pi/agent/mcp.json`, read by the
+[pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) package —
+pi has no built-in MCP). Two files because each agent has its own loader;
+keep the server entries identical.
+
+Auth is browser OAuth — the same Datadog login you use in the web app
+(e.g. Google SSO); no API/application keys. Datadog supports dynamic client
+registration and accepts omp's/pi's localhost callbacks, so no org
+allow-listing is needed. Tokens are stored per agent (omp: its `agent.db`;
+pi: the macOS keychain), never in this repo, and refresh automatically.
+
+The endpoint is pinned to the org's site, US5
+(`https://mcp.us5.datadoghq.com/api/unstable/mcp-server/mcp`, login at
+`us5.datadoghq.com`), directly in both files — not via an env var, so omp/pi
+launched from anywhere (Orca, an old shell) always hit the right site. For
+another site swap the host (`mcp.datadoghq.com` = US1, `mcp.us3.datadoghq.com`,
+`mcp.datadoghq.eu`, `mcp.ap1.datadoghq.com`, …) in both files and re-login.
+
+First login, once per agent:
+
+- omp: `/mcp reauth datadog` → browser opens → sign in → `/mcp test datadog`.
+- pi: `/mcp-auth datadog` (or `/mcp`, Enter on the server) → browser → sign in.
+  Servers connect lazily on first tool call — the agent finds tools via
+  `mcp({ search: "logs" })`.
+
+Default toolsets only; to add product toolsets append e.g.
+`?toolsets=apm,llmobs` (or `all`) to the `url` in both files. If your org
+signs in through a custom subdomain, append `?subdomain=<name>` too.
 
 ## Orca agent defaults
 

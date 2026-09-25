@@ -230,6 +230,9 @@ link "$DOTFILES_DIR/omp/models.yml" "$HOME/.omp/agent/models.yml"
 # (omp-model-profiles plugin, installed below) — kept in this repo so both
 # profiles are versioned next to the models.yml provider they reference.
 link "$DOTFILES_DIR/omp/model-profiles" "$HOME/.omp/model-profiles"
+# mcp.json holds the user-level MCP servers (Datadog US5, browser OAuth — no
+# keys, no env vars). Same server as pi/mcp.json below.
+link "$DOTFILES_DIR/omp/mcp.json" "$HOME/.omp/agent/mcp.json"
 # pi reads its settings from the agent directory, ~/.pi/agent, by default.
 # Only the two files this repo owns are symlinked (not the whole
 # directory) — pi writes its own runtime state into ~/.pi/agent too
@@ -244,6 +247,9 @@ link "$DOTFILES_DIR/pi/themes" "$HOME/.pi/agent/themes"
 # gateway) as omp/models.yml and opencode/opencode.json, same
 # $CEKAT_API_KEY — see zsh/.zshrc.local.example.
 link "$DOTFILES_DIR/pi/models.json" "$HOME/.pi/agent/models.json"
+# mcp.json is read by the pi-mcp-adapter package (installed below) — pi has
+# no built-in MCP support. Same Datadog server + env vars as omp/mcp.json.
+link "$DOTFILES_DIR/pi/mcp.json" "$HOME/.pi/agent/mcp.json"
 # profiles/*.json are switched between at runtime with `/profile <name>`
 # (pi-profile extension, installed below) — one profile per model role
 # (default/smol/slow/plan/commit/task/web) plus personal-labs/
@@ -295,6 +301,7 @@ PI_PACKAGES=(
   "timestamp-pi:npm:timestamp-pi"
   "pi-subagents:npm:@tintinweb/pi-subagents"
   "subagents-pi:$DOTFILES_DIR/pi/extensions/subagents-pi"
+  "pi-mcp-adapter:npm:pi-mcp-adapter"
 )
 for entry in "${PI_PACKAGES[@]}"; do
   needle="${entry%%:*}"
