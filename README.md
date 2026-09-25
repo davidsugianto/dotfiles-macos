@@ -147,7 +147,7 @@ toolchain that not everyone using this repo needs:
 | [Ansible](https://www.ansible.com) | Config management (`ansible-vault` ships as a subcommand) |
 | [kubectl](https://kubernetes.io/docs/reference/kubectl/) / [kubectx](https://github.com/ahmetb/kubectx) | Kubernetes CLI + fast context/namespace switching (`kubectx`/`kubens`) |
 | [k9s](https://k9scli.io) | Terminal Kubernetes UI — themed Catppuccin Mocha (transparent), matching WezTerm/Neovim (`k9s/`) |
-| [sofka](https://sofka.rs) | Kubernetes TUI (Rust, k9s-inspired) — Flux/Argo CD built in, native incident view, themed Catppuccin Mocha, matching WezTerm/Neovim/k9s (`sofka/`); `Ctrl-T` opens a WezTerm pane with `kubectl`/`helm` pinned to Sofka’s active context and namespace |
+| [sofka](https://sofka.rs) | Kubernetes TUI (Rust, k9s-inspired) — Flux/Argo CD built in, native incident view, themed Catppuccin Mocha, matching WezTerm/Neovim/k9s (`sofka/`); `Ctrl-T` opens a WezTerm pane with `kubectl`/`helm` pinned to Sofka’s active context and namespace, including from tmux sessions with stale WezTerm socket state |
 | [Helm](https://helm.sh) + [helm-diff](https://github.com/databus23/helm-diff) | Kubernetes package manager + `helm diff upgrade`/`helm diff rollback` plugin (previews changes before applying) |
 | [Freelens](https://freelens.app) | Kubernetes IDE — open-source Lens fork |
 | [lazygit](https://github.com/jesseduffield/lazygit) | Terminal git UI |

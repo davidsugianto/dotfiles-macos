@@ -4,6 +4,13 @@ set -euo pipefail
 
 context=$1
 namespace=$2
+# A long-lived tmux server can preserve the socket path of a WezTerm GUI
+# that has since quit. Probe without starting a mux server; if stale, let the
+# CLI discover the currently running GUI instead.
+if [[ -n ${WEZTERM_UNIX_SOCKET:-} ]] &&
+  ! wezterm cli --no-auto-start list >/dev/null 2>&1; then
+  unset WEZTERM_UNIX_SOCKET
+fi
 
 exec wezterm cli split-pane \
   --bottom \

@@ -125,7 +125,15 @@ fi
 # aliases here so existing `k`/`helm` habits use the inspected context and
 # namespace without mutating the kubeconfig's current-context.
 if [[ -n ${SOFKA_CONTEXT:-} ]]; then
-  kubectl() { command kubectl --context "$SOFKA_CONTEXT" --namespace "$SOFKA_NAMESPACE" "$@"; }
+  # TAB completion calls `kubectl __complete …`; kubectl rejects flags placed
+  # before that hidden subcommand, so inject them after it instead.
+  kubectl() {
+    if [[ ${1:-} == __complete* ]]; then
+      command kubectl "$1" --context "$SOFKA_CONTEXT" --namespace "$SOFKA_NAMESPACE" "${@:2}"
+    else
+      command kubectl --context "$SOFKA_CONTEXT" --namespace "$SOFKA_NAMESPACE" "$@"
+    fi
+  }
   helm() { command helm --kube-context "$SOFKA_CONTEXT" --namespace "$SOFKA_NAMESPACE" "$@"; }
 fi
 
