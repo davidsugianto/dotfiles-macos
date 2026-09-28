@@ -59,3 +59,5 @@ dev:
   autoqaConsent: granted
 browser:
   relay: true
+claudeResets:
+  autoRedeem: "no"
