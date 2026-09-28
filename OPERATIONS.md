@@ -103,6 +103,7 @@ table here too — it drifts otherwise.
 ### AeroSpace
 
 Modifier is `alt` throughout. Defined in `aerospace/aerospace.toml`.
+Tiled windows use a per-monitor top gap (`outer.top` in `aerospace/aerospace.toml`): 16 px on the MacBook built-in display, 48 px on external monitors, so they don't sit beneath the floating SketchyBar.
 
 | Key | Action |
 |---|---|

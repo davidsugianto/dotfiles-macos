@@ -34,7 +34,9 @@ accordion-padding = 30
   inner.vertical = 8
   outer.left = 8
   outer.right = 8
-  outer.top = 16   # extra breathing room below the floating SketchyBar pill
+  # Built-in display keeps its original gap; external monitors need more room
+  # below the floating SketchyBar pill. AeroSpace applies these automatically.
+  outer.top = [{ monitor."built-in" = 16 }, 48]
   outer.bottom = 8
 
 # ------------------------------------------------------------------------------
