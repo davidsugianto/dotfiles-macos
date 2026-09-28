@@ -119,7 +119,7 @@ Tiled windows use a per-monitor top gap (`outer.top` in `aerospace/aerospace.tom
 | `alt-1`…`alt-9` | Switch to workspace 1–9 |
 | `alt-shift-1`…`alt-shift-9` | Move focused window to workspace 1–9 and follow |
 | `alt-tab` | Jump to previously focused workspace |
-| `alt-shift-,` / `alt-shift-.` | Focus previous/next monitor |
+| `alt-shift-,` / `alt-shift-.` | Focus previous/next monitor (mouse moves to that monitor) |
 | `alt-r` | Enter resize mode |
 | `alt-shift-c` | Reload config |
 | `alt-shift-w` | Launch WezTerm |
