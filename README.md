@@ -297,7 +297,7 @@ allow-listing is needed. Tokens are stored per agent (omp: its `agent.db`;
 pi: the macOS keychain), never in this repo, and refresh automatically.
 
 The endpoint is pinned to the org's site, US5
-(`https://mcp.us5.datadoghq.com/api/unstable/mcp-server/mcp`, login at
+(`https://mcp.us5.datadoghq.com/v1/mcp`, login at
 `us5.datadoghq.com`), directly in both files — not via an env var, so omp/pi
 launched from anywhere (Orca, an old shell) always hit the right site. For
 another site swap the host (`mcp.datadoghq.com` = US1, `mcp.us3.datadoghq.com`,
