@@ -108,6 +108,7 @@ CASKS=(
   slack
   thebrowsercompany-dia
   zen
+  google-chrome
   obsidian
   spotify
 )

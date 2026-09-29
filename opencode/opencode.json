@@ -11,6 +11,7 @@
       "models": {
         "anthropic/claude-opus-4.8": { "name": "Claude Opus 4.8" },
         "anthropic/claude-sonnet-5": { "name": "Claude Sonnet 5" },
+        "anthropic/claude-sonnet-5.5": { "name": "Claude Sonnet 5.5" },
         "anthropic/claude-fable-5": { "name": "Claude Fable 5" },
         "anthropic/claude-haiku-4.5": { "name": "Claude Haiku 4.5" },
         "anthropic/claude-sonnet-4.6": { "name": "Claude Sonnet 4.6" },

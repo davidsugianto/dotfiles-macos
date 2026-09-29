@@ -12,9 +12,9 @@
 # `/v1/responses` instead, which has no such restriction.
 # Switch to this with `/profile work-cekataiofficial`.
 modelRoles:
-  default: cekat/azure_ai/gpt-6-luna
+  default: cekat/azure_ai/gpt-6-sol
   smol: cekat/azure_ai/gpt-6-luna
   slow: cekat/azure_ai/gpt-6-sol
   plan: cekat/azure_ai/gpt-6-sol
   commit: cekat/azure_ai/gpt-6-luna
-  task: cekat/azure_ai/gpt-6-luna
+  task: cekat/azure_ai/gpt-6-sol
