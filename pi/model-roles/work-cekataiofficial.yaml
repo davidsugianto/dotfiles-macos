@@ -2,8 +2,8 @@
 # (../models.json, $CEKAT_API_KEY) using the three internal GPT-5.6
 # deployments, tiered by capability like dotfiles-macos/omp's work profile:
 #   Luna  = fast/small  -> smol, commit (cheap, high-volume roles)
-#   Terra = balanced     -> default, task (everyday driver)
-#   Sol   = deep/large   -> slow, plan (thinking-heavy work, high effort)
+#   Terra = balanced     -> default (everyday driver)
+#   Sol   = deep/large   -> slow, plan, task (thinking-heavy work, high effort)
 #
 # Deploy with `pi-roles work` (dotfiles-macos/pi/scripts/pi-roles), not a
 # symlink — see that script and OPERATIONS.md. Run /reload afterwards.
@@ -70,5 +70,5 @@ roles:
       that are neither trivial lookups nor open-ended design problems.
     model:
       provider: cekat
-      id: azure_ai/gpt-5.6-terra
+      id: azure_ai/gpt-6-sol
     effort: off

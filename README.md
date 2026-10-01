@@ -101,7 +101,7 @@ cd ~/dotfiles-macos
 4. Symlinks each folder into `~/.config/<tool>` (`.zshrc`/`starship.toml`
    to their expected locations; `omp/config.yml`+`omp/models.yml`+
    `omp/mcp.json` to `~/.omp/agent/` and
-   `pi/settings.json`+`pi/models.json`+`pi/mcp.json` to
+   `pi/settings.json`+`pi/models.json`+`pi/mcp-adapter.json` to
    `~/.pi/agent/`, since neither agent uses an XDG config path; and
    `omp/model-profiles/`+`pi/profiles/` to `~/.omp/model-profiles/`+
    `~/.pi/profiles/`) — existing files in the way are backed up to
@@ -285,7 +285,7 @@ omp and pi both talk to Datadog's hosted
 [MCP server](https://docs.datadoghq.com/mcp_server/setup/) (logs, metrics,
 traces, monitors, incidents, dashboards) over Streamable HTTP, defined as a
 `datadog` server in `omp/mcp.json` (→ `~/.omp/agent/mcp.json`, native omp
-MCP) and `pi/mcp.json` (→ `~/.pi/agent/mcp.json`, read by the
+MCP) and `pi/mcp-adapter.json` (→ `~/.pi/agent/mcp-adapter.json`, read by the
 [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) package —
 pi has no built-in MCP). Two files because each agent has its own loader;
 keep the server entries identical.

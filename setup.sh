@@ -232,7 +232,7 @@ link "$DOTFILES_DIR/omp/models.yml" "$HOME/.omp/agent/models.yml"
 # profiles are versioned next to the models.yml provider they reference.
 link "$DOTFILES_DIR/omp/model-profiles" "$HOME/.omp/model-profiles"
 # mcp.json holds the user-level MCP servers (Datadog US5, browser OAuth — no
-# keys, no env vars). Same server as pi/mcp.json below.
+# keys, no env vars). Same server as pi/mcp-adapter.json below.
 link "$DOTFILES_DIR/omp/mcp.json" "$HOME/.omp/agent/mcp.json"
 # pi reads its settings from the agent directory, ~/.pi/agent, by default.
 # Only the two files this repo owns are symlinked (not the whole
@@ -248,15 +248,20 @@ link "$DOTFILES_DIR/pi/themes" "$HOME/.pi/agent/themes"
 # gateway) as omp/models.yml and opencode/opencode.json, same
 # $CEKAT_API_KEY — see zsh/.zshrc.local.example.
 link "$DOTFILES_DIR/pi/models.json" "$HOME/.pi/agent/models.json"
-# mcp.json is read by the pi-mcp-adapter package (installed below) — pi has
+# mcp-adapter.json is read by the pi-mcp-adapter package (installed below) — pi has
 # no built-in MCP support. Same Datadog server + env vars as omp/mcp.json.
-link "$DOTFILES_DIR/pi/mcp.json" "$HOME/.pi/agent/mcp.json"
+link "$DOTFILES_DIR/pi/mcp-adapter.json" "$HOME/.pi/agent/mcp-adapter.json"
 # profiles/*.json are switched between at runtime with `/profile <name>`
 # (pi-profile extension, installed below) — one profile per model role
 # (default/smol/slow/plan/commit/task/web) plus personal-labs/
 # work-cekataiofficial account switches, kept in this repo so they're
 # versioned next to the models.json provider they reference.
 link "$DOTFILES_DIR/pi/profiles" "$HOME/.pi/profiles"
+# Skills live in the tool-neutral ~/.agents/skills, which omp's `agents`
+# provider and pi both read. The `skills` CLI writes to pi's path
+# (~/.pi/agent/skills), so that path is a symlink into the shared dir.
+mkdir -p -- "$HOME/.agents/skills"
+link "$HOME/.agents/skills" "$HOME/.pi/agent/skills"
 link "$DOTFILES_DIR/pi/scripts/pi-roles" "$HOME/.local/bin/pi-roles"
 link "$DOTFILES_DIR/starship.toml"   "$HOME/.config/starship.toml"
 link "$OH_MY_TMUX_DIR/.tmux.conf"    "$HOME/.config/tmux/tmux.conf"
@@ -312,6 +317,41 @@ for entry in "${PI_PACKAGES[@]}"; do
   else
     pi install "$pkg_source"
     ok "$needle installed"
+  fi
+done
+
+# ------------------------------------------------------------------------------
+# Agent skills — shared by pi and omp via ~/.agents/skills (linked above).
+# Each entry is "<owner/repo>:<space-separated skill names>". Names are the
+# folder names inside the repo, verified with `bunx skills@1.7.0 add <repo> --list`.
+# bunx (not npx): bun is installed above, node is not guaranteed on a fresh Mac.
+# Skills are third-party instructions (some ship scripts) the agent executes
+# with full permissions — review additions before adding them here.
+# ------------------------------------------------------------------------------
+step "Installing agent skills (pi + omp)"
+SKILLS_CLI="skills@1.7.0"
+SKILLS_DIR="$HOME/.agents/skills"
+SKILL_SOURCES=(
+  "obra/superpowers:brainstorming writing-plans executing-plans test-driven-development systematic-debugging verification-before-completion requesting-code-review receiving-code-review finishing-a-development-branch"
+  "DietrichGebert/ponytail:ponytail ponytail-review ponytail-audit"
+  "trailofbits/skills:audit-context-building differential-review semgrep"
+  "wshobson/agents:k8s-manifest-generator k8s-security-policies helm-chart-scaffolding gitops-workflow terraform-module-library github-actions-templates deployment-pipeline-design secrets-management cost-optimization slo-implementation incident-runbook-templates postmortem-writing on-call-handoff-patterns"
+  "hashicorp/agent-skills:terraform-style-guide terraform-test refactor-module"
+  "aws/agent-toolkit-for-aws:aws-iam aws-containers aws-networking aws-observability aws-billing-and-cost-management"
+  "google/skills:gke-basics gke-upgrades gke-networking gke-golden-path"
+  "github/awesome-copilot:multi-stage-dockerfile github-actions-hardening"
+)
+for entry in "${SKILL_SOURCES[@]}"; do
+  repo="${entry%%:*}"
+  missing=()
+  for skill in ${entry#*:}; do
+    [[ -f "$SKILLS_DIR/$skill/SKILL.md" ]] || missing+=("$skill")
+  done
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    skip "$repo skills already installed"
+  else
+    bunx "$SKILLS_CLI" add "$repo" -a pi -g -y --skill "${missing[@]}"
+    ok "$repo: ${missing[*]}"
   fi
 done
 

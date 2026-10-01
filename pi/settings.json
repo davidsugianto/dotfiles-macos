@@ -1,6 +1,6 @@
 {
-  "defaultProvider": "anthropic",
-  "defaultModel": "claude-sonnet-5",
+  "defaultProvider": "cekat",
+  "defaultModel": "azure_ai/gpt-5.6-terra",
   "defaultThinkingLevel": "medium",
   "theme": "synthwave-84",
   "packages": [
