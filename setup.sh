@@ -244,6 +244,8 @@ link "$DOTFILES_DIR/pi/settings.json" "$HOME/.pi/agent/settings.json"
 # JSON files from ~/.pi/agent/themes, while its other runtime state remains
 # outside the dotfiles repository.
 link "$DOTFILES_DIR/pi/themes" "$HOME/.pi/agent/themes"
+# Prompt templates are loaded as slash commands (for example, /plan).
+link "$DOTFILES_DIR/pi/prompts" "$HOME/.pi/agent/prompts"
 # models.json defines the same custom "cekat" provider (office LiteLLM
 # gateway) as omp/models.yml and opencode/opencode.json, same
 # $CEKAT_API_KEY — see zsh/.zshrc.local.example.

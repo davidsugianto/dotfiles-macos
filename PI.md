@@ -1,32 +1,31 @@
 # Development Workflow
 
-Follow this flow for every non-trivial task. Stop at each GATE and wait for my reply.
+Use this flow for non-trivial tasks; scale the depth to the change. For small documentation or configuration edits, use a short plan and relevant validation rather than inventing tests or a build. Preserve unrelated uncommitted changes. Stop at each GATE and wait for my reply.
 
 ## 1. Plan (no edits)
-- Use the `brainstorming` and `writing-plans` skills. Use a `scout` subagent to explore unfamiliar code.
-- For every decision with materially different tradeoffs, use the `ask` tool:
-  2-5 options, mark the recommended one, put tradeoffs in each option's description.
-  Batch related questions. Never choose silently.
-- Write the plan from my answers.
+- Use `brainstorming` and `writing-plans` when the task warrants them. Explore unfamiliar code directly or with an available research subagent when useful.
+- For decisions with materially different tradeoffs, ask me using the available tools or chat. Give 2-5 options, recommend one, and explain the tradeoffs. Never choose silently.
+- Present a concise plan from my answers; use a written plan for larger work and an in-chat plan for bounded changes.
 - **GATE:** wait for my OK on the plan.
 
 ## 2. Execute
-- Use `executing-plans` and `test-driven-development`: failing test first, then implementation.
-- Track steps in the todo list. Parallelize independent slices with `task` subagents.
+- Follow the approved plan. For behavior changes, use `test-driven-development`: failing test first, then implementation. For docs/config changes, use appropriate validation instead.
+- Track steps with an available checklist or todo tool. Delegate clearly scoped, non-conflicting slices to available subagents when that helps; otherwise execute directly. Give each subagent its scope, acceptance criteria, and validation commands. Do not delegate decisions requiring my approval.
+- Check delegated changes and their validation evidence before accepting them. Run relevant targeted checks as work is integrated; leave full verification for step 5.
 
 ## 3. Review
-- Run a `reviewer` subagent on the diff (`requesting-code-review`).
-- Add `security-reviewer` if the change is security-sensitive.
+- Review the diff against the approved plan (`requesting-code-review`); use a reviewer subagent when available and useful.
+- Include a security-focused review for security-sensitive changes.
 
 ## 4. Fix
 - Use `receiving-code-review`: verify each finding against the code before applying it.
-- If fixes introduce new findings, return to step 3 (max 2 rounds).
+- If fixes introduce new findings, return to step 3 (max 2 rounds). If blocking findings remain, report them and ask how to proceed.
 
 ## 5. Test
-- Use `verification-before-completion`: run real tests, lint, build, and a smoke run of the changed path.
-- On failure, use `systematic-debugging`.
-- **GATE:** show me the diff and test output.
+- Use `verification-before-completion`: run relevant tests, lint, build, and a smoke check where applicable. Report what ran, its output, and why any check was skipped.
+- On failure, use `systematic-debugging`; do not claim success or proceed to commit with unresolved failures.
+- **GATE:** show me the diff summary and validation output.
 
 ## 6. Commit
 - Use `finishing-a-development-branch`.
-- Write a conventional commit message, show it, and commit only after my OK.
+- Show the conventional commit message and exact files to be committed. Stage and commit only after my OK; exclude unrelated changes.
