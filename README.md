@@ -44,7 +44,7 @@ fastfetch/     System info shown on new top-level shells
 yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog MCP server) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial), linked to ~/.omp/agent/ and ~/.omp/model-profiles/
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog MCP server) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial), linked to ~/.omp/agent/ (incl. themes/) and ~/.omp/model-profiles/
 pi/            settings.json + models.json (custom "cekat" provider) + mcp.json (Datadog MCP server, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, work-cekataiofficial) + profiles/*.json + extensions/subagents-pi/ (vendored, not on npm), linked to ~/.pi/agent/ and ~/.pi/profiles/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
@@ -102,7 +102,8 @@ cd ~/dotfiles-macos
    to their expected locations; `omp/config.yml`+`omp/models.yml`+
    `omp/mcp.json` to `~/.omp/agent/` and
    `pi/settings.json`+`pi/models.json`+`pi/mcp-adapter.json` to
-   `~/.pi/agent/`, since neither agent uses an XDG config path; and
+   `~/.pi/agent/`, since neither agent uses an XDG config path;
+   `omp/themes/` to `~/.omp/agent/themes/`; and
    `omp/model-profiles/`+`pi/profiles/` to `~/.omp/model-profiles/`+
    `~/.pi/profiles/`) — existing files in the way are backed up to
    `~/.dotfiles-backup/<timestamp>/`, never deleted.

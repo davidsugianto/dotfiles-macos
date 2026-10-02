@@ -9,7 +9,7 @@ modelRoles:
   web: anthropic/claude-haiku-4-5
 defaultThinkingLevel: auto
 theme:
-  dark: catppuccin
+  dark: atom-one-dark
   light: catppuccin
 symbolPreset: nerd
 goal:

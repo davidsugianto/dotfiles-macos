@@ -235,6 +235,9 @@ link "$DOTFILES_DIR/omp/model-profiles" "$HOME/.omp/model-profiles"
 # mcp.json holds the user-level MCP servers (Datadog US5, browser OAuth — no
 # keys, no env vars). Same server as pi/mcp-adapter.json below.
 link "$DOTFILES_DIR/omp/mcp.json" "$HOME/.omp/agent/mcp.json"
+# themes/*.json are omp's custom themes (~/.omp/agent/themes); select one in
+# `/settings` -> Appearance. Linked wholesale, same as pi/themes below.
+link "$DOTFILES_DIR/omp/themes" "$HOME/.omp/agent/themes"
 # pi reads its settings from the agent directory, ~/.pi/agent, by default.
 # Only the two files this repo owns are symlinked (not the whole
 # directory) — pi writes its own runtime state into ~/.pi/agent too
