@@ -6,7 +6,7 @@ Review the current changes. Optional focus: $@
 
 Review only: do not edit files, install dependencies, commit, or dismiss findings without evidence.
 
-1. Read `PI.md`, `git diff`, `git diff --cached`, git status, relevant surrounding code, and applicable tests.
+1. Read `~/.pi/agent/PI.md`, `git diff`, `git diff --cached`, git status, relevant surrounding code, and applicable tests.
 2. Review correctness, regressions, error handling, maintainability, test coverage, and adherence to the approved plan.
 3. When the change handles sensitive inputs, authorization, secrets, external requests, or CI/CD, also perform a security-focused review.
 4. Report only actionable findings. For each finding, include severity, file and line, concrete impact, and a concise remediation. Clearly separate blocking findings from suggestions.

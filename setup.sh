@@ -246,6 +246,8 @@ link "$DOTFILES_DIR/pi/settings.json" "$HOME/.pi/agent/settings.json"
 link "$DOTFILES_DIR/pi/themes" "$HOME/.pi/agent/themes"
 # Prompt templates are loaded as slash commands (for example, /plan).
 link "$DOTFILES_DIR/pi/prompts" "$HOME/.pi/agent/prompts"
+# Templates refer to the global workflow file, regardless of the current project.
+link "$DOTFILES_DIR/PI.md" "$HOME/.pi/agent/PI.md"
 # models.json defines the same custom "cekat" provider (office LiteLLM
 # gateway) as omp/models.yml and opencode/opencode.json, same
 # $CEKAT_API_KEY — see zsh/.zshrc.local.example.

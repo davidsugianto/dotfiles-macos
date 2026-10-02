@@ -6,7 +6,7 @@ Execute this approved plan or task: $@
 
 Before editing, confirm the plan has explicit user approval. If it has not, summarize the proposed work and stop for approval.
 
-1. Read `PI.md`, the approved plan, relevant files, repository conventions, git status, and recent history. Do not overwrite unrelated uncommitted changes.
+1. Read `~/.pi/agent/PI.md`, the approved plan, relevant files, repository conventions, git status, and recent history. Do not overwrite unrelated uncommitted changes.
 2. Implement only the approved scope. For each behavior change, use TDD: write a focused failing test, run it and confirm the expected failure, implement the smallest change, then rerun the test. For documentation or configuration changes, use appropriate validation instead.
 3. Reuse existing patterns and dependencies. Do not make material design decisions silently; stop and ask when the approved plan does not decide them.
 4. Keep a concise checklist of completed plan steps. Delegate clearly scoped, non-conflicting slices to available subagents only when that helps; otherwise execute directly. Give each subagent its scope, acceptance criteria, and validation commands. Do not delegate decisions requiring user approval.

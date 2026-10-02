@@ -6,7 +6,7 @@ Plan this task: $@
 
 Planning mode only: do not edit files, install dependencies, run destructive commands, commit, or start implementation.
 
-1. Read `PI.md`, inspect the repository, relevant files, documentation, git status, and recent history. Preserve unrelated uncommitted changes.
+1. Read `~/.pi/agent/PI.md`, inspect the repository, relevant files, documentation, git status, and recent history. Preserve unrelated uncommitted changes.
 2. State the task understanding, assumptions, constraints, and measurable success criteria. Ask focused questions when required information is missing or trade-offs are material; do not choose them silently.
 3. Prefer the smallest solution that satisfies the task. Reuse existing conventions and dependencies; identify explicitly what is out of scope.
 4. Present 2–3 approaches only when their trade-offs are material. Recommend one and explain why.
