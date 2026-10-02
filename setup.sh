@@ -304,7 +304,6 @@ step "Installing pi packages"
 PI_PACKAGES=(
   "pi-model-roles:git:github.com/spksoft/pi-model-roles"
   "pi-profile:npm:pi-profile"
-  "catppuccin-pi-coding-agent:git:github.com/XYenon/catppuccin-pi-coding-agent"
   "statusline-pi:npm:statusline-pi"
   "timestamp-pi:npm:timestamp-pi"
   "pi-subagents:npm:@tintinweb/pi-subagents"

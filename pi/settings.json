@@ -2,11 +2,10 @@
   "defaultProvider": "cekat",
   "defaultModel": "azure_ai/gpt-5.6-terra",
   "defaultThinkingLevel": "medium",
-  "theme": "synthwave-84",
+  "theme": "alien-candy",
   "packages": [
     "git:github.com/spksoft/pi-model-roles",
     "npm:pi-profile",
-    "git:github.com/XYenon/catppuccin-pi-coding-agent",
     "npm:statusline-pi",
     "npm:timestamp-pi",
     "npm:@tintinweb/pi-subagents",
