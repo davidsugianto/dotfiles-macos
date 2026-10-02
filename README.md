@@ -120,9 +120,10 @@ cd ~/dotfiles-macos
    [pi-subagents](https://github.com/tintinweb/pi-subagents), and
    [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) packages
    via `pi install`, plus the vendored `pi/extensions/subagents-pi/` fleet
-   panel from a local path, then deploys the personal-labs model-roles config
-   (see "pi model-role switching", "pi status & subagent extensions", and
-   "Datadog MCP" below).
+   panel from a local path, then deploys the personal-labs model-roles config.
+   It also installs Node.js and Browser Relay's local CLI/service and shared
+   agent skill (see "pi model-role switching", "pi status & subagent
+   extensions", "Browser Relay for pi", and "Datadog MCP" below).
 7. Copies `zsh/.zshrc.local.example` to `~/.zshrc.local` on first run
    (git-ignored — put machine-specific overrides there).
 8. Hides the native macOS menu bar (`defaults write NSGlobalDomain
@@ -279,6 +280,33 @@ here pulls updates automatically.
 Toggle commands once installed: `/statusline-pi`, `/statusline-refresh`,
 `/timestamp-pi`, `/subagents-pi`, `/subagents-pi-refresh`.
 
+## Browser Relay for pi
+
+[Browser Relay](https://github.com/reliefeai/browser-relay) lets pi work in
+existing, logged-in Google Chrome tabs using its `browser-relay` CLI and a
+skill installed at `~/.agents/skills/browser-relay` (shared with pi through
+`~/.pi/agent/skills`). `setup.sh` installs Node.js, the CLI and its macOS
+launchd service, and the skill. It is **not** a `pi install` package; no
+separate browser or API key is needed. Only the localhost relay is used;
+**do not enable Remote Relay** in the extension unless you intend to expose
+browser control through a remote service and manage its device credential.
+
+Finish the browser setup manually after running `setup.sh`:
+
+1. Run `browser-relay path` to print the unpacked Chrome extension directory.
+2. Open `chrome://extensions`, enable **Developer mode**, choose **Load
+   unpacked**, and select that directory. Approve the extension's debugger
+   access only for tabs you want the agent to control.
+3. Run `browser-relay doctor` and `browser-relay tabs` to verify that the
+   local service and extension are connected and at least one tab is attached.
+   If launchd is unavailable, run `browser-relay` in a separate terminal and
+   retry. Restart pi (or `/reload`) to load the new skill.
+
+Browser Relay can read pages and act using your logged-in browser privileges.
+Start with a read-only prompt such as "Use Browser Relay to tell me the title
+and URL of my current Chrome tab; do not navigate." Do not attach tabs with
+sensitive data unless you trust the agent with that data.
+
 ## Datadog MCP
 
 omp and pi both talk to Datadog's hosted
@@ -310,9 +338,12 @@ First login, once per agent:
   Servers connect lazily on first tool call — the agent finds tools via
   `mcp({ search: "logs" })`.
 
-Default toolsets only; to add product toolsets append e.g.
-`?toolsets=apm,llmobs` (or `all`) to the `url` in both files. If your org
-signs in through a custom subdomain, append `?subdomain=<name>` too.
+Both agents enable all generally available toolsets with `?toolsets=all`,
+including write-capable product toolsets. Datadog permissions still control
+which actions the signed-in user can perform. To limit exposure, replace
+`all` with a comma-separated list such as `core,alerting,dashboards` in both
+files. If your org signs in through a custom subdomain, append
+`&subdomain=<name>` too.
 
 ## Orca agent defaults
 

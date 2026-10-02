@@ -86,6 +86,7 @@ FORMULAE=(
   anomalyco/tap/opencode
   can1357/tap/omp # coding agent CLI, used inside Orca's ADE below
   pi-coding-agent # coding agent CLI omp/oh-my-pi builds on — per-role model/theme/profile config in pi/
+  node # npm/Node runtime for the local Browser Relay service and CLI
   oven-sh/bun/bun # JS runtime `omp plugin install` shells out to
 )
 for formula in "${FORMULAE[@]}"; do
@@ -357,6 +358,24 @@ for entry in "${SKILL_SOURCES[@]}"; do
     ok "$repo: ${missing[*]}"
   fi
 done
+
+# Browser Relay connects pi to the user's existing Chrome tabs through a
+# localhost-only service + Chrome extension. Its bundled skill lives in the
+# shared ~/.agents/skills directory, which pi already reads via the link above.
+# Loading the unpacked Chrome extension still requires a manual browser step.
+step "Installing Browser Relay for pi"
+if npm list -g --depth=0 @linsoai/browser-relay &>/dev/null; then
+  skip "Browser Relay already installed"
+else
+  npm install -g @linsoai/browser-relay
+  ok "Browser Relay CLI and local service installed"
+fi
+if [[ -f "$SKILLS_DIR/browser-relay/SKILL.md" ]]; then
+  skip "Browser Relay skill already installed"
+else
+  browser-relay skill install --agent universal
+  ok "Browser Relay skill installed for pi"
+fi
 
 # pi-model-roles refuses to save through a symlinked config.yaml, so its
 # config is deployed with a plain copy instead of `link` — see
