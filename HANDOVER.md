@@ -106,6 +106,18 @@ the repository role file, then the original `personal-labs` role config was
 restored and compared. Open pi sessions may need `/reload` to pick up a role
 config switch; model catalog changes reload when `/model` is opened.
 
+## 2026-10-05: gpt-6.1-sol and work-profile model swap
+
+Added `azure_ai/gpt-6.1-sol` (`api: openai-responses`, copied from `gpt-6-sol`;
+not live-tested) to `pi/models.json` and `omp/models.yml`. The
+`work-cekataiofficial` profile now uses `gpt-6.1-sol` for slow/plan/task and
+`gpt-6-luna` for default/smol/commit in both tools (omp: `omp/model-profiles/`;
+pi: `pi/model-roles/` + `pi/profiles/`). `gpt-5.6-terra` is no longer referenced
+by the work profile but stays in the model catalogs. Effort: `default`
+(Luna), `slow`, `plan` = high; omp via `:high` suffix, pi via `effort:`.
+pi `settings.json` now has `defaultModel: azure_ai/gpt-6-luna` and
+`defaultThinkingLevel: high`. Redeploy pi roles with `pi-roles work` + `/reload`.
+
 ## Repo structure notes (for a fresh session with no memory)
 
 - `setup.sh` — base install (Homebrew, taps, general CLI + GUI apps/fonts,

@@ -229,7 +229,7 @@ rather than linked.
 
 ```sh
 pi-roles personal   # Anthropic direct — the global default
-pi-roles work        # cekat gateway (office GPT-5.6 Luna/Terra/Sol)
+pi-roles work        # cekat gateway (office GPT-6 Luna / GPT-6.1 Sol)
 ```
 
 Run `/reload` in every open `pi` session afterwards — `pi-model-roles` has
@@ -239,14 +239,15 @@ exactly which role set is checked in as the machine default.
 
 ## Cekat model tool-call routing
 
-The Cekat LiteLLM gateway rejects function-tool requests for `azure_ai/gpt-6-luna`
-and `azure_ai/gpt-6-sol` on `/v1/chat/completions`: LiteLLM attaches a
-server-side `reasoning_effort` value, even when the client omits it. Setting
-`compat.supportsReasoningEffort: false` or sending `reasoning_effort: "none"`
-does not avoid this gateway behavior. Route these two models through the
-Responses API instead by setting `api: openai-responses` on their model entries
-in both `pi/models.json` and `omp/models.yml`. Keep the provider default as
-`openai-completions` for the other models.
+The Cekat LiteLLM gateway rejects function-tool requests for `azure_ai/gpt-6-luna`,
+`azure_ai/gpt-6-sol`, and `azure_ai/gpt-6.1-sol` on `/v1/chat/completions`: LiteLLM
+attaches a server-side `reasoning_effort` value, even when the client omits it.
+Setting `compat.supportsReasoningEffort: false` or sending
+`reasoning_effort: "none"` does not avoid this gateway behavior. Route these
+models through the Responses API instead by setting `api: openai-responses` on
+their model entries in both `pi/models.json` and `omp/models.yml`. Keep the
+provider default as `openai-completions` for the other models. (`gpt-6.1-sol`
+was given the same routing by assumption, not verified against the gateway.)
 
 The pi model catalog reloads when `/model` is opened; use `/reload` in open
 sessions if needed. After changing pi model-role sets with `pi-roles work` or

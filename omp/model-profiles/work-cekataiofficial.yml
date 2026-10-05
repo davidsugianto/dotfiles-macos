@@ -7,14 +7,14 @@
 # litellm attaches its own server-side default even if the client omits the
 # field, so client-side `compat.supportsReasoningEffort: false` (or forcing
 # reasoning_effort to "none") does NOT help. The real fix lives in
-# models.yml: `api: openai-responses` on the azure_ai/gpt-6-luna and
-# azure_ai/gpt-6-sol entries, routing those two models through
+# models.yml: `api: openai-responses` on the azure_ai/gpt-6-luna and the
+# azure_ai/gpt-6-sol / gpt-6.1-sol entries, routing those models through
 # `/v1/responses` instead, which has no such restriction.
 # Switch to this with `/profile work-cekataiofficial`.
 modelRoles:
-  default: cekat/azure_ai/gpt-6-sol
+  default: cekat/azure_ai/gpt-6-luna:high
   smol: cekat/azure_ai/gpt-6-luna
-  slow: cekat/azure_ai/gpt-6-sol
-  plan: cekat/azure_ai/gpt-6-sol
+  slow: cekat/azure_ai/gpt-6.1-sol:high
+  plan: cekat/azure_ai/gpt-6.1-sol:high
   commit: cekat/azure_ai/gpt-6-luna
-  task: cekat/azure_ai/gpt-6-sol
+  task: cekat/azure_ai/gpt-6.1-sol
