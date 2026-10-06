@@ -12,5 +12,8 @@
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/subagents-pi",
     "npm:pi-mcp-adapter"
   ],
-  "lastChangelogVersion": "0.86.1"
+  "lastChangelogVersion": "1.0.4",
+  "extensions": [
+    "-builtin:mcp"
+  ]
 }
