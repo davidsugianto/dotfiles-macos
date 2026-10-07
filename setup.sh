@@ -88,6 +88,8 @@ FORMULAE=(
   pi-coding-agent # coding agent CLI omp/oh-my-pi builds on — per-role model/theme/profile config in pi/
   node # npm/Node runtime for the local Browser Relay service and CLI
   oven-sh/bun/bun # JS runtime `omp plugin install` shells out to
+  herdr # agent runtime: persistent workspaces/panes; /superagent workers run here
+  jq # parses herdr CLI JSON in the herdr / herdr-delegate skills
 )
 for formula in "${FORMULAE[@]}"; do
   if brew list --formula "$formula" &>/dev/null; then
@@ -238,6 +240,9 @@ link "$DOTFILES_DIR/omp/mcp.json" "$HOME/.omp/agent/mcp.json"
 # themes/*.json are omp's custom themes (~/.omp/agent/themes); select one in
 # `/settings` -> Appearance. Linked wholesale, same as pi/themes below.
 link "$DOTFILES_DIR/omp/themes" "$HOME/.omp/agent/themes"
+# skills/ holds omp's user skills (scanned as ~/.omp/agent/skills/*/SKILL.md,
+# non-recursive); entries symlink to the agent-agnostic skills in pi/skills.
+link "$DOTFILES_DIR/omp/skills" "$HOME/.omp/agent/skills"
 # pi reads its settings from the agent directory, ~/.pi/agent, by default.
 # Only the two files this repo owns are symlinked (not the whole
 # directory) — pi writes its own runtime state into ~/.pi/agent too
@@ -394,6 +399,16 @@ else
   "$DOTFILES_DIR/pi/scripts/pi-roles" personal
   ok "personal-labs model roles deployed"
 fi
+
+# Herdr integrations: pi -> ~/.pi/agent/extensions/herdr-agent-state.ts,
+# omp -> ~/.omp/agent/extensions/herdr-omp-agent-state.ts. Herdr owns and
+# overwrites those files (never vendor them here); reinstalling is idempotent
+# and upgrades them after `brew upgrade herdr`.
+step "Installing Herdr integrations (pi + omp)"
+for agent in pi omp; do
+  herdr integration install "$agent"
+  ok "herdr $agent integration installed"
+done
 
 step "Setting up personal/work workspace directories"
 mkdir -p "$HOME/Artifacts/labs" "$HOME/Artifacts/work"

@@ -44,8 +44,8 @@ fastfetch/     System info shown on new top-level shells
 yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog MCP server) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial), linked to ~/.omp/agent/ (incl. themes/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp.json (Datadog MCP server, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekataiofficial) + profiles/*.json + extensions/subagents-pi/ (vendored, not on npm), linked to ~/.pi/agent/ and ~/.pi/profiles/
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog MCP server) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial) + skills/ (symlinks to pi/skills/herdr*), linked to ~/.omp/agent/ (incl. themes/, skills/) and ~/.omp/model-profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp.json (Datadog MCP server, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekataiofficial) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
@@ -93,7 +93,7 @@ cd ~/dotfiles-macos
 1. Installs Homebrew if it's missing.
 2. Installs every formula/cask this repo needs (window management stack,
    WezTerm, Neovim, Starship, modern CLI tools, yazi, htop, fastfetch,
-   Claude Code, opencode, omp, pi, bun, Orca, a Nerd Font).
+   Claude Code, opencode, omp, pi, bun, Herdr, jq, Orca, a Nerd Font).
 3. Builds [SbarLua](https://github.com/FelixKratz/SbarLua), the Lua API
    SketchyBar's config is written against, and vendors
    [Oh my tmux!](https://github.com/gpakosz/.tmux) into
@@ -121,7 +121,8 @@ cd ~/dotfiles-macos
    [pi-subagents](https://github.com/tintinweb/pi-subagents), and
    [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) packages
    via `pi install`, plus the vendored `pi/extensions/subagents-pi/` fleet
-   panel from a local path, then deploys the personal-labs model-roles config.
+   panel from a local path, then deploys the personal-labs model-roles config
+   and runs `herdr integration install pi` / `omp` (see "Herdr superagent").
    It also installs Node.js and Browser Relay's local CLI/service and shared
    agent skill (see "pi model-role switching", "pi status & subagent
    extensions", "Browser Relay for pi", and "Datadog MCP" below).
@@ -288,6 +289,33 @@ here pulls updates automatically.
 
 Toggle commands once installed: `/statusline-pi`, `/statusline-refresh`,
 `/timestamp-pi`, `/subagents-pi`, `/subagents-pi-refresh`.
+
+## Herdr superagent (pi + omp)
+
+[Herdr](https://herdr.dev) runs agents in persistent workspaces/tabs/panes and
+exposes them through the `herdr` CLI. Start `herdr`, then `pi` or `omp` in a
+pane. Step-by-step usage (plan → execute/superagent → review → fix → test →
+commit, with an end-to-end example): [docs/pi-workflow-guide.md](docs/pi-workflow-guide.md);
+every prompt annotated: [docs/pi-prompts.md](docs/pi-prompts.md).
+
+| Command / file | What it does |
+|---|---|
+| `/superagent <plan>` | Slices an approved plan into file-disjoint workers, starts one pi/omp worker per tab in a new `sa-<id>` workspace, waits, re-runs validation, closes the workspace. Stops at the plan GATE first. |
+| `/delegate [constraints]` | Same, using the open `/todos` items as slices; toggles each todo after its worker is verified. |
+| `/herdr-agents` | Lists live Herdr agents. The footer shows `sa ● N working · ◐ N blocked · ✓ N ready` while workers run, with a warning when one blocks. |
+| `/todos`, `/handoff`, `/do-handoff`, `/work-on-handoff` | Session todo list; handoff docs in `~/.pi/agent/handoffs` (`/handoff` archives `status: done` ones). |
+| `pi/skills/herdr-delegate/SKILL.md` | The orchestration procedure both agents follow. Briefs/results live in `$TMPDIR/superagent/<id>/`. |
+| `pi/skills/herdr/SKILL.md` | Vendored `herdr --skill` output plus `LOCAL:` edits — re-sync after `brew upgrade herdr`. |
+
+Herdr's agent-state integrations (`~/.pi/agent/extensions/herdr-agent-state.ts`,
+`~/.omp/agent/extensions/herdr-omp-agent-state.ts`) are owned by Herdr and
+installed by `setup.sh`; don't vendor them. `notify.ts` sends OSC 777 desktop
+notifications only outside Herdr (inside, Herdr's own toasts apply).
+
+Herdr reports pi's project-trust dialog as `idle`, not `blocked`, and a
+prompt sent to it presses Enter on **Trust**. The delegate skill checks each
+worker's screen before dispatching; workers started in an already-trusted
+repo never see the dialog.
 
 ## Browser Relay for pi
 

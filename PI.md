@@ -10,7 +10,8 @@ Use this flow for non-trivial tasks; scale the depth to the change. For small do
 
 ## 2. Execute
 - Follow the approved plan. For behavior changes, use `test-driven-development`: failing test first, then implementation. For docs/config changes, use appropriate validation instead.
-- Track steps with an available checklist or todo tool. Delegate clearly scoped, non-conflicting slices to available subagents when that helps; otherwise execute directly. Give each subagent its scope, acceptance criteria, and validation commands. Do not delegate decisions requiring my approval.
+- Track steps with the `todo` tool (/todos to view).
+- Delegation routing: use the in-process `Agent` tool (pi-subagents) for read-only exploration and short self-contained lookups. Use Herdr workers (`/superagent`, `/delegate`, or the `herdr-delegate` skill) only when I ask for delegation/parallel work: each worker is a visible, persistent pi/omp session in a dedicated Herdr workspace and owns a disjoint set of files. Give every delegate its scope, acceptance criteria, and validation commands; never delegate decisions requiring my approval.
 - Check delegated changes and their validation evidence before accepting them. Run relevant targeted checks as work is integrated; leave full verification for step 5.
 
 ## 3. Review
@@ -29,3 +30,6 @@ Use this flow for non-trivial tasks; scale the depth to the change. For small do
 ## 6. Commit
 - Use `finishing-a-development-branch`.
 - Show the conventional commit message and exact files to be committed. Stage and commit only after my OK; exclude unrelated changes.
+
+## Long-running work
+- Before ending a session with unfinished work, run /do-handoff; resume later with /work-on-handoff <file> (handoffs live in ~/.pi/agent/handoffs, /handoff lists and archives them).

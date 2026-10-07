@@ -13,7 +13,14 @@
     "npm:pi-mcp-adapter"
   ],
   "lastChangelogVersion": "1.0.4",
+  "skills": [
+    "../../Artifacts/labs/src/dotfiles-macos/pi/skills"
+  ],
   "extensions": [
-    "-builtin:mcp"
+    "-builtin:mcp",
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/herdr-agent",
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/notify.ts",
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/todo.ts",
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/manage-handoff.ts"
   ]
 }
