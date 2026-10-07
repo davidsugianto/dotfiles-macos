@@ -1,6 +1,6 @@
 {
   "name": "default",
-  "label": "🧭 Default",
-  "description": "Baseline identity — no model override, uses pi's configured default (settings.json).",
+  "label": "🧭 Default (Anthropic)",
+  "description": "Baseline identity — no model override, uses pi's configured default (settings.json: Anthropic OAuth, claude-sonnet-5-5), matches the default model-roles set.",
   "sessionName": "Default"
 }

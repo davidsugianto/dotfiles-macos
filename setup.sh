@@ -389,7 +389,7 @@ fi
 # re-run never clobbers a live switch to the work profile.
 step "Deploying default pi-model-roles config (personal)"
 if [[ -f "$HOME/.pi/agent/extensions/pi-model-roles/config.yaml" ]]; then
-  skip "pi-model-roles config already deployed (pi-roles personal|work to switch)"
+  skip "pi-model-roles config already deployed (pi-roles personal|default|work to switch)"
 else
   "$DOTFILES_DIR/pi/scripts/pi-roles" personal
   ok "personal-labs model roles deployed"

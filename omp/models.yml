@@ -4,18 +4,6 @@ providers:
     apiKey: CEKAT_API_KEY
     api: openai-completions
     models:
-      - id: anthropic/claude-opus-4.8
-        name: Claude Opus 4.8
-      - id: anthropic/claude-sonnet-5
-        name: Claude Sonnet 5
-      - id: anthropic/claude-sonnet-5.5
-        name: Claude Sonnet 5.5
-      - id: anthropic/claude-fable-5
-        name: Claude Fable 5
-      - id: anthropic/claude-haiku-4.5
-        name: Claude Haiku 4.5
-      - id: anthropic/claude-sonnet-4.6
-        name: Claude Sonnet 4.6
       - id: azure_ai/gpt-5.3-codex
         name: GPT-5.3 Codex
       - id: azure_ai/gpt-5.4-mini

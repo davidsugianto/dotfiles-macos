@@ -20,6 +20,11 @@ version: 1
 enabled: true
 selectorTimeoutMs: 8000
 selectorContext: conversation
+selector:
+  model:
+    provider: cekat
+    id: azure_ai/gpt-6-luna
+  effort: high
 roles:
   default:
     model:

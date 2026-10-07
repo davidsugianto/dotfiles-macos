@@ -24,8 +24,8 @@ system.
 | [htop](https://htop.dev) / [btop](https://github.com/aristocratos/btop) | Process monitors | `htop` for the classic view, `btop` (aliased over `top`) for the fuller dashboard — kept both since they cover different moments |
 | [Claude Code](https://claude.com/product/claude-code) | AI coding agent CLI | `claude` in any project directory |
 | [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story; themed Catppuccin Mocha (transparent), matching WezTerm/Neovim/k9s (`opencode/`); also configured with a custom "cekat" provider (office LLM gateway) — its API key is read from `$CEKAT_API_KEY`, set in the git-ignored `~/.zshrc.local`, never committed |
-| [omp](https://omp.sh) | AI coding agent CLI | Another alternative agent (`omp`, aka "Oh My Pi") — subagents, plan mode, LSP/DAP wired in; installed via `can1357/tap/omp`; per-role model config (`omp/`) picks Sonnet 5 by default, Haiku 4.5 for smol/commit tasks, Opus 5 (high) for slow/plan; themed Catppuccin (transparent status line), matching WezTerm/Neovim/k9s/opencode; web search tries Anthropic's native tool first (already authenticated, no extra key), then free keyless fallbacks (duckduckgo, startpage, google); also configured with the same custom "cekat" provider (office LiteLLM gateway) as opencode — `omp/models.yml`, same `$CEKAT_API_KEY` env var; [omp-model-profiles](https://github.com/rezhajulio/omp-model-profiles) plugin (installed via `omp plugin install`, needs `bun`) adds `/profile personal-labs` (the Anthropic roles above) and `/profile work-cekataiofficial` (internal GPT-5.6 Sol/Terra/Luna via the cekat gateway — Sol for slow/plan, Terra for default/task, Luna for smol/commit) to switch the whole role set in-session — `omp/model-profiles/` |
-| [pi](https://pi.dev) | AI coding agent CLI | The minimal upstream agent `omp`/"Oh My Pi" builds on; installed via `brew install pi-coding-agent`; task-based model routing across the same default/smol/slow/plan/commit/task/web split as `omp/`, via the [pi-model-roles](https://github.com/spksoft/pi-model-roles) extension (`pi/model-roles/`, deployed with `pi-roles personal\|work`, not symlinked — see below); instant `/profile <name>` switching via [pi-profile](https://github.com/Eddie0521/pi-profile) (`pi/profiles/`, one profile per role plus `personal-labs`/`work-cekataiofficial`); Alien Candy by default plus ten vendored switchable themes in `pi/themes/` (eight from [pi-extensions](https://github.com/luongnv89/pi-extensions), two from [awesome-pi-themes](https://github.com/isashi/awesome-pi-themes)); also configured with the same custom "cekat" provider as opencode/omp — `pi/models.json`, same `$CEKAT_API_KEY` env var |
+| [omp](https://omp.sh) | AI coding agent CLI | Another alternative agent (`omp`, aka "Oh My Pi") — subagents, plan mode, LSP/DAP wired in; installed via `can1357/tap/omp`; per-role model config (`omp/`) picks Sonnet 5.5 by default, Haiku 4.5 for smol/commit tasks, Opus 5.5 (high) for slow/plan (all Claude models via the Anthropic OAuth login, never the cekat gateway); themed Catppuccin (transparent status line), matching WezTerm/Neovim/k9s/opencode; web search tries Anthropic's native tool first (already authenticated, no extra key), then free keyless fallbacks (duckduckgo, startpage, google); also configured with the same custom "cekat" provider (office LiteLLM gateway) as opencode — `omp/models.yml`, same `$CEKAT_API_KEY` env var; [omp-model-profiles](https://github.com/rezhajulio/omp-model-profiles) plugin (installed via `omp plugin install`, needs `bun`) adds `/profile personal-labs` (the Anthropic roles above) and `/profile work-cekataiofficial` (internal GPT-5.6 Sol/Terra/Luna via the cekat gateway — Sol for slow/plan, Terra for default/task, Luna for smol/commit) to switch the whole role set in-session — `omp/model-profiles/` |
+| [pi](https://pi.dev) | AI coding agent CLI | The minimal upstream agent `omp`/"Oh My Pi" builds on; installed via `brew install pi-coding-agent`; task-based model routing across the same default/smol/slow/plan/commit/task/web split as `omp/`, via the [pi-model-roles](https://github.com/spksoft/pi-model-roles) extension (`pi/model-roles/`, deployed with `pi-roles personal\|default\|work`, not symlinked — see below); Anthropic models use the `/login` OAuth subscription, never the cekat gateway; instant `/profile <name>` switching via [pi-profile](https://github.com/Eddie0521/pi-profile) (`pi/profiles/`, one profile per role plus `personal-labs`/`work-cekataiofficial`); Alien Candy by default plus ten vendored switchable themes in `pi/themes/` (eight from [pi-extensions](https://github.com/luongnv89/pi-extensions), two from [awesome-pi-themes](https://github.com/isashi/awesome-pi-themes)); also configured with the same custom "cekat" provider as opencode/omp — `pi/models.json`, same `$CEKAT_API_KEY` env var |
 | [Orca](https://www.onorca.dev) | Agent Development Environment (ADE) | Desktop app for running Claude Code/opencode/omp in parallel, each in its own isolated git worktree, with diffs viewable side by side; installed via `stablyai/orca/orca`; launch shortcut `alt+shift+r` (see [aerospace/aerospace.toml](aerospace/aerospace.toml)); default tab agent set to `omp` so new tabs use the internal "cekat" LLM gateway by default, personal Claude Code still one command away — see below |
 | git + [delta](https://dandavison.github.io/delta) | Version control, syntax-highlighted diffs | Identity/SSH key auto-switches by directory — see below |
 | zsh (no framework) | Shell | Organized, commented, no oh-my-zsh overhead — installed via Homebrew for a newer version than the one macOS ships |
@@ -45,7 +45,7 @@ yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog MCP server) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial), linked to ~/.omp/agent/ (incl. themes/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp.json (Datadog MCP server, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, work-cekataiofficial) + profiles/*.json + extensions/subagents-pi/ (vendored, not on npm), linked to ~/.pi/agent/ and ~/.pi/profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp.json (Datadog MCP server, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekataiofficial) + profiles/*.json + extensions/subagents-pi/ (vendored, not on npm), linked to ~/.pi/agent/ and ~/.pi/profiles/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
@@ -228,9 +228,16 @@ a symlinked `config.yaml`, so `pi/model-roles/*.yaml` are copied into place
 rather than linked.
 
 ```sh
-pi-roles personal   # Anthropic direct — the global default
-pi-roles work        # cekat gateway (office GPT-6 Luna / GPT-6.1 Sol)
+pi-roles personal   # Anthropic OAuth — mirrors omp's personal-labs profile (the global default)
+pi-roles default    # Anthropic OAuth — mirrors omp's default profile
+pi-roles work       # cekat gateway (office GPT-6 Luna / GPT-6.1 Sol)
 ```
+
+Anthropic roles use the `anthropic` provider, authenticated by `/login`
+(OAuth subscription) — `pi/settings.json` defaults to
+`anthropic/claude-sonnet-5-5` too, so nothing routes through the cekat
+gateway unless `pi-roles work` is active. omp's `:auto` effort has no pi
+equivalent and custom roles can't `inherit`, so `:auto` maps to `medium`.
 
 Run `/reload` in every open `pi` session afterwards — `pi-model-roles` has
 no file watcher. `pi-roles` is a plain script (`pi/scripts/pi-roles`,
@@ -250,8 +257,8 @@ provider default as `openai-completions` for the other models. (`gpt-6.1-sol`
 was given the same routing by assumption, not verified against the gateway.)
 
 The pi model catalog reloads when `/model` is opened; use `/reload` in open
-sessions if needed. After changing pi model-role sets with `pi-roles work` or
-`pi-roles personal`, run `/reload` in each open session to load the copied role
+sessions if needed. After changing pi model-role sets with `pi-roles work`,
+`pi-roles default`, or `pi-roles personal`, run `/reload` in each open session to load the copied role
 config.
 
 ## pi status & subagent extensions

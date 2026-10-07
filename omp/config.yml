@@ -1,12 +1,12 @@
 setupVersion: 2
 modelRoles:
-  default: anthropic/claude-sonnet-5-5
-  smol: anthropic/claude-haiku-4-5
-  slow: anthropic/claude-opus-5:high
-  plan: anthropic/claude-opus-5:high
-  commit: anthropic/claude-haiku-4-5
-  task: anthropic/claude-sonnet-5
-  web: anthropic/claude-haiku-4-5
+  default: anthropic/claude-sonnet-5-5:auto
+  smol: anthropic/claude-haiku-4-5:auto
+  slow: anthropic/claude-opus-5-5:high
+  plan: anthropic/claude-opus-5-5:high
+  commit: anthropic/claude-haiku-4-5:auto
+  task: anthropic/claude-sonnet-5:auto
+  web: anthropic/claude-haiku-4-5:auto
 defaultThinkingLevel: auto
 theme:
   dark: atom-one-dark

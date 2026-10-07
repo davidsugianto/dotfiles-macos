@@ -1,26 +1,22 @@
-# Personal roles — Anthropic direct via the `/login` OAuth subscription
+# Default roles — Anthropic direct via the `/login` OAuth subscription
 # (pi auth.json `anthropic: oauth`), never the cekat gateway. Mirrors
-# dotfiles-macos/omp/model-profiles/personal-labs.yml role-for-role:
+# dotfiles-macos/omp/model-profiles/default.yml role-for-role (Sonnet 5.5
+# everywhere except Haiku 4.5 for the cheap roles; slow/plan at high):
 #
 #   omp role   omp value                         pi value (this file)
-#   default    sonnet-5-5:high                   sonnet-5-5 / high
-#   smol       sonnet-5-5:auto                   sonnet-5-5 / medium
-#   slow       opus-5-5:high                     opus-5-5   / high
-#   plan       opus-5-5:high                     opus-5-5   / high
+#   default    sonnet-5-5:auto                   sonnet-5-5 / medium
+#   smol       haiku-4-5:auto                    haiku-4-5  / medium
+#   slow       sonnet-5-5:high                   sonnet-5-5 / high
+#   plan       sonnet-5-5:high                   sonnet-5-5 / high
 #   commit     haiku-4-5:auto                    haiku-4-5  / medium
-#   task       sonnet-5-5:high                   sonnet-5-5 / high
-#   web        (falls back to omp config.yml)    haiku-4-5  / medium
+#   task       sonnet-5-5:auto                   sonnet-5-5 / medium
+#   web        sonnet-5-5:auto                   sonnet-5-5 / medium
 #
 # pi has no `auto` effort and custom roles can't `inherit`, so omp's `:auto`
-# is pinned to `medium` here. `web` is explicit because omp's personal-labs
-# profile is a layered override that falls back to config.yml's global
-# `web` role (haiku-4-5:auto); pi-model-roles has no layering.
+# is pinned to `medium` here.
 #
-# This is the pi-model-roles extension's config file
-# (~/.pi/agent/extensions/pi-model-roles/config.yaml) — deploy it with
-# `pi-roles personal` (dotfiles-macos/pi/scripts/pi-roles), not a symlink;
-# see that script and OPERATIONS.md for why. Run /reload in any open pi
-# session afterwards.
+# Deploy with `pi-roles default` (dotfiles-macos/pi/scripts/pi-roles), not a
+# symlink — see that script and OPERATIONS.md. Run /reload afterwards.
 #
 # Model IDs verified against `pi --list-models` (provider `anthropic`).
 version: 1
@@ -32,7 +28,7 @@ roles:
     model:
       provider: anthropic
       id: claude-sonnet-5-5
-    effort: high
+    effort: medium
   smol:
     description: >-
       Use for small, well-specified, low-risk edits or lookups with an
@@ -40,7 +36,7 @@ roles:
       one-line fixes, short factual questions.
     model:
       provider: anthropic
-      id: claude-sonnet-5-5
+      id: claude-haiku-4-5
     effort: medium
   slow:
     description: >-
@@ -49,7 +45,7 @@ roles:
       correctness review, architecture trade-offs.
     model:
       provider: anthropic
-      id: claude-opus-5-5
+      id: claude-sonnet-5-5
     effort: high
   plan:
     description: >-
@@ -58,7 +54,7 @@ roles:
       writing an implementation plan.
     model:
       provider: anthropic
-      id: claude-opus-5-5
+      id: claude-sonnet-5-5
     effort: high
   commit:
     description: >-
@@ -77,12 +73,12 @@ roles:
     model:
       provider: anthropic
       id: claude-sonnet-5-5
-    effort: high
+    effort: medium
   web:
     description: >-
       Use when the task is primarily researching or summarizing information
       from the web rather than editing code.
     model:
       provider: anthropic
-      id: claude-haiku-4-5
+      id: claude-sonnet-5-5
     effort: medium

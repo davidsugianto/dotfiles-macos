@@ -1,6 +1,6 @@
 {
-  "defaultProvider": "cekat",
-  "defaultModel": "azure_ai/gpt-6-luna",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-sonnet-5-5",
   "defaultThinkingLevel": "high",
   "theme": "alien-candy",
   "packages": [

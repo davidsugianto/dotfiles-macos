@@ -1,11 +1,12 @@
 # Default profile — mirrors modelRoles in ../config.yml (Anthropic direct), except
 # slow/plan/task/web, which use Sonnet 5.5 (slow/plan at :high) instead of Opus 5 /
-# Sonnet 5 / Haiku 4.5. Switch to this with `/profile default`.
+# Sonnet 5 / Haiku 4.5. Roles without an explicit level use `:auto`. Switch to this
+# with `/profile default`.
 modelRoles:
-  default: anthropic/claude-sonnet-5-5
-  smol: anthropic/claude-haiku-4-5
+  default: anthropic/claude-sonnet-5-5:auto
+  smol: anthropic/claude-haiku-4-5:auto
   slow: anthropic/claude-sonnet-5-5:high
   plan: anthropic/claude-sonnet-5-5:high
-  commit: anthropic/claude-haiku-4-5
-  task: anthropic/claude-sonnet-5-5
-  web: anthropic/claude-sonnet-5-5
+  commit: anthropic/claude-haiku-4-5:auto
+  task: anthropic/claude-sonnet-5-5:auto
+  web: anthropic/claude-sonnet-5-5:auto

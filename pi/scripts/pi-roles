@@ -11,25 +11,30 @@
 # `/profile work-cekataiofficial` but a plain copy instead of a live
 # in-session command (pi-model-roles has no such command).
 #
-# Usage: pi-roles personal | pi-roles work
+# Usage: pi-roles personal | pi-roles default | pi-roles work
 #
 # After switching, run /reload in every open pi session (or restart it) to
 # pick up the new file — pi-model-roles has no file watcher.
 # ==============================================================================
 set -euo pipefail
 
-DOTFILES_PI_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &>/dev/null && pwd)"
+# readlink -f: this script is symlinked into ~/.local/bin, and BASH_SOURCE
+# is the symlink path, not the repo path.
+DOTFILES_PI_DIR="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/.." &>/dev/null && pwd)"
 DEST="$HOME/.pi/agent/extensions/pi-model-roles/config.yaml"
 
 case "${1:-}" in
   personal | personal-labs)
     SRC="$DOTFILES_PI_DIR/model-roles/personal-labs.yaml"
     ;;
+  default)
+    SRC="$DOTFILES_PI_DIR/model-roles/default.yaml"
+    ;;
   work | work-cekataiofficial)
     SRC="$DOTFILES_PI_DIR/model-roles/work-cekataiofficial.yaml"
     ;;
   *)
-    echo "usage: pi-roles <personal|work>" >&2
+    echo "usage: pi-roles <personal|default|work>" >&2
     exit 1
     ;;
 esac
