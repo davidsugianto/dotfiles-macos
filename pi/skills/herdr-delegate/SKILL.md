@@ -1,12 +1,12 @@
 ---
 name: herdr-delegate
-description: "Delegate work to registered pi/omp worker agents in a dedicated Herdr workspace (one tab per worker), with disjoint file ownership, file-based briefs and results, and verified integration. Use only when the user explicitly asks to delegate/spawn/parallelize, or when /superagent or /delegate invokes it. Never delegate ordinary requests proactively."
+description: "Delegate work to registered claude/pi/omp worker agents in a dedicated Herdr workspace (one tab per worker), with disjoint file ownership, file-based briefs and results, and verified integration. Use only when the user explicitly asks to delegate/spawn/parallelize, or when /superagent or /delegate invokes it. Never delegate ordinary requests proactively."
 license: MIT
 ---
 
 # Herdr delegate
 
-Orchestrate parallel pi/omp workers through Herdr. You (the orchestrator) slice the work, write briefs, start and prompt workers, wait, verify, and integrate. Workers share the current git tree; safety comes from disjoint file ownership, not isolation.
+Orchestrate parallel claude/pi/omp workers through Herdr. You (the orchestrator) slice the work, write briefs, start and prompt workers, wait, verify, and integrate. Workers share the current git tree; safety comes from disjoint file ownership, not isolation.
 
 ## 1. When
 
@@ -23,10 +23,10 @@ Only on an explicit delegation request from the user, `/superagent`, or `/delega
 
 ```bash
 KIND=$(herdr agent get "$HERDR_PANE_ID" | jq -r '.result.agent.agent // empty')
-case "$KIND" in pi|omp) ;; *) KIND=pi ;; esac
+case "$KIND" in pi|omp|claude) ;; *) KIND=pi ;; esac
 ```
 
-Pass no model flags by default: workers inherit the user's settings and active profile. Only when the user names a worker model, append `-- --model <provider/id>` to `agent start`.
+Pass no model flags by default: workers inherit the user's settings and active profile. Only when the user names a worker model, append `-- --model <provider/id>` to `agent start` (for `claude` workers, `-- --model <model-id>`, e.g. `claude-opus-5-5`).
 
 ## 4. Slice
 

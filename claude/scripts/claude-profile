@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# claude-profile — start Claude Code with a model profile.
+#
+# Claude Code's equivalent of pi-profile: each ~/.claude/profiles/<name>.json
+# (linked from ../profiles/) is a settings overlay (model + effortLevel) layered
+# on top of ~/.claude/settings.json via `claude --settings`, for this session
+# only. Everything else (hooks, env, permissions) still comes from
+# settings.json.
+#
+# Usage: claude-profile                       list profiles
+#        claude-profile <name> [claude args]  e.g. claude-profile plan
+#                                                  claude-profile smol -p "..."
+# ==============================================================================
+set -euo pipefail
+
+PROFILES_DIR="$HOME/.claude/profiles"
+
+if [[ $# -eq 0 ]]; then
+  for f in "$PROFILES_DIR"/*.json; do
+    printf '%-15s %s\n' "$(basename -- "$f" .json)" \
+      "$(jq -r '[.model, (.effortLevel // "-")] | join("  effort=")' "$f")"
+  done
+  exit 0
+fi
+
+name="$1"
+shift
+profile="$PROFILES_DIR/$name.json"
+
+if [[ ! -f "$profile" ]]; then
+  echo "claude-profile: no profile '$name' in $PROFILES_DIR" >&2
+  echo "run claude-profile with no arguments to list them" >&2
+  exit 1
+fi
+
+exec claude --settings "$profile" "$@"

@@ -1,3 +1,30 @@
+# Handover — 2026-10-08
+
+## Session summary: Claude Code mirrors pi (uncommitted)
+
+Added `claude/`, which gives Claude Code pi's workflow, prompt templates, model
+roles and model profiles. It's linked into `~/.claude/` (already applied on
+this machine). See `docs/claude-workflow-guide.md`.
+
+- `claude/CLAUDE.md`: port of `PI.md`, using TodoWrite, the Agent tool and role subagents, and `~/.claude/handoffs`.
+- `claude/commands/`: port of `pi/prompts/` (`$ARGUMENTS`, `~/.claude/CLAUDE.md`), plus `/handoff`. `/plan` is pinned to `claude-opus-5-5[1m]`.
+- `claude/model-roles/{default,personal-labs}/`: role subagents generated from `pi/model-roles/*.yaml` (same descriptions, models and effort). `claude-roles` repoints the `~/.claude/agents` symlink.
+- `claude/profiles/*.json` + `claude-profile`: `--settings` overlays, Anthropic-only (the user chose no cekat).
+- `claude/settings.json`: the live file captured wholesale (Orca + Herdr hooks, autoMode, statusLine). I added `model: claude-sonnet-5-5[1m]`, `effortLevel: high`, and `env` `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000` / `CLAUDE_CODE_AUTO_COMPACT_WINDOW=922000` to match the cekat work models (922K/128K). The pre-link original is backed up in `~/.claude/backups/dotfiles-claude-20261008-121957/`.
+- `pi/skills/herdr-delegate`: `KIND` now accepts `claude`, so a Claude orchestrator starts Claude workers.
+- `setup.sh`: Claude links, per-entry skill links into `~/.claude/skills` (that directory keeps claude.ai's `synced/`), seeding of `claude-roles default`, and `herdr integration install claude`.
+
+Verified: the smol profile runs on Haiku 4.5; the default runs on `claude-sonnet-5-5[1m]`; the smol and slow subagents run on haiku and sonnet[1m]; `/plan` runs on Opus 5.5 and stops at the gate.
+
+- MCP: `claude/mcp.json` holds the same Datadog and Slack servers as `pi/mcp-adapter.json`. `claude-mcp-sync` (run by `setup.sh`) registers them at user scope through `claude mcp add-json`. It can't be a symlink because the servers live in `~/.claude.json` (runtime state). The Slack secret goes to the keychain through `MCP_CLIENT_SECRET`. Both servers are registered and still need `/mcp` → Authenticate.
+- The `setup.sh` skills loop now prunes dangling `~/.claude/skills` links.
+
+Open:
+- Authenticate datadog and slack via `/mcp`.
+- Run `/config` interactively once and confirm `~/.claude/settings.json` is still a symlink afterwards.
+- Run `/superagent` with Claude workers end to end inside Herdr (not tested yet).
+- Haiku 4.5 has no effort parameter, so Haiku profiles and agents leave effort out.
+
 # Handover — 2026-09-14
 
 ## Session summary

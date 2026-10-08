@@ -238,8 +238,9 @@ link "$DOTFILES_DIR/omp/models.yml" "$HOME/.omp/agent/models.yml"
 # (omp-model-profiles plugin, installed below) — kept in this repo so both
 # profiles are versioned next to the models.yml provider they reference.
 link "$DOTFILES_DIR/omp/model-profiles" "$HOME/.omp/model-profiles"
-# mcp.json holds the user-level MCP servers (Datadog US5, browser OAuth — no
-# keys, no env vars). Same server as pi/mcp-adapter.json below.
+# mcp.json holds the user-level MCP servers (Datadog US5 via browser OAuth with
+# dynamic registration; Slack via browser OAuth with a pre-registered app whose
+# SLACK_MCP_CLIENT_ID/SECRET come from ~/.zshrc.local — no secrets in the repo).
 link "$DOTFILES_DIR/omp/mcp.json" "$HOME/.omp/agent/mcp.json"
 # themes/*.json are omp's custom themes (~/.omp/agent/themes); select one in
 # `/settings` -> Appearance. Linked wholesale, same as pi/themes below.
@@ -266,7 +267,7 @@ link "$DOTFILES_DIR/PI.md" "$HOME/.pi/agent/PI.md"
 # $CEKAT_API_KEY — see zsh/.zshrc.local.example.
 link "$DOTFILES_DIR/pi/models.json" "$HOME/.pi/agent/models.json"
 # mcp-adapter.json is read by the pi-mcp-adapter package (installed below) — pi has
-# no built-in MCP support. Same Datadog server + env vars as omp/mcp.json.
+# no built-in MCP support. Same Datadog + Slack servers as omp/mcp.json.
 link "$DOTFILES_DIR/pi/mcp-adapter.json" "$HOME/.pi/agent/mcp-adapter.json"
 # profiles/*.json are switched between at runtime with `/profile <name>`
 # (pi-profile extension, installed below) — one profile per model role
@@ -280,6 +281,19 @@ link "$DOTFILES_DIR/pi/profiles" "$HOME/.pi/profiles"
 mkdir -p -- "$HOME/.agents/skills"
 link "$HOME/.agents/skills" "$HOME/.pi/agent/skills"
 link "$DOTFILES_DIR/pi/scripts/pi-roles" "$HOME/.local/bin/pi-roles"
+# Claude Code mirrors pi's setup: CLAUDE.md is the PI.md workflow, commands/
+# are the pi prompt templates as slash commands, profiles/ are `--settings`
+# overlays (claude-profile), and model-roles/ hold the role subagents that
+# claude-roles links into ~/.claude/agents (seeded further down). settings.json
+# is linked wholesale, like pi's: Orca and Herdr write their hooks into it, so
+# those edits land in the repo — review `git diff claude/settings.json`.
+link "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+link "$DOTFILES_DIR/claude/CLAUDE.md"     "$HOME/.claude/CLAUDE.md"
+link "$DOTFILES_DIR/claude/commands"      "$HOME/.claude/commands"
+link "$DOTFILES_DIR/claude/profiles"      "$HOME/.claude/profiles"
+link "$DOTFILES_DIR/claude/scripts/claude-roles"   "$HOME/.local/bin/claude-roles"
+link "$DOTFILES_DIR/claude/scripts/claude-profile" "$HOME/.local/bin/claude-profile"
+link "$DOTFILES_DIR/claude/scripts/claude-mcp-sync" "$HOME/.local/bin/claude-mcp-sync"
 link "$DOTFILES_DIR/starship.toml"   "$HOME/.config/starship.toml"
 link "$OH_MY_TMUX_DIR/.tmux.conf"    "$HOME/.config/tmux/tmux.conf"
 link "$DOTFILES_DIR/tmux/tmux.conf.local" "$HOME/.config/tmux/tmux.conf.local"
@@ -404,12 +418,59 @@ else
   ok "personal-labs model roles deployed"
 fi
 
+# Claude Code skills: ~/.claude/skills also holds claude.ai's own synced/
+# directory, so it can't be one symlink like pi's. Link each shared skill
+# (~/.agents/skills, installed above) and each repo skill (pi/skills)
+# individually instead; existing real directories are left alone.
+step "Linking agent skills into Claude Code"
+mkdir -p -- "$HOME/.claude/skills"
+for skill_dir in "$SKILLS_DIR"/*/ "$DOTFILES_DIR"/pi/skills/*/; do
+  [[ -d "$skill_dir" ]] || continue # unmatched glob
+  skill_dir="${skill_dir%/}"
+  dest="$HOME/.claude/skills/$(basename -- "$skill_dir")"
+  if [[ -e "$dest" && ! -L "$dest" ]]; then
+    skip "$dest is a real directory, left alone"
+    continue
+  fi
+  if [[ -L "$dest" && "$(readlink -- "$dest")" == "$skill_dir" ]]; then
+    continue
+  fi
+  ln -sfn -- "$skill_dir" "$dest"
+done
+# Prune links left dangling by skills uninstalled from ~/.agents/skills.
+for dest in "$HOME"/.claude/skills/*; do
+  if [[ -L "$dest" && ! -e "$dest" ]]; then
+    rm -- "$dest"
+    echo "  (removed dangling skill link $dest)"
+  fi
+done
+ok "Claude Code skills linked"
+
+# MCP servers: Claude Code keeps user-scope servers in ~/.claude.json (runtime
+# state, never linked), so claude/mcp.json is registered through
+# `claude mcp add-json` instead. Same Datadog + Slack servers as
+# pi/mcp-adapter.json and omp/mcp.json. Slack is skipped until its
+# SLACK_MCP_CLIENT_* vars are set in ~/.zshrc.local. Authenticate with /mcp.
+step "Registering Claude Code MCP servers"
+"$DOTFILES_DIR/claude/scripts/claude-mcp-sync"
+
+# Seed Claude Code's role subagents only if no set is linked yet, so a re-run
+# never undoes a live `claude-roles personal` switch.
+step "Linking default Claude Code role subagents"
+if [[ -e "$HOME/.claude/agents" || -L "$HOME/.claude/agents" ]]; then
+  skip "~/.claude/agents already present (claude-roles default|personal to switch)"
+else
+  "$DOTFILES_DIR/claude/scripts/claude-roles" default
+  ok "default role subagents linked"
+fi
+
 # Herdr integrations: pi -> ~/.pi/agent/extensions/herdr-agent-state.ts,
-# omp -> ~/.omp/agent/extensions/herdr-omp-agent-state.ts. Herdr owns and
+# omp -> ~/.omp/agent/extensions/herdr-omp-agent-state.ts, claude ->
+# ~/.claude/hooks/herdr-agent-state.sh (+ hooks in claude/settings.json). Herdr owns and
 # overwrites those files (never vendor them here); reinstalling is idempotent
 # and upgrades them after `brew upgrade herdr`.
-step "Installing Herdr integrations (pi + omp)"
-for agent in pi omp; do
+step "Installing Herdr integrations (pi + omp + claude)"
+for agent in pi omp claude; do
   herdr integration install "$agent"
   ok "herdr $agent integration installed"
 done

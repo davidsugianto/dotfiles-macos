@@ -45,8 +45,9 @@ yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog MCP server) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial) + skills/ (symlinks to pi/skills/herdr*), linked to ~/.omp/agent/ (incl. themes/, skills/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp.json (Datadog MCP server, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekataiofficial) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial) + skills/ (symlinks to pi/skills/herdr*), linked to ~/.omp/agent/ (incl. themes/, skills/) and ~/.omp/model-profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekataiofficial) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
+claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{default,personal-labs}/*.md (role subagents) + profiles/*.json (`--settings` overlays) + scripts/ (claude-roles, claude-profile) + settings.json, linked to ~/.claude/ and ~/.local/bin/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
@@ -291,7 +292,26 @@ here pulls updates automatically.
 Toggle commands once installed: `/statusline-pi`, `/statusline-refresh`,
 `/timestamp-pi`, `/subagents-pi`, `/subagents-pi-refresh`.
 
-## Herdr superagent (pi + omp)
+## Claude Code workflow (mirrors pi)
+
+`claude/` gives Claude Code the same workflow, prompt templates, model roles
+and model profiles as `pi/`, using Claude Code's own features. Full guide:
+[docs/claude-workflow-guide.md](docs/claude-workflow-guide.md).
+
+| pi | Claude Code |
+|---|---|
+| `PI.md` | `claude/CLAUDE.md` → `~/.claude/CLAUDE.md` |
+| `pi/prompts/*.md` | `claude/commands/*.md` → `/plan`, `/execute`, `/superagent`, `/delegate`, `/review`, `/fix`, `/test`, `/commit`, `/do-handoff`, `/work-on-handoff`, `/handoff` |
+| pi-model-roles + `pi-roles` | role subagents `smol`/`slow`/`plan`/`commit`/`task`/`web` in `claude/model-roles/<set>/`; `claude-roles default\|personal` repoints `~/.claude/agents` |
+| pi-profile `/profile` | `claude-profile <name>` (`claude --settings claude/profiles/<name>.json`); aliases `ccp`, `ccplan`, `ccslow`, `ccsmol` |
+
+The setup is Anthropic-only (`/login` subscription). Sonnet/Opus 5.5 run
+with 1M context (`[1m]`), and `settings.json` sets 128K max output and a
+922K auto-compact window to match the cekat work models in `pi/models.json`.
+`setup.sh` also links every shared skill (`~/.agents/skills`, `pi/skills`)
+into `~/.claude/skills/` one by one, so claude.ai's `synced/` dir is left alone.
+
+## Herdr superagent (pi + omp + claude)
 
 [Herdr](https://herdr.dev) runs agents in persistent workspaces/tabs/panes and
 exposes them through the `herdr` CLI. Start `herdr`, then `pi` or `omp` in a
@@ -353,8 +373,13 @@ traces, monitors, incidents, dashboards) over Streamable HTTP, defined as a
 `datadog` server in `omp/mcp.json` (→ `~/.omp/agent/mcp.json`, native omp
 MCP) and `pi/mcp-adapter.json` (→ `~/.pi/agent/mcp-adapter.json`, read by the
 [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) package —
-pi has no built-in MCP). Two files because each agent has its own loader;
-keep the server entries identical.
+pi has no built-in MCP), and `claude/mcp.json` for Claude Code. Each agent has its
+own loader, so keep the server entries identical across all three.
+
+Claude Code keeps its user-scope servers in `~/.claude.json` (runtime state,
+never linked), so `claude/mcp.json` is registered with
+`claude-mcp-sync` (`claude mcp add-json -s user`, run by `setup.sh`;
+`--force` re-adds after editing). Login: `/mcp` → server → Authenticate.
 
 Auth is browser OAuth — the same Datadog login you use in the web app
 (e.g. Google SSO); no API/application keys. Datadog supports dynamic client
@@ -373,6 +398,7 @@ First login, once per agent:
 
 - omp: `/mcp reauth datadog` → browser opens → sign in → `/mcp test datadog`.
 - pi: `/mcp-auth datadog` (or `/mcp`, Enter on the server) → browser → sign in.
+- Claude Code: `/mcp` → `datadog` → Authenticate → browser → sign in.
   Servers connect lazily on first tool call — the agent finds tools via
   `mcp({ search: "logs" })`.
 
@@ -382,6 +408,48 @@ which actions the signed-in user can perform. To limit exposure, replace
 `all` with a comma-separated list such as `core,alerting,dashboards` in both
 files. If your org signs in through a custom subdomain, append
 `&subdomain=<name>` too.
+
+## Slack MCP
+
+omp and pi also talk to Slack's hosted MCP server
+(`https://mcp.slack.com/mcp`: search, read channels/threads, send messages,
+canvases, lists) as a `slack` server in the same two files as Datadog
+(`omp/mcp.json`, `pi/mcp-adapter.json`, `claude/mcp.json`; keep them identical).
+
+Unlike Datadog, Slack does **not** support dynamic client registration — it
+needs a pre-registered Slack app (internal or directory-published) with a
+fixed client ID/secret. Client credentials are never committed: both files
+reference `${SLACK_MCP_CLIENT_ID}` and `${SLACK_MCP_CLIENT_SECRET}`, which you
+export in the git-ignored `~/.zshrc.local` (template in
+`zsh/.zshrc.local.example`). Tokens are stored per agent like Datadog's
+(omp: `agent.db`; pi: macOS keychain).
+
+One-time setup:
+
+1. [api.slack.com/apps](https://api.slack.com/apps) → create an app in your
+   workspace → **OAuth & Permissions**:
+   - Redirect URL: `http://localhost:3118/callback` (both agents use this
+     exact URL via `oauth.redirectUri`; only one can be mid-login at a time).
+   - **User Token Scopes** for the tools you want: `search:read.public`,
+     `search:read.private`, `search:read.mpim`, `search:read.im`,
+     `search:read.files`, `search:read.users`, `channels:history`,
+     `groups:history`, `mpim:history`, `im:history`, `channels:read`,
+     `groups:read`, `im:read`, `mpim:read`, `users:read`, `users:read.email`,
+     `chat:write`, `reactions:read`, `reactions:write`, `canvases:read`,
+     `canvases:write`, `lists:read`, `lists:write`, `files:read`,
+     `files:write`, `emoji:read`, `channels:write`, `groups:write`,
+     `im:write`, `mpim:write`. Drop write scopes for a read-only setup.
+   - Slack only allows MCP for internal or directory-published apps; a
+     workspace admin may need to approve the app.
+2. Copy Client ID/Secret (**Basic Information**) into `~/.zshrc.local` as
+   `SLACK_MCP_CLIENT_ID` / `SLACK_MCP_CLIENT_SECRET`, then `exec zsh`.
+3. Login, once per agent (restart the agent so it sees the env vars):
+   - omp: `/mcp reauth slack` → browser → approve → `/mcp test slack`.
+   - pi: `/mcp-auth slack` → browser → approve.
+   - Claude Code: `claude-mcp-sync` (it registers Slack only once the env
+     vars are set, and hands the secret to Claude via `MCP_CLIENT_SECRET`, which
+     stores it in the keychain and not in JSON), then `/mcp` → `slack` → Authenticate.
+     Claude's `oauth.callbackPort: 3118` matches the same redirect URL.
 
 ## Orca agent defaults
 

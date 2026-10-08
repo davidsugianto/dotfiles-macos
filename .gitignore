@@ -18,3 +18,10 @@ omp/*.lock
 # pi likely does the same beside its symlinked settings.json/models.json —
 # not confirmed, ignored preemptively so a lock file never lands in-repo.
 pi/*.lock
+pi/extensions/*/node_modules/
+
+# Claude Code writes settings.json through the ~/.claude symlink; guard
+# against temp/backup/lock files landing beside the real file in-repo.
+claude/*.lock
+claude/*.tmp*
+claude/*.bak*

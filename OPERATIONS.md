@@ -20,7 +20,7 @@ package.
 | zsh | `exec zsh` (alias: `reload`) |
 | Starship | Auto-reloads on next prompt draw |
 | pi | `/reload` inside pi for `settings.json`/`models.json`/`mcp-adapter.json`/profile edits; `pi-roles personal\|default\|work` then `/reload` for a model-roles switch (not a live watcher) |
-| omp MCP | `/mcp reload` inside omp after editing `omp/mcp.json`; after changing the Datadog site host, also `/mcp unauth datadog` then `/mcp reauth datadog` |
+| omp MCP | `/mcp reload` inside omp after editing `omp/mcp.json`; after changing the Datadog site host, also `/mcp unauth datadog` then `/mcp reauth datadog`; after changing `SLACK_MCP_CLIENT_*` in `~/.zshrc.local`, restart omp (env is read at discovery) then `/mcp reauth slack` |
 
 ## Modifying configs
 
@@ -360,6 +360,16 @@ resurface after a Homebrew self-update resets trust state), re-run
   gopls. Note gvm and mason.nvim are two independent Go-tool managers here
   (gvm's own `gvm tools init` also installs gopls/golangci-lint) — nothing
   deduplicates between them.
+- **`~/.claude/settings.json` is a symlink into this repo** (`claude/settings.json`,
+  linked wholesale like `pi/settings.json`). Orca and Herdr inject their
+  hooks into it, and `/config` writes to it too, so those edits show up in
+  `git diff claude/settings.json`. Review them before committing. If a
+  Claude Code update ever saves by replacing the file instead of writing
+  through the link, `ls -la ~/.claude/settings.json` shows a regular file.
+  Fix it with `cp ~/.claude/settings.json claude/settings.json`, review the
+  diff, then re-run `setup.sh`. Role subagents (`~/.claude/agents`) switch
+  with `claude-roles default|personal`; restart Claude afterwards. See
+  [docs/claude-workflow-guide.md](docs/claude-workflow-guide.md).
 
 ## Backups
 

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# claude-roles — switch Claude Code's role subagents between role sets.
+#
+# Claude Code's equivalent of pi-model-roles is a set of user subagents
+# (smol/slow/plan/commit/task/web) whose `description` routes work to them and
+# whose `model`/`effort` frontmatter pins each role's model. Each role set is a
+# directory under ../model-roles/; ~/.claude/agents is a symlink to the active
+# one. Unlike pi-roles (which must copy because pi-model-roles can't save
+# through a symlink), Claude Code only reads these files, so switching is just
+# repointing the symlink.
+#
+# Usage: claude-roles default | claude-roles personal | claude-roles (show active)
+#
+# Restart open claude sessions (or run /agents) to pick up the new set.
+# ==============================================================================
+set -euo pipefail
+
+# readlink -f: this script is symlinked into ~/.local/bin, and BASH_SOURCE
+# is the symlink path, not the repo path.
+DOTFILES_CLAUDE_DIR="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/.." &>/dev/null && pwd)"
+DEST="$HOME/.claude/agents"
+
+case "${1:-}" in
+  "")
+    if [[ -L "$DEST" ]]; then
+      echo "claude-roles: active set is $(basename -- "$(readlink -- "$DEST")")"
+    else
+      echo "claude-roles: no role set linked at $DEST"
+    fi
+    exit 0
+    ;;
+  default)
+    SET=default
+    ;;
+  personal | personal-labs)
+    SET=personal-labs
+    ;;
+  *)
+    echo "usage: claude-roles [default|personal]" >&2
+    exit 1
+    ;;
+esac
+
+SRC="$DOTFILES_CLAUDE_DIR/model-roles/$SET"
+
+if [[ -e "$DEST" && ! -L "$DEST" ]]; then
+  echo "claude-roles: $DEST is a real directory, not a symlink; move it aside first" >&2
+  exit 1
+fi
+
+mkdir -p -- "$(dirname -- "$DEST")"
+ln -sfn -- "$SRC" "$DEST"
+echo "claude-roles: linked $DEST -> $SRC"
+echo "claude-roles: restart open claude sessions to pick it up."

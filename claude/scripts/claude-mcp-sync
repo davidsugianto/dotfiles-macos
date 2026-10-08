@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# claude-mcp-sync — register this repo's MCP servers with Claude Code.
+#
+# Claude Code keeps user-scope MCP servers in ~/.claude.json, a large runtime
+# state file (sessions, projects, caches) that can't be symlinked into the
+# repo. So ../mcp.json is the source of truth (same servers as
+# pi/mcp-adapter.json and omp/mcp.json), and this script registers each entry
+# through the official CLI: `claude mcp add-json -s user`.
+#
+# ${VAR} references are expanded from the environment (~/.zshrc.local). A
+# server whose variables are unset is skipped with a warning. `_clientSecretEnv`
+# names the env var holding an OAuth client secret: it's handed to Claude
+# Code via MCP_CLIENT_SECRET (stored in the macOS keychain) and never written
+# to JSON.
+#
+# Usage: claude-mcp-sync            register missing servers
+#        claude-mcp-sync --force    remove and re-add every server
+# ==============================================================================
+set -euo pipefail
+
+# readlink -f: this script is symlinked into ~/.local/bin, and BASH_SOURCE
+# is the symlink path, not the repo path.
+DOTFILES_CLAUDE_DIR="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/.." &>/dev/null && pwd)"
+CONFIG="$DOTFILES_CLAUDE_DIR/mcp.json"
+
+force=0
+case "${1:-}" in
+  "") ;;
+  --force) force=1 ;;
+  *)
+    echo "usage: claude-mcp-sync [--force]" >&2
+    exit 1
+    ;;
+esac
+
+for name in $(jq -r '.mcpServers | keys[]' "$CONFIG"); do
+  raw="$(jq -c --arg n "$name" '.mcpServers[$n]' "$CONFIG")"
+
+  missing="$(jq -r '[.. | strings | scan("\\$\\{([A-Za-z_][A-Za-z0-9_]*)\\}")[0]] | unique[] | select(env[.] == null or env[.] == "")' <<<"$raw")"
+  secret_env="$(jq -r '._clientSecretEnv // empty' <<<"$raw")"
+  if [[ -n "$secret_env" && -z "${!secret_env:-}" ]]; then
+    missing+=$'\n'"$secret_env"
+  fi
+  missing="$(sed '/^$/d' <<<"$missing" | paste -sd ' ' -)"
+  if [[ -n "$missing" ]]; then
+    echo "claude-mcp-sync: skipping $name (unset: $missing — see zsh/.zshrc.local.example)" >&2
+    continue
+  fi
+
+  if claude mcp get "$name" &>/dev/null; then
+    if [[ $force -eq 0 ]]; then
+      echo "claude-mcp-sync: $name already registered (--force to re-add)"
+      continue
+    fi
+    claude mcp remove -s user "$name" >/dev/null
+  fi
+
+  json="$(jq -c 'walk(if type == "string" then gsub("\\$\\{(?<v>[A-Za-z_][A-Za-z0-9_]*)\\}"; env[.v]) else . end) | del(._clientSecretEnv)' <<<"$raw")"
+
+  if [[ -n "$secret_env" ]]; then
+    MCP_CLIENT_SECRET="${!secret_env}" claude mcp add-json -s user --client-secret "$name" "$json" >/dev/null
+  else
+    claude mcp add-json -s user "$name" "$json" >/dev/null
+  fi
+  echo "claude-mcp-sync: registered $name"
+done
+
+echo "claude-mcp-sync: run /mcp in Claude to authenticate servers that need it."

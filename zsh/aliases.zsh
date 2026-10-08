@@ -179,6 +179,16 @@ if command -v colima >/dev/null 2>&1; then
 fi
 
 # ------------------------------------------------------------------------------
+# Claude Code — model profiles (claude/profiles, via claude-profile)
+# ------------------------------------------------------------------------------
+if command -v claude-profile >/dev/null 2>&1; then
+  alias ccp='claude-profile'
+  alias ccplan='claude-profile plan'
+  alias ccslow='claude-profile slow'
+  alias ccsmol='claude-profile smol'
+fi
+
+# ------------------------------------------------------------------------------
 # Misc
 # ------------------------------------------------------------------------------
 alias reload='exec zsh'
