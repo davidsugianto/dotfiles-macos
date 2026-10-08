@@ -85,6 +85,10 @@ claude-roles                # show the active set
 claude-roles personal       # switch; restart open claude sessions afterwards
 ```
 
+Role sets apply to subagents and to Herdr workers: `/superagent` and
+`/delegate` start each worker with `claude --agent <role>`. Switching sets
+with `claude-roles` therefore also changes which model workers get.
+
 Slash-command models: `/plan` and `/execute` run on
 `claude-sonnet-5-5[1m]`; `/plan-deep` runs on `claude-opus-5-5[1m]` for hard
 or high-risk work. All other commands inherit the session model. A command's
@@ -99,7 +103,7 @@ commit message on Haiku, ask for the `commit` subagent.
 | Helper | What it is | Where you see it | Use it for |
 |---|---|---|---|
 | **Subagent** (Agent tool) | A child context in the same Claude process: built-in `Explore`/`general-purpose`, or a role agent (`smol`, `slow`, `plan`, `commit`, `task`, `web`) | Inline in the chat, `/agents` | Read-only exploration, short lookups, role-pinned side tasks |
-| **Herdr worker** (`/superagent`, `/delegate`) | A full `claude` session in its own Herdr tab, in a `sa-<id>` workspace | Herdr sidebar, `herdr agent list` | Parallel implementation slices that own disjoint files |
+| **Herdr worker** (`/superagent`, `/delegate`) | A full `claude` session started with `--agent <role>` in its own Herdr tab, in a `sa-<id>` workspace, so it uses the active role set's model, effort, and prompt | Herdr sidebar, `herdr agent list` | Parallel implementation slices that own disjoint files |
 | **You** | — | — | Every gate, every approval or trust dialog, every question a worker raises |
 
 ## Step 0: once per machine
@@ -165,8 +169,14 @@ These steps are the same as the pi guide, with these differences:
 - `/execute` tracks steps with TodoWrite (`ctrl+t`) instead of `/todos`.
 - `/superagent` starts **`claude` workers** (`herdr agent start --kind
   claude`) when the orchestrator is Claude. pi and omp orchestrators still
-  start their own kind. Name a model to override it, e.g.
-  `… workers on claude-opus-5-5`.
+  start their own kind. Slices carry a **Role** column (`task` by default,
+  `slow` for hard or risky slices, `smol` for trivial ones).
+  `/delegate`, or `/superagent` with a plan that isn't approved yet, stops
+  at a gate so you can approve the roles. With an already-approved plan
+  `/superagent` doesn't stop, so name the roles in the command to set them.
+  Override one worker with e.g. `worker 2 as slow`. Naming a model
+  (`… workers on claude-opus-5-5`) adds `--model` after `--agent`, and it
+  wins over the role's model.
 - Claude has no `sa ●` footer. Watch the Herdr sidebar or run
   `herdr agent list` / `herdr agent read sa-<id>-N --lines 60`.
 - `/delegate` turns the open TodoWrite items into slices labelled
