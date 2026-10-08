@@ -29,6 +29,14 @@ export LANG="en_US.UTF-8"
 # default, so it must be pointed here explicitly.
 export OMP_STATUSLINE_THEME="catppuccin"
 
+# sre-ai-skills handlers (datadog-investigate, jira-space-keeper) run
+# preflight.sh before every use. PREFLIGHT_FF=1 lets it fast-forward a clean
+# checkout of main that is only behind origin, so the cores stay current;
+# PREFLIGHT_LAZY=1 serves a cached result and re-checks in the background.
+# Claude Code gets the same pair from claude/settings.json "env".
+export PREFLIGHT_FF=1
+export PREFLIGHT_LAZY=1
+
 # Homebrew (Apple Silicon default prefix; no-op if already on PATH).
 if [[ -x /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"

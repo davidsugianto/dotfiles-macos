@@ -426,14 +426,22 @@ fi
 
 # Claude Code skills: ~/.claude/skills also holds claude.ai's own synced/
 # directory, so it can't be one symlink like pi's. Link each shared skill
-# (~/.agents/skills, installed above) and each repo skill (pi/skills)
-# individually instead; existing real directories are left alone.
+# (~/.agents/skills, installed above), each repo skill (pi/skills) and each
+# Claude-specific handler (claude/skills) individually instead; claude/skills
+# replaces a same-named shared or pi/skills one. Existing real directories
+# are left alone.
 step "Linking agent skills into Claude Code"
 mkdir -p -- "$HOME/.claude/skills"
-for skill_dir in "$SKILLS_DIR"/*/ "$DOTFILES_DIR"/pi/skills/*/; do
+for skill_dir in "$SKILLS_DIR"/*/ "$DOTFILES_DIR"/pi/skills/*/ "$DOTFILES_DIR"/claude/skills/*/; do
   [[ -d "$skill_dir" ]] || continue # unmatched glob
   skill_dir="${skill_dir%/}"
-  dest="$HOME/.claude/skills/$(basename -- "$skill_dir")"
+  name="$(basename -- "$skill_dir")"
+  # A Claude-specific handler replaces any shared/pi skill of the same name;
+  # skip the shared one so the link is not rewritten back and forth.
+  if [[ "$skill_dir" != "$DOTFILES_DIR"/claude/skills/* && -d "$DOTFILES_DIR/claude/skills/$name" ]]; then
+    continue
+  fi
+  dest="$HOME/.claude/skills/$name"
   if [[ -e "$dest" && ! -L "$dest" ]]; then
     skip "$dest is a real directory, left alone"
     continue

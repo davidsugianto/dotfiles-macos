@@ -29,6 +29,20 @@ Deferred review findings (accepted, not fixed yet):
 
 # Handover — 2026-10-08
 
+## Session summary: sre-ai-skills onboarding (uncommitted)
+
+`datadog-investigate` and `jira-space-keeper` come from `../sre-ai-skills`. Their `SKILL.md` files there are portable cores with `{{PLACEHOLDERS}}`, so they are not copied. The repo holds machine-local **handlers** that run `preflight.sh` and then read the core live from the clone, so core updates apply with no copying.
+
+- `pi/skills/{datadog-investigate,jira-space-keeper}`: handlers for pi and omp (omp links to them via `omp/skills/*`, as for herdr).
+- `claude/skills/...`: Claude handlers (`sonnet`/`opus`, `general-purpose` subagents, `mcp__datadog__` / `mcp__jira__`). `setup.sh` links `claude/skills/*` into `~/.claude/skills` and skips any shared or pi skill of the same name.
+- Auto-update: `PREFLIGHT_FF=1` + `PREFLIGHT_LAZY=1` in `.zshrc` (pi, omp) and `claude/settings.json` `env`. preflight fast-forwards the clone only when it is clean, on `main` and merely behind; otherwise it pauses and reports.
+- `JIRA_SITE` is `unset` (the skill discovers it). Handlers hardcode `/Users/davidsugianto/...` paths because they are machine-local.
+- Regenerate a handler from `personal-skill-generator/templates/handler.SKILL.md` if a core adds placeholders; `check-skill.sh <core> <handler>` flags drift.
+
+Open:
+- (Done) The old untracked handler `~/.agents/skills/datadog-investigate` is removed.
+- Start new pi, omp and Claude sessions and confirm both skills are listed.
+
 ## Session summary: Claude Code mirrors pi (uncommitted)
 
 Added `claude/`, which gives Claude Code pi's workflow, prompt templates, model
