@@ -1,6 +1,7 @@
 ---
 description: Execute an approved plan using test-driven development
 argument-hint: "<approved-plan-or-task>"
+model: claude-sonnet-5-5[1m]
 ---
 Execute this approved plan or task: $ARGUMENTS
 

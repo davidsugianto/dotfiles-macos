@@ -9,7 +9,7 @@ from the pi guide.
 
 ```mermaid
 flowchart LR
-    plan["/plan"] -->|OK| exec{"how to execute?"}
+    plan["/plan or /plan-deep"] -->|OK| exec{"how to execute?"}
     exec -->|one agent| execute["/execute"]
     exec -->|parallel slices| superagent["/superagent"]
     exec -->|open todos| delegate["/delegate"]
@@ -85,8 +85,11 @@ claude-roles                # show the active set
 claude-roles personal       # switch; restart open claude sessions afterwards
 ```
 
-Slash-command models: `/plan` runs on `claude-opus-5-5[1m]`. All other
-commands inherit the session model. `/commit` stays on the session model
+Slash-command models: `/plan` and `/execute` run on
+`claude-sonnet-5-5[1m]`; `/plan-deep` runs on `claude-opus-5-5[1m]` for hard
+or high-risk work. All other commands inherit the session model. A command's
+`model:` sticks for the rest of the session, so `/execute` pins Sonnet to
+switch back after `/plan-deep`. `/commit` stays on the session model
 on purpose: a command's `model:` switches the whole conversation, and
 Haiku's 200K window can't hold a long 1M-context session. To write the
 commit message on Haiku, ask for the `commit` subagent.
@@ -135,9 +138,10 @@ claude                          # in the Herdr pane (or `claude-profile <name>`)
 
 ```text
 /plan Add a /health endpoint and a status badge in the UI, with an E2E test
+/plan-deep Redesign the auth flow          # same steps, on Opus 5.5
 ```
 
-Runs on Opus 5.5. It reads the repo, may ask you questions with
+`/plan` runs on Sonnet 5.5; `/plan-deep` runs on Opus 5.5. It reads the repo, may ask you questions with
 AskUserQuestion, ends with a plan, and **stops**. Reply `OK`. For a big
 plan, ask it to list **files per step**, since that decides whether the
 work can be parallelized. You can also use plan mode (`shift+tab`) for a
@@ -206,7 +210,7 @@ status is cached for 5 s.
 
 | Symptom | Cause / fix |
 |---|---|
-| `/plan` etc. missing from the slash menu | `~/.claude/commands` isn't linked. Re-run `setup.sh` |
+| `/plan`, `/plan-deep` etc. missing from the slash menu | `~/.claude/commands` isn't linked. Re-run `setup.sh` |
 | Role agents missing from `/agents` | No set linked. Run `claude-roles default` and restart Claude |
 | `~/.claude/settings.json` is a regular file again | Something replaced the symlink when it saved. Copy it back with `cp ~/.claude/settings.json claude/settings.json`, review with `git diff`, then re-run `setup.sh` |
 | Orca/Herdr hook changes show up in `git diff claude/settings.json` | Expected: settings.json is linked wholesale. Commit them or revert them deliberately |

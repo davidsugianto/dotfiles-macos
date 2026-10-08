@@ -301,7 +301,7 @@ and model profiles as `pi/`, using Claude Code's own features. Full guide:
 | pi | Claude Code |
 |---|---|
 | `PI.md` | `claude/CLAUDE.md` → `~/.claude/CLAUDE.md` |
-| `pi/prompts/*.md` | `claude/commands/*.md` → `/plan`, `/execute`, `/superagent`, `/delegate`, `/review`, `/fix`, `/test`, `/commit`, `/do-handoff`, `/work-on-handoff`, `/handoff` |
+| `pi/prompts/*.md` | `claude/commands/*.md` → `/plan`, `/plan-deep`, `/execute`, `/superagent`, `/delegate`, `/review`, `/fix`, `/test`, `/commit`, `/do-handoff`, `/work-on-handoff`, `/handoff` |
 | pi-model-roles + `pi-roles` | role subagents `smol`/`slow`/`plan`/`commit`/`task`/`web` in `claude/model-roles/<set>/`; `claude-roles default\|personal` repoints `~/.claude/agents` |
 | pi-profile `/profile` | `claude-profile <name>` (`claude --settings claude/profiles/<name>.json`); aliases `ccp`, `ccplan`, `ccslow`, `ccsmol` |
 

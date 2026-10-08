@@ -1,7 +1,7 @@
 ---
-description: Create an implementation plan without editing code
+description: Create a deep implementation plan on Opus (hard or high-risk work)
 argument-hint: "<task>"
-model: claude-sonnet-5-5[1m]
+model: claude-opus-5-5[1m]
 ---
 Plan this task: $ARGUMENTS
 
