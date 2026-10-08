@@ -220,6 +220,10 @@ link "$DOTFILES_DIR/sofka/config.toml" "$HOME/.config/sofka/config.toml"
 link "$DOTFILES_DIR/sofka/sofka-pane"  "$HOME/.local/bin/sofka-pane"
 link "$DOTFILES_DIR/btop/btop.conf"  "$HOME/.config/btop/btop.conf"
 link "$DOTFILES_DIR/btop/themes"     "$HOME/.config/btop/themes"
+# herdr only owns config.toml + sounds/ here — it keeps sockets, logs and
+# session.json in ~/.config/herdr, so the directory is never linked wholesale.
+link "$DOTFILES_DIR/herdr/config.toml" "$HOME/.config/herdr/config.toml"
+link "$DOTFILES_DIR/herdr/sounds"      "$HOME/.config/herdr/sounds"
 link "$DOTFILES_DIR/opencode/tui.json"      "$HOME/.config/opencode/tui.json"
 link "$DOTFILES_DIR/opencode/themes"        "$HOME/.config/opencode/themes"
 link "$DOTFILES_DIR/opencode/opencode.json" "$HOME/.config/opencode/opencode.json"

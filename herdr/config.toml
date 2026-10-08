@@ -1,0 +1,144 @@
+# herdr configuration — linked to ~/.config/herdr/config.toml by setup.sh.
+#
+# Only this file is owned by the repo: herdr keeps its sockets, logs,
+# session.json and session-snapshots/ in ~/.config/herdr, so the directory
+# itself is never symlinked (same reasoning as k9s/sofka, see OPERATIONS.md).
+# Full reference: `herdr --default-config`. Validate with `herdr config check`,
+# apply to a running server with `herdr server reload-config` (prefix+shift+r).
+
+# Skip the first-run notification wizard — choices are made below.
+onboarding = false
+
+# -- theme --------------------------------------------------------------------
+# Dracula. Pinned (no auto_switch): the rest of the desktop is dark-only.
+[theme]
+name = "dracula"
+auto_switch = false
+
+# "reset" leaves the panel background to the terminal, so WezTerm's
+# window_background_opacity (0.85) shows through herdr like it does for tmux.
+[theme.custom]
+panel_bg = "reset"
+
+# -- terminal -----------------------------------------------------------------
+[terminal]
+# New panes/tabs/workspaces start in the directory of the one they came from.
+new_cwd = "follow"
+# macOS: login shell so ~/.zprofile (Homebrew PATH) loads in every pane.
+shell_mode = "auto"
+
+# -- keys ---------------------------------------------------------------------
+# Defaults are kept (prefix = ctrl+b, h/j/k/l focus, v / minus split, z zoom):
+# WezTerm owns ctrl+a as its leader, so ctrl+b stays free for herdr.
+[keys]
+# Direct (no-prefix) pane resize, so you don't need resize mode (prefix+r).
+resize_pane_left = "ctrl+shift+alt+left"
+resize_pane_down = "ctrl+shift+alt+down"
+resize_pane_up = "ctrl+shift+alt+up"
+resize_pane_right = "ctrl+shift+alt+right"
+# Reorder tabs in place.
+move_tab_previous = "alt+shift+left"
+move_tab_next = "alt+shift+right"
+# Tab-order jump through workspaces/agents without the picker.
+previous_workspace = "prefix+["
+next_workspace = "prefix+]"
+previous_agent = "prefix+shift+["
+next_agent = "prefix+shift+]"
+# Last-focused pane, tmux `last-pane` style.
+last_pane = "prefix+;"
+
+# Popups: session-modal terminals that don't touch the tab layout.
+[[keys.command]]
+key = "prefix+alt+g"
+type = "popup"
+command = "lazygit"
+width = "90%"
+height = "90%"
+
+[[keys.command]]
+key = "prefix+alt+b"
+type = "popup"
+command = "btop"
+width = "90%"
+height = "90%"
+
+[[keys.command]]
+key = "prefix+alt+k"
+type = "popup"
+command = "k9s"
+width = "90%"
+height = "90%"
+
+[[keys.command]]
+key = "prefix+alt+y"
+type = "popup"
+command = "yazi"
+width = "90%"
+height = "90%"
+
+# -- ui -----------------------------------------------------------------------
+[ui]
+sidebar_width = 28
+sidebar_min_width = 20
+sidebar_max_width = 40
+mouse_capture = true
+copy_on_select = true
+mouse_scroll_lines = 3
+confirm_close = true
+
+# Visible split separation; names the agent on each pane border so a grid of
+# pi/omp/claude workers stays readable without opening the sidebar.
+pane_borders = "auto"
+pane_gaps = true
+show_agent_labels_on_pane_borders = true
+
+# Distinct glyphs per agent state (blocked/working/done/idle) instead of
+# colour-only dots — readable at a glance and colour-blind safe.
+status_indicators = "symbols"
+
+# Agents needing attention float to the top of the agents panel.
+agent_panel_sort = "priority"
+
+# Dracula purple.
+accent = "#bd93f9"
+
+# Window/tab title seen by AeroSpace and the macOS window list.
+window_title = "{workspace} · {tab}"
+
+# Right side of the tab bar: zoom pill, host, clock.
+tab_bar_right = [
+  { type = "zoom" },
+  { type = "hostname" },
+  { type = "datetime", format = "%a %H:%M" },
+]
+tab_bar_right_separator = " · "
+
+# Background notifications: native macOS notification centre.
+[ui.toast]
+delivery = "system"
+delay_seconds = 1
+
+# Sounds play when an agent in a *background* workspace finishes (done) or
+# needs input (request). Custom sounds must be .mp3 (macOS ships only .aiff);
+# herdr/sounds/*.mp3 are original synthesized tones, linked to
+# ~/.config/herdr/sounds by setup.sh. Relative paths resolve from this file.
+[ui.sound]
+enabled = true
+done_path = "sounds/done.mp3"
+request_path = "sounds/request.mp3"
+
+# -- session ------------------------------------------------------------------
+[session]
+# After a herdr server restart, reopen pi/omp/claude panes in their previous
+# conversation (needs the integrations installed by setup.sh).
+resume_agents_on_restore = true
+startup_per_agent_delay_ms = 250
+
+# -- updates ------------------------------------------------------------------
+# Homebrew owns the binary (`brew upgrade herdr`); keep herdr from nagging.
+[update]
+version_check = false
+
+[advanced]
+# ~20 MB per pane (default 10 MB) for long agent transcripts.
+scrollback_limit_bytes = 20000000
