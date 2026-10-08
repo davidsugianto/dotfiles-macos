@@ -34,7 +34,7 @@ Each arrow labelled `OK` is a gate: the agent stops and waits for your reply.
 | `pi-roles personal\|default` | `claude-roles personal\|default` (repoints the symlink) | `claude/scripts/claude-roles` |
 | pi-profile `/profile <name>` | `claude-profile <name>` (a `--settings` overlay applied at launch) | `claude/profiles/*.json` → `~/.claude/profiles` |
 | `pi/settings.json` | `~/.claude/settings.json` | `claude/settings.json` |
-| `pi/mcp-adapter.json` (Datadog, Slack) | user-scope MCP servers registered by `claude-mcp-sync` (they live in `~/.claude.json`, which can't be linked); log in with `/mcp` | `claude/mcp.json` |
+| `pi/mcp-adapter.json` (Datadog, Jira, Slack) | user-scope MCP servers registered by `claude-mcp-sync` (they live in `~/.claude.json`, which can't be linked); log in with `/mcp` | `claude/mcp.json` |
 | shared skills (`~/.agents/skills`, `pi/skills`) | linked one by one into `~/.claude/skills/` (pi-mcp-adapter's pi-only `mcp-scripting` skill is excluded) | — |
 | `/todos` | TodoWrite list (`ctrl+t` toggles it) | — |
 | `~/.pi/agent/handoffs` | `~/.claude/handoffs` | — |

@@ -1,3 +1,32 @@
+# Handover — 2026-10-08 (Jira MCP)
+
+Added a `jira` MCP server (Atlassian Rovo, `https://mcp.atlassian.com/v1/mcp/authv2`,
+browser OAuth + dynamic client registration, also exposes Confluence/Compass) to
+`claude/mcp.json`, `omp/mcp.json` and `pi/mcp-adapter.json`, plus a README
+"Jira MCP" section. Claude Code has it registered (`claude-mcp-sync`).
+
+Open items: authenticate jira in Claude Code (`/mcp`), omp (`/mcp reauth jira`)
+and pi (`/mcp-auth jira`). If an Atlassian admin blocks access, ask them to
+enable Rovo MCP. Fallback endpoint `/v1/mcp` if an agent's OAuth can't follow
+RFC 9728 discovery.
+
+Deferred review findings (accepted, not fixed yet):
+- Rovo vs "Jira-only": Atlassian's only official Jira MCP is the Rovo MCP
+  Server (no extra licence on Cloud; rate limits by plan, 500/h on Free). The
+  only non-Rovo option is community `sooperset/mcp-atlassian` (local, API token
+  or own OAuth app, no dynamic registration). Kept Rovo; revisit if needed.
+- README "Jira MCP" product list is incomplete: the server also exposes Jira
+  Service Management and Bitbucket tools, not just Jira/Confluence/Compass.
+  Optionally document plan rate limits.
+- Write access: scopes include `write:jira-work` and Confluence page/comment
+  writes, with no toolset filter. Once tool names are visible after login,
+  consider `permissions.deny`/`ask` rules for `mcp__jira__` write tools in
+  `claude/settings.json` (omp/pi have no per-tool control here).
+- Drift: pi 1.0.4 has built-in MCP (`pi mcp …`, reads `~/.pi/agent/mcp.json`),
+  but `setup.sh` still says "pi has no built-in MCP support" and the repo uses
+  `pi-mcp-adapter`. Decide whether to migrate.
+- `shellcheck` isn't installed, so `setup.sh` was only checked with `bash -n`.
+
 # Handover — 2026-10-08
 
 ## Session summary: Claude Code mirrors pi (uncommitted)

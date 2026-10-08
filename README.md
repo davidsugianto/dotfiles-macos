@@ -45,8 +45,8 @@ yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial) + skills/ (symlinks to pi/skills/herdr*), linked to ~/.omp/agent/ (incl. themes/, skills/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekataiofficial) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial) + skills/ (symlinks to pi/skills/herdr*), linked to ~/.omp/agent/ (incl. themes/, skills/) and ~/.omp/model-profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekataiofficial) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
 claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{default,personal-labs}/*.md (role subagents) + profiles/*.json (`--settings` overlays) + scripts/ (claude-roles, claude-profile) + settings.json, linked to ~/.claude/ and ~/.local/bin/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
@@ -408,6 +408,40 @@ which actions the signed-in user can perform. To limit exposure, replace
 `all` with a comma-separated list such as `core,alerting,dashboards` in both
 files. If your org signs in through a custom subdomain, append
 `&subdomain=<name>` too.
+
+## Jira MCP
+
+All three agents also talk to Atlassian's hosted Rovo
+[MCP server](https://support.atlassian.com/atlassian-ai-gateway/docs/get-started-with-the-atlassian-remote-mcp-server/)
+(`https://mcp.atlassian.com/v1/mcp/authv2`, Streamable HTTP) as a `jira`
+server in `omp/mcp.json`, `pi/mcp-adapter.json` and `claude/mcp.json` — keep
+the three entries identical. The old `/v1/sse` endpoint is deprecated.
+
+Auth is browser OAuth 2.1 with your Atlassian Cloud login (incl. SSO). Like
+Datadog (unlike Slack) it supports dynamic client registration, so there is no
+app, client ID/secret, API token or env var. Tokens are stored per agent (omp:
+`agent.db`; pi and Claude Code: the macOS keychain), never in this repo. On
+first login you pick the Atlassian site to grant access to.
+
+The one server exposes Jira **and** Confluence and Compass tools (scopes
+include read/write:jira-work, Confluence page/comment read/write, Compass).
+There is no toolset filter like Datadog's `?toolsets=`; the signed-in user's
+Atlassian permissions bound what it can do, including writes. An org/site
+admin can disable the Rovo MCP server or restrict allowed clients/domains, and
+first-time access may need admin approval — if login fails after the browser
+step, that is the likely cause.
+
+If an agent's OAuth client can't follow RFC 9728 discovery to
+`auth.atlassian.com`, use `https://mcp.atlassian.com/v1/mcp` (legacy
+discovery, also DCR) for that agent.
+
+First login, once per agent:
+
+- omp: `/mcp reload`, then `/mcp reauth jira` → browser → approve →
+  `/mcp test jira`.
+- pi: `/reload`, then `/mcp-auth jira` → browser → approve.
+- Claude Code: `claude-mcp-sync` (registers only missing servers; no
+  `--force` needed), then `/mcp` → `jira` → Authenticate.
 
 ## Slack MCP
 

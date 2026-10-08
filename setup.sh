@@ -238,9 +238,10 @@ link "$DOTFILES_DIR/omp/models.yml" "$HOME/.omp/agent/models.yml"
 # (omp-model-profiles plugin, installed below) — kept in this repo so both
 # profiles are versioned next to the models.yml provider they reference.
 link "$DOTFILES_DIR/omp/model-profiles" "$HOME/.omp/model-profiles"
-# mcp.json holds the user-level MCP servers (Datadog US5 via browser OAuth with
-# dynamic registration; Slack via browser OAuth with a pre-registered app whose
-# SLACK_MCP_CLIENT_ID/SECRET come from ~/.zshrc.local — no secrets in the repo).
+# mcp.json holds the user-level MCP servers (Datadog US5 and Jira (Atlassian
+# Rovo) via browser OAuth with dynamic registration; Slack via browser OAuth
+# with a pre-registered app whose SLACK_MCP_CLIENT_ID/SECRET come from
+# ~/.zshrc.local — no secrets in the repo).
 link "$DOTFILES_DIR/omp/mcp.json" "$HOME/.omp/agent/mcp.json"
 # themes/*.json are omp's custom themes (~/.omp/agent/themes); select one in
 # `/settings` -> Appearance. Linked wholesale, same as pi/themes below.
@@ -267,7 +268,7 @@ link "$DOTFILES_DIR/PI.md" "$HOME/.pi/agent/PI.md"
 # $CEKAT_API_KEY — see zsh/.zshrc.local.example.
 link "$DOTFILES_DIR/pi/models.json" "$HOME/.pi/agent/models.json"
 # mcp-adapter.json is read by the pi-mcp-adapter package (installed below) — pi has
-# no built-in MCP support. Same Datadog + Slack servers as omp/mcp.json.
+# no built-in MCP support. Same Datadog + Jira + Slack servers as omp/mcp.json.
 link "$DOTFILES_DIR/pi/mcp-adapter.json" "$HOME/.pi/agent/mcp-adapter.json"
 # profiles/*.json are switched between at runtime with `/profile <name>`
 # (pi-profile extension, installed below) — one profile per model role
@@ -453,7 +454,7 @@ ok "Claude Code skills linked"
 
 # MCP servers: Claude Code keeps user-scope servers in ~/.claude.json (runtime
 # state, never linked), so claude/mcp.json is registered through
-# `claude mcp add-json` instead. Same Datadog + Slack servers as
+# `claude mcp add-json` instead. Same Datadog + Jira + Slack servers as
 # pi/mcp-adapter.json and omp/mcp.json. Slack is skipped until its
 # SLACK_MCP_CLIENT_* vars are set in ~/.zshrc.local. Authenticate with /mcp.
 step "Registering Claude Code MCP servers"
