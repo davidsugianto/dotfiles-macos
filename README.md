@@ -231,16 +231,19 @@ a symlinked `config.yaml`, so `pi/model-roles/*.yaml` are copied into place
 rather than linked.
 
 ```sh
-pi-roles personal   # Anthropic OAuth — mirrors omp's personal-labs profile (the global default)
+pi-roles personal   # Anthropic OAuth — mirrors omp's personal-labs profile (the default role set)
 pi-roles default    # Anthropic OAuth — mirrors omp's default profile
 pi-roles work       # cekat gateway (office GPT-6 Luna / GPT-6.1 Sol)
 ```
 
 Anthropic roles use the `anthropic` provider, authenticated by `/login`
-(OAuth subscription) — `pi/settings.json` defaults to
-`anthropic/claude-sonnet-5-5` too, so nothing routes through the cekat
-gateway unless `pi-roles work` is active. omp's `:auto` effort has no pi
-equivalent and custom roles can't `inherit`, so `:auto` maps to `medium`.
+(OAuth subscription). Pi's global startup default is
+`cekat/azure_ai/gpt-6-luna`; Pi reports that deployment supports no thinking
+levels, so its effective effort is `off`. This startup default is independent
+of the copied model-role set: `pi-roles personal` / `default` configure
+Anthropic roles, while `pi-roles work` configures Cekat roles. omp's `:auto`
+effort has no pi equivalent and custom roles can't `inherit`, so `:auto` maps
+to `medium`.
 
 Run `/reload` in every open `pi` session afterwards — `pi-model-roles` has
 no file watcher. `pi-roles` is a plain script (`pi/scripts/pi-roles`,
