@@ -28,7 +28,7 @@ case "$KIND" in pi|omp|claude) ;; *) KIND=pi ;; esac
 
 For `pi`/`omp`, pass no model flags by default: workers inherit the user's settings and active profile. Only when the user names a worker model, append `-- --model <provider/id>` to `agent start`.
 
-For `KIND=claude`, every slice has a **role**: the name of an agent in `~/.claude/agents` (the active role set, switched with `claude-roles`). Start the worker with `-- --agent <role>`; the role supplies the model, effort and system prompt. Default role is `task`. Before starting any worker, check every slice's role with `test -f ~/.claude/agents/<role>.md`; if any file is missing, start no workers: show the user the missing role and ask which role to use. If the user names a worker model, append `--model <model-id>` (e.g. `claude-opus-5-5`) after `--agent <role>`; the explicit model wins over the role's model.
+For `KIND=claude`, every slice has a **role**: the name of an agent in `~/.claude/agents` (the active role set, switched with `claude-roles`). Start the worker with `-- --agent <role>`; the role supplies the model, effort and system prompt. Default role is `task`. Before starting any worker, check every slice's role with `test -f ~/.claude/agents/<role>.md`; if any file is missing, start no workers: show the user the missing role and ask which role to use. If the user names a worker model, append `--model <model-id>` (e.g. `claude-opus-5-5[1m]`; keep the `[1m]` suffix or the worker loses the 1M context window) after `--agent <role>`; the explicit model wins over the role's model.
 
 ## 4. Slice
 

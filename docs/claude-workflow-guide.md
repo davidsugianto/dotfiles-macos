@@ -175,8 +175,9 @@ These steps are the same as the pi guide, with these differences:
   at a gate so you can approve the roles. With an already-approved plan
   `/superagent` doesn't stop, so name the roles in the command to set them.
   Override one worker with e.g. `worker 2 as slow`. Naming a model
-  (`… workers on claude-opus-5-5`) adds `--model` after `--agent`, and it
-  wins over the role's model.
+  (`… workers on claude-opus-5-5[1m]`) adds `--model` after `--agent`, and
+  it wins over the role's model. Keep the `[1m]` suffix, or the worker
+  loses the 1M context window.
 - Claude has no `sa ●` footer. Watch the Herdr sidebar or run
   `herdr agent list` / `herdr agent read sa-<id>-N --lines 60`.
 - `/delegate` turns the open TodoWrite items into slices labelled
