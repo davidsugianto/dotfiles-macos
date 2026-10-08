@@ -10,7 +10,7 @@ this machine). See `docs/claude-workflow-guide.md`.
 - `claude/commands/`: port of `pi/prompts/` (`$ARGUMENTS`, `~/.claude/CLAUDE.md`), plus `/handoff`. `/plan` is pinned to `claude-opus-5-5[1m]`.
 - `claude/model-roles/{default,personal-labs}/`: role subagents generated from `pi/model-roles/*.yaml` (same descriptions, models and effort). `claude-roles` repoints the `~/.claude/agents` symlink.
 - `claude/profiles/*.json` + `claude-profile`: `--settings` overlays, Anthropic-only (the user chose no cekat).
-- `claude/settings.json`: the live file captured wholesale (Orca + Herdr hooks, autoMode, statusLine). I added `model: claude-sonnet-5-5[1m]`, `effortLevel: high`, and `env` `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000` / `CLAUDE_CODE_AUTO_COMPACT_WINDOW=922000` to match the cekat work models (922K/128K). The pre-link original is backed up in `~/.claude/backups/dotfiles-claude-20261008-121957/`.
+- `claude/settings.json`: the live file captured wholesale (Orca + Herdr hooks, autoMode, statusLine — now `claude-statusline`, a custom two-line script, replacing ccstatusline). I added `model: claude-sonnet-5-5[1m]`, `effortLevel: high`, and `env` `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000` / `CLAUDE_CODE_AUTO_COMPACT_WINDOW=922000` to match the cekat work models (922K/128K). The pre-link original is backed up in `~/.claude/backups/dotfiles-claude-20261008-121957/`.
 - `pi/skills/herdr-delegate`: `KIND` now accepts `claude`, so a Claude orchestrator starts Claude workers.
 - `setup.sh`: Claude links, per-entry skill links into `~/.claude/skills` (that directory keeps claude.ai's `synced/`), seeding of `claude-roles default`, and `herdr integration install claude`.
 

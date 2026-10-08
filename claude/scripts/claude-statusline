@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# claude-statusline — two-line Claude Code status line (pi statusline-pi style).
+#
+#   dotfiles-macos  main ●3 ↑1 │ Sonnet 5.5 · high │ $1.23
+#   ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:default · MCP 2
+#
+# Claude Code pipes a JSON blob to stdin on every refresh. Segments never
+# disappear (missing data shows "–"), so the line count stays stable. Colours
+# are Catppuccin Mocha; load/usage colours go green → yellow → red. Only
+# narrow-width glyphs are used, so it renders in any font. Not shown (no data in
+# the JSON): tps, subagent count, plan mode.
+# ==============================================================================
+set -uo pipefail
+
+command -v jq >/dev/null 2>&1 || { echo "claude-statusline: jq missing"; exit 0; }
+input=$(cat)
+j() { jq -r "$1 // empty" <<<"$input" 2>/dev/null; }
+
+c() { printf '\033[38;2;%sm' "$1"; }
+RST=$'\033[0m'; BOLD=$'\033[1m'
+BLUE=$(c '137;180;250'); MAUVE=$(c '203;166;247'); GREEN=$(c '166;227;161')
+YEL=$(c '249;226;175');  RED=$(c '243;139;168');   TEAL=$(c '148;226;213')
+PEACH=$(c '250;179;135'); TEXT=$(c '205;214;244'); DIM=$(c '108;112;134')
+SEP=" ${DIM}│${RST} "
+
+# green <warn <crit → colour for a 0-100 value
+level() { awk -v v="$1" -v w="$2" -v c="$3" -v g="$GREEN" -v y="$YEL" -v r="$RED" \
+  'BEGIN{print (v>=c ? r : v>=w ? y : g)}'; }
+
+# --- line 1: repo  branch ●dirty ↑ahead ↓behind │ model · effort │ $cost -----
+dir=$(j .workspace.current_dir); [[ -n $dir ]] || dir=$(j .cwd); [[ -n $dir ]] || dir=$PWD
+seg_repo="${BOLD}${BLUE}$(basename -- "$dir")${RST}"
+
+# git status can be slow in big repos: cache per directory for 5s.
+cache="${TMPDIR:-/tmp}/claude-statusline-git-$(printf '%s' "$dir" | cksum | cut -d' ' -f1)"
+now=$(date +%s); mtime=$(stat -f %m "$cache" 2>/dev/null || echo 0)
+if (( now - mtime > 5 )); then
+  if git -C "$dir" rev-parse --git-dir >/dev/null 2>&1; then
+    b=$(git -C "$dir" symbolic-ref --short -q HEAD 2>/dev/null || git -C "$dir" rev-parse --short HEAD 2>/dev/null)
+    d=$(git -C "$dir" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+    ab=$(git -C "$dir" rev-list --left-right --count '@{u}...HEAD' 2>/dev/null || echo "0 0")
+    printf '%s\t%s\t%s\n' "$b" "$d" "$ab" >"$cache" 2>/dev/null
+  else
+    : >"$cache" 2>/dev/null
+  fi
+fi
+seg_git=
+IFS=$'\t ' read -r b d behind ahead <"$cache" 2>/dev/null || b=
+if [[ -n ${b:-} ]]; then
+  seg_git=" ${MAUVE}${b}${RST}"
+  (( ${d:-0} > 0 ))      && seg_git+=" ${PEACH}●${d}${RST}"
+  (( ${ahead:-0} > 0 ))  && seg_git+=" ${GREEN}↑${ahead}${RST}"
+  (( ${behind:-0} > 0 )) && seg_git+=" ${RED}↓${behind}${RST}"
+fi
+
+model=$(j .model.display_name); [[ -n $model ]] || model=$(j .model.id)
+effort=$(j .effort.level)
+[[ -n $effort ]] || effort=$(jq -r '.effortLevel // empty' "$HOME/.claude/settings.json" 2>/dev/null)
+seg_model="${TEXT}${model:-–}${RST}"
+[[ -n $effort ]] && seg_model+="${DIM} · ${RST}${TEAL}${effort}${RST}"
+
+cost=$(j .cost.total_cost_usd)
+[[ $cost =~ ^[0-9]+(\.[0-9]+)?$ ]] || cost=0
+seg_cost="${GREEN}$(printf '$%.2f' "${cost:-0}")${RST}"
+
+line1="${seg_repo}${seg_git}${SEP}${seg_model}${SEP}${seg_cost}"
+
+# --- line 2: ctx bar pct used/size │ CPU MEM │ roles · MCP ------------------
+pct=$(j .context_window.used_percentage)
+size=$(j .context_window.context_window_size)
+if [[ -n $pct ]]; then
+  col=$(level "$pct" 50 80)
+  bar=$(awk -v p="$pct" -v on="${col}▰" -v off="${DIM}▱" 'BEGIN{n=int(p/10+0.5); if(n>10)n=10;
+    for(i=0;i<10;i++) printf "%s", (i<n?on:off)}')
+  human=$(awk -v p="$pct" -v s="${size:-0}" 'function k(n){return n>=1e6?sprintf("%.1fM",n/1e6):sprintf("%dk",n/1e3+0.5)}
+    BEGIN{printf "%s/%s", k(s*p/100), k(s)}')
+  seg_ctx="${DIM}ctx${RST} ${bar}${RST} ${col}$(printf '%.0f' "$pct")%${RST} ${DIM}${human}${RST}"
+else
+  seg_ctx="${DIM}ctx ▱▱▱▱▱▱▱▱▱▱ –${RST}"
+fi
+
+cpu=$(ps -A -o %cpu= 2>/dev/null | awk -v n="$(sysctl -n hw.ncpu 2>/dev/null || echo 1)" '{s+=$1} END{v=s/n; printf "%d", (v>100?100:v)}')
+mem=$(vm_stat 2>/dev/null | awk -v t="$(sysctl -n hw.memsize 2>/dev/null || echo 0)" '
+  /page size of/ {ps=$8}
+  /Pages active/ {a=$3} /Pages wired/ {w=$4} /occupied by compressor/ {c=$5}
+  END{if (t>0) printf "%d", (a+w+c)*ps*100/t}')
+seg_sys="${DIM}CPU${RST} $(level "${cpu:-0}" 70 90)${cpu:-–}%${RST} ${DIM}MEM${RST} $(level "${mem:-0}" 80 92)${mem:-–}%${RST}"
+
+roles=–
+[[ -L $HOME/.claude/agents ]] && roles=$(basename -- "$(readlink -- "$HOME/.claude/agents")")
+mcp=$(jq -r '.mcpServers // {} | length' "$HOME/.claude.json" 2>/dev/null)
+seg_env="${YEL}roles:${roles}${RST}${DIM} · ${RST}${TEAL}MCP ${mcp:-–}${RST}"
+
+printf '%s\n%s\n' "$line1" "${seg_ctx}${SEP}${seg_sys}${SEP}${seg_env}"
+exit 0

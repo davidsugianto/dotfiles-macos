@@ -186,6 +186,22 @@ is staged until you reply `yes` to `/commit`.
 /work-on-handoff 2026-10-08-handoff-health-endpoint.md
 ```
 
+## Statusline
+
+`claude/scripts/claude-statusline` (linked to `~/.local/bin` by `setup.sh`,
+selected by `statusLine` in `settings.json`) is a two-line, pi-style footer:
+
+```text
+dotfiles-macos main ●3 ↑1 │ Sonnet 5.5 · high │ $1.23
+ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:default · MCP 2
+```
+
+`●n` = changed files, `↑/↓` = ahead/behind upstream. Context, CPU and MEM turn
+yellow then red as they climb. Missing data shows `–`, so the height never
+changes. tps, subagent count and plan mode aren't shown — the statusline JSON
+doesn't expose them. Needs `jq`; the MCP count reads `~/.claude.json`; git
+status is cached for 5 s.
+
 ## Troubleshooting
 
 | Symptom | Cause / fix |
@@ -196,3 +212,4 @@ is staged until you reply `yes` to `/commit`.
 | Orca/Herdr hook changes show up in `git diff claude/settings.json` | Expected: settings.json is linked wholesale. Commit them or revert them deliberately |
 | Workers start pi instead of claude | The orchestrator pane isn't registered as `claude`. Check `herdr agent get "$HERDR_PANE_ID"` and `herdr integration status` |
 | Haiku profile errors about effort | Haiku 4.5 has no effort setting. Keep `effortLevel` out of Haiku profiles |
+| Statusline blank or missing | `~/.local/bin/claude-statusline` isn't linked or `jq` is missing. Re-run `setup.sh`; test with `echo '{}' \| claude-statusline` |
