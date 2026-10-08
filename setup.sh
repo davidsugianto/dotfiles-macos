@@ -291,6 +291,10 @@ link "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 link "$DOTFILES_DIR/claude/CLAUDE.md"     "$HOME/.claude/CLAUDE.md"
 link "$DOTFILES_DIR/claude/commands"      "$HOME/.claude/commands"
 link "$DOTFILES_DIR/claude/profiles"      "$HOME/.claude/profiles"
+# Catppuccin themes vendored from matcra587/claude-themes (plugins/catppuccin,
+# rev 4ae1032). settings.json selects "custom:catppuccin-mocha"; /theme
+# switches flavour (the -ansi variants need WezTerm's palette incl. color 16).
+link "$DOTFILES_DIR/claude/themes"        "$HOME/.claude/themes"
 link "$DOTFILES_DIR/claude/scripts/claude-roles"   "$HOME/.local/bin/claude-roles"
 link "$DOTFILES_DIR/claude/scripts/claude-profile" "$HOME/.local/bin/claude-profile"
 link "$DOTFILES_DIR/claude/scripts/claude-mcp-sync" "$HOME/.local/bin/claude-mcp-sync"

@@ -1,5 +1,5 @@
 {
-  "theme": "dark",
+  "theme": "custom:catppuccin-mocha",
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "autoMode": {

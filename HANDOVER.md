@@ -18,6 +18,7 @@ Verified: the smol profile runs on Haiku 4.5; the default runs on `claude-sonnet
 
 - MCP: `claude/mcp.json` holds the same Datadog and Slack servers as `pi/mcp-adapter.json`. `claude-mcp-sync` (run by `setup.sh`) registers them at user scope through `claude mcp add-json`. It can't be a symlink because the servers live in `~/.claude.json` (runtime state). The Slack secret goes to the keychain through `MCP_CLIENT_SECRET`. Both servers are registered and still need `/mcp` → Authenticate.
 - The `setup.sh` skills loop now prunes dangling `~/.claude/skills` links.
+- `claude/themes/`: the 8 Catppuccin themes (+ MIT licence) vendored from matcra587/claude-themes `plugins/catppuccin` @ 4ae1032, linked to `~/.claude/themes` (already applied). `settings.json` sets `"theme": "custom:catppuccin-mocha"` (slug = file stem). Vendored rather than `/plugin install` so it is versioned with the repo and needs no marketplace.
 
 Open:
 - Authenticate datadog and slack via `/mcp`.
