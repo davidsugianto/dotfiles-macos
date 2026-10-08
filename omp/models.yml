@@ -3,27 +3,101 @@ providers:
     baseUrl: https://llm.cekat.id/v1
     apiKey: CEKAT_API_KEY
     api: openai-completions
+    # contextWindow / maxTokens in tokens; cost in USD per 1M tokens.
+    # Source: gateway /model/info where the gateway lists the model (gpt-6-luna,
+    # gpt-6.1-sol, gpt-5.6-terra, deepseek-v4-flash), else pi's bundled catalog.
+    # maxTokens is sent as max_completion_tokens (omp default for this host).
     models:
       - id: azure_ai/gpt-5.3-codex
         name: GPT-5.3 Codex
+        contextWindow: 400000
+        maxTokens: 128000
+        cost:
+          input: 1.75
+          output: 14
+          cacheRead: 0.175
+          cacheWrite: 0
       - id: azure_ai/gpt-5.4-mini
         name: GPT-5.4 Mini
+        contextWindow: 400000
+        maxTokens: 128000
+        cost:
+          input: 0.75
+          output: 4.5
+          cacheRead: 0.075
+          cacheWrite: 0
       - id: azure_ai/gpt-5.5
         name: GPT-5.5
+        contextWindow: 1050000
+        maxTokens: 128000
+        cost:
+          input: 5
+          output: 30
+          cacheRead: 0.5
+          cacheWrite: 0
       - id: azure_ai/gpt-6-luna
         name: GPT-6 Luna
         api: openai-responses
+        contextWindow: 922000
+        maxTokens: 128000
+        cost:
+          input: 0.2
+          output: 0.75
+          cacheRead: 0.01
+          cacheWrite: 0.125
       - id: azure_ai/gpt-5.6-terra
         name: GPT-5.6 Terra
+        contextWindow: 1050000
+        maxTokens: 128000
+        cost:
+          input: 2
+          output: 12
+          cacheRead: 0.2
+          cacheWrite: 2.5
       - id: azure_ai/gpt-6-sol
         name: GPT-6 Sol
         api: openai-responses
+        contextWindow: 922000
+        maxTokens: 128000
+        cost:
+          input: 2
+          output: 10
+          cacheRead: 0.2
+          cacheWrite: 2.5
       - id: azure_ai/gpt-6.1-sol
         name: GPT-6.1 Sol
         api: openai-responses
+        contextWindow: 922000
+        maxTokens: 128000
+        cost:
+          input: 2
+          output: 10
+          cacheRead: 0.1
+          cacheWrite: 2.5
       - id: azure_ai/kimi-k2.6
         name: Kimi K2.6
+        contextWindow: 262144
+        maxTokens: 262144
+        cost:
+          input: 0.95
+          output: 4
+          cacheRead: 0.16
+          cacheWrite: 0
       - id: azure_ai/deepseek-v4-flash
         name: DeepSeek V4 Flash
+        contextWindow: 1000000
+        maxTokens: 384000
+        cost:
+          input: 0.15
+          output: 0.6
+          cacheRead: 0.006
+          cacheWrite: 0
       - id: azure_ai/deepseek-v4-pro
         name: DeepSeek V4 Pro
+        contextWindow: 1000000
+        maxTokens: 384000
+        cost:
+          input: 1.925
+          output: 3.828
+          cacheRead: 0.165
+          cacheWrite: 0

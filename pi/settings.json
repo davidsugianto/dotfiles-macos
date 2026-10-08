@@ -10,7 +10,8 @@
     "npm:timestamp-pi",
     "npm:@tintinweb/pi-subagents",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/subagents-pi",
-    "npm:pi-mcp-adapter"
+    "npm:pi-mcp-adapter",
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/anthropic-oauth"
   ],
   "lastChangelogVersion": "1.0.4",
   "skills": [

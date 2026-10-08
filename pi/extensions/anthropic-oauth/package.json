@@ -1,0 +1,31 @@
+{
+  "name": "pi-anthropic-auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pi extension: /anthropic-auth:status diagnostics for Anthropic OAuth/API-key providers",
+  "keywords": [
+    "pi-package"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.ts\"",
+    "check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^1.1.0",
+    "@types/node": "^26.6.4",
+    "typescript": "^5.9.3"
+  }
+}

@@ -15,3 +15,10 @@
 # Read by the "cekat" provider in opencode/opencode.json, omp/models.yml,
 # and pi/models.json (all repo-tracked).
 # export CEKAT_API_KEY="sk-..."
+
+# --- Slack MCP (omp + pi) ---------------------------------------------------
+# Client ID/secret of your Slack app (api.slack.com/apps -> Basic Information).
+# Read by the "slack" server in omp/mcp.json and pi/mcp-adapter.json via
+# ${SLACK_MCP_CLIENT_ID} / ${SLACK_MCP_CLIENT_SECRET}. See README "Slack MCP".
+# export SLACK_MCP_CLIENT_ID="1234567890.1234567890"
+# export SLACK_MCP_CLIENT_SECRET="..."   # or: $(security find-generic-password -s slack-mcp-client-secret -w)
