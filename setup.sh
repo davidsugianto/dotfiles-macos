@@ -281,6 +281,14 @@ link "$DOTFILES_DIR/pi/profiles" "$HOME/.pi/profiles"
 # (~/.pi/agent/skills), so that path is a symlink into the shared dir.
 mkdir -p -- "$HOME/.agents/skills"
 link "$HOME/.agents/skills" "$HOME/.pi/agent/skills"
+# Repo skills (pi/skills) are linked in individually so pi can open them at
+# ~/.pi/agent/skills/<name>/SKILL.md; a whole-directory link would be wiped by
+# the `skills` CLI.
+for skill_dir in "$DOTFILES_DIR"/pi/skills/*/; do
+  [[ -d "$skill_dir" ]] || continue
+  skill_dir="${skill_dir%/}"
+  link "$skill_dir" "$HOME/.agents/skills/$(basename -- "$skill_dir")"
+done
 link "$DOTFILES_DIR/pi/scripts/pi-roles" "$HOME/.local/bin/pi-roles"
 # Resolve a pi Herdr worker's model from the active pi-model-roles config.
 link "$DOTFILES_DIR/pi/scripts/pi-worker-model" "$HOME/.local/bin/pi-worker-model"
