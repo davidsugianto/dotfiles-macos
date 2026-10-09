@@ -64,7 +64,9 @@ or "the approved plan above".
 ## `/superagent` — `superagent.md`
 
 **Use when:** an approved plan has steps that touch different files and can
-run at the same time. Must run inside Herdr. **Argument:** the plan.
+run at the same time. Must run inside Herdr. **Argument:** the plan, plus
+optional overrides: a worker count ("5 workers"), a role ("worker 2 as
+slow"), or a model ("workers on cekat/azure_ai/gpt-6.1-sol").
 
 | Template step | What it's for |
 |---|---|
@@ -74,12 +76,24 @@ run at the same time. Must run inside Herdr. **Argument:** the plan.
 | 3. Run herdr-delegate end to end; do non-parallel work directly; pi slices carry a Role (`task` default, override like "worker 2 as slow") | The orchestrator also handles glue work that doesn't fit a slice; the role picks the worker model via `pi-worker-model` |
 | 4. End at review hand-off, no commit | Output goes into the normal `/review` step |
 
-**What the skill adds** (`pi/skills/herdr-delegate/SKILL.md`): at most 6
-workers; each owns a disjoint file set; one `sa-<id>` workspace with one tab
+**What the skill adds** (`pi/skills/herdr-delegate/SKILL.md`): 6 workers by
+default (a number you name is a ceiling, capped at 12); each owns a disjoint
+file set; one `sa-<id>` workspace with one tab
 per worker; briefs and results as files under `$TMPDIR/superagent/<id>/`; a
 screen check before prompting (for undetected dialogs); a check that only
 owned files changed; re-running every validation; and closing the workspace
 only if all workers finished.
+
+**Which model a pi worker gets:** each slice has a role (`task` by default,
+`slow` for hard or risky work, `smol` for trivial work). The orchestrator runs
+`pi-worker-model <role>`, which reads the active `pi-roles` set
+(`~/.pi/agent/extensions/pi-model-roles/config.yaml`) and prints the provider,
+model and thinking effort; those are passed to `pi` as `--provider`, `--model`
+and `--thinking`. A model you name in the command wins over the role. If the
+role config is missing or disabled, the worker inherits `defaultModel`, and
+omp workers always do. The slice table shows the resolved model, so check it
+before approving. Re-run `pi-roles` after editing a role file; the helper reads
+the deployed copy.
 
 ## `/delegate` — `delegate.md`
 
@@ -90,7 +104,7 @@ Herdr. **Argument:** optional extra constraints for every worker.
 |---|---|
 | 1. `todo list`; nothing open → "Nothing to delegate" | No empty runs |
 | 2. One slice per todo (merged when they share files), labelled `todo#<id>`; constraints: `$@` | Lets you trace each worker back to its todo |
-| 3. Load skills, print the slice table, wait for OK | Same approval point as `/superagent` |
+| 3. Load skills, print the slice table (pi slices carry a role and resolved model), wait for OK | Same approval point as `/superagent`; override a role with "worker 2 as slow" |
 | 4. Tick a todo only after its worker reports `done` **and** verification passes; list blocked items with their questions | `/todos` never shows unverified work as done |
 | 5. Review hand-off, no commit | Same as `/superagent` |
 

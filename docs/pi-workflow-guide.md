@@ -26,7 +26,7 @@ Each arrow labelled `OK` is a gate: the agent stops and waits for your reply.
 | Helper | What it is | Where you see it | Use it for |
 |---|---|---|---|
 | **Subagent** (`Agent` tool, pi-subagents) | A child session inside the same pi process (`Explore`, `Plan`, `general-purpose`, or a custom agent) | Inline in the chat, the widget above the editor, FleetView (`↓` at an empty prompt), `/agents` | Read-only exploration and short lookups while you plan or execute |
-| **Herdr worker** (`/superagent`, `/delegate`) | A full pi/omp session in its own Herdr tab, in a `sa-<id>` workspace | Herdr sidebar, the `sa ●/◐/✓` footer in the orchestrator, `/herdr-agents` | Parallel implementation slices that own disjoint files |
+| **Herdr worker** (`/superagent`, `/delegate`) | A full pi/omp session in its own Herdr tab, in a `sa-<id>` workspace; a pi worker's model comes from its role (`pi-worker-model`) | Herdr sidebar, the `sa ●/◐/✓` footer in the orchestrator, `/herdr-agents` | Parallel implementation slices that own disjoint files |
 | **You** | — | — | Every gate, every approval or trust dialog, every question a worker raises |
 
 PI.md routes work this way: subagents for read-only lookups, Herdr workers only
@@ -113,15 +113,19 @@ not commit. Next: [Step 5](#step-5-review).
 1. **Slice table.** The orchestrator prints one row per worker:
 
    ```text
-   | Worker | Owned files              | Goal                 | Validation          |
-   |--------|--------------------------|----------------------|---------------------|
-   | 1      | src/server/health.ts ... | /health endpoint     | npm test -- health  |
-   | 2      | src/ui/StatusBadge.tsx … | status badge         | npm test -- Badge   |
+   | Worker | Role | Model                          | Owned files              | Goal             | Validation         |
+   |--------|------|--------------------------------|--------------------------|------------------|--------------------|
+   | 1      | task | cekat/azure_ai/gpt-6.1-sol off | src/server/health.ts ... | /health endpoint | npm test -- health |
+   | 2      | smol | cekat/azure_ai/gpt-6-luna off  | src/ui/StatusBadge.tsx … | status badge     | npm test -- Badge  |
    ```
 
    Check that no file appears in two rows and that each validation command is
-   real. If the plan wasn't approved in this conversation, it stops here;
-   reply `OK`.
+   real. The Role is `task` by default, `slow` for hard or risky work and
+   `smol` for trivial work; the Model column is what that role resolves to in
+   your active `pi-roles` set (`inherit` means the worker uses `defaultModel`).
+   To change a worker, reply e.g. `worker 2 as slow`, or name a model in the
+   command. omp workers have no roles and always inherit. If the plan wasn't
+   approved in this conversation, it stops here; reply `OK`.
 2. **Workers start.** A new workspace `sa-<id>` appears in the Herdr sidebar
    with one tab per worker (`sa-<id>-1`, `sa-<id>-2`, …). Your focus stays on
    the orchestrator.
@@ -151,9 +155,9 @@ add todos: add /health endpoint; add status badge; add E2E test for the badge
 /delegate keep the existing API client
 ```
 
-Same flow as `/superagent`, but each row is labelled `todo#<id>`, and each todo
-gets ticked off only after its worker is verified. Todos that share files are
-merged into one worker.
+Same flow as `/superagent` (including the Role and Model columns), but each row
+is labelled `todo#<id>`, and each todo gets ticked off only after its worker is
+verified. Todos that share files are merged into one worker.
 
 ## Blocked workers
 

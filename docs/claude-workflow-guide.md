@@ -178,6 +178,11 @@ These steps are the same as the pi guide, with these differences:
   (`… workers on claude-opus-5-5[1m]`) adds `--model` after `--agent`, and
   it wins over the role's model. Keep the `[1m]` suffix, or the worker
   loses the 1M context window.
+- The slice table has a Role column but no Model column: a Claude worker's
+  model comes from its role agent in `~/.claude/agents` (the active
+  `claude-roles` set), not from `pi-worker-model`, which only applies to pi
+  workers. Naming a number in the command (`/superagent 5 workers …`) caps the
+  worker count, same as in the pi guide: default 6, absolute cap 12.
 - Claude has no `sa ●` footer. Watch the Herdr sidebar or run
   `herdr agent list` / `herdr agent read sa-<id>-N --lines 60`.
 - `/delegate` turns the open TodoWrite items into slices labelled
