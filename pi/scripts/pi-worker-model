@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# pi-worker-model — resolve the model for a pi Herdr worker from the active
+# pi-model-roles config.
+#
+# Usage: pi-worker-model <role>
+#
+# Prints one line: "<provider> <id> <effort>" for roles.<role>. Ids may contain
+# "/" (e.g. azure_ai/gpt-6.1-sol). A role without `effort` prints "-" as the
+# third field. An unknown role falls back to the `default` role (warning on
+# stderr). If the config is missing, `enabled: false`, or has no usable
+# `default` role, prints nothing and exits 0 so callers pass no model flags.
+#
+# Config: ${PI_MODEL_ROLES_CONFIG:-~/.pi/agent/extensions/pi-model-roles/config.yaml}
+# ==============================================================================
+set -euo pipefail
+
+if [[ $# -lt 1 || -z "${1:-}" ]]; then
+  echo "usage: pi-worker-model <role>" >&2
+  exit 2
+fi
+
+ROLE="$1"
+CONFIG="${PI_MODEL_ROLES_CONFIG:-$HOME/.pi/agent/extensions/pi-model-roles/config.yaml}"
+
+[[ -f "$CONFIG" ]] || exit 0
+
+if [[ "$(yq '.enabled == false' "$CONFIG")" == "true" ]]; then
+  exit 0
+fi
+
+# Prints "<provider> <id> <effort>" for a role, or nothing if unusable.
+resolve() {
+  R="$1" yq '
+    .roles[strenv(R)] as $r
+    | select($r.model.provider != null and $r.model.id != null)
+    | $r.model.provider + " " + $r.model.id + " " + ($r.effort // "-" | tostring)
+  ' "$CONFIG"
+}
+
+out="$(resolve "$ROLE")"
+if [[ -z "$out" && "$ROLE" != "default" ]]; then
+  out="$(resolve default)"
+  if [[ -n "$out" ]]; then
+    echo "pi-worker-model: unknown role '$ROLE', falling back to 'default'" >&2
+  fi
+fi
+
+[[ -z "$out" ]] || printf '%s\n' "$out"

@@ -26,14 +26,21 @@ KIND=$(herdr agent get "$HERDR_PANE_ID" | jq -r '.result.agent.agent // empty')
 case "$KIND" in pi|omp|claude) ;; *) KIND=pi ;; esac
 ```
 
-For `pi`/`omp`, pass no model flags by default: workers inherit the user's settings and active profile. Only when the user names a worker model, append `-- --model <provider/id>` to `agent start`.
+For `KIND=omp`, pass no model flags: workers inherit the user's settings and active profile. omp has no role mapping.
+
+For `KIND=pi`, every slice has a **role** (`task` default, `slow` hard/risky, `smol` trivial; same table as claude below). Resolve each slice's role with `pi-worker-model <role>`:
+
+- It prints `<provider> <id> <effort>`: append `-- --provider <provider> --model <id>` to `agent start`, plus `--thinking <effort>` unless effort is `-` (then omit `--thinking`).
+- It prints nothing (role config missing or disabled): pass no flags; the worker inherits the user's settings.
+- A model the user names wins over the role: append `-- --model <provider/id>` instead.
 
 For `KIND=claude`, every slice has a **role**: the name of an agent in `~/.claude/agents` (the active role set, switched with `claude-roles`). Start the worker with `-- --agent <role>`; the role supplies the model, effort and system prompt. Default role is `task`. Before starting any worker, check every slice's role with `test -f ~/.claude/agents/<role>.md`; if any file is missing, start no workers: show the user the missing role and ask which role to use. If the user names a worker model, append `--model <model-id>` (e.g. `claude-opus-5-5[1m]`; keep the `[1m]` suffix or the worker loses the 1M context window) after `--agent <role>`; the explicit model wins over the role's model.
 
 ## 4. Slice
 
 - Read enough code to list the files each unit of work will create or modify.
-- Merge units that share any file into one slice. Maximum 6 workers.
+- Merge units that share any file into one slice.
+- Worker count: if the user names a number N, treat it as a ceiling and spawn `min(N, independent slices)`; if fewer slices exist than N, say so in the table (e.g. "asked for 10, plan has 4 disjoint slices"). Never split a file across workers or invent busywork to reach N. With no number named, the ceiling is 6. Absolute cap is 12: if the user asks for more, start no workers and ask them to confirm a lower number.
 - Each slice gets: goal, owned files (the only files it may create/edit), read-only context files, acceptance criteria, validation commands.
 - Work that cannot be parallelized stays with you.
 
@@ -42,10 +49,12 @@ Print this table before spawning:
 | Worker | Owned files | Goal | Validation |
 |---|---|---|---|
 
-For `claude` workers, add a Role column:
+For `claude` and `pi` workers, add a Role column (omp has no roles):
 
 | Worker | Role | Owned files | Goal | Validation |
 |---|---|---|---|---|
+
+For `pi`, also add a Model column with the resolved model (`<provider>/<id> <effort>`, or `inherit`), after Role.
 
 Pick each role:
 
@@ -118,7 +127,7 @@ Write `$RUN_DIR/<name>.brief.md` per worker with the file-writing tool. Never in
 - `<command>`
 
 ## Rules
-Do not commit, push, stage, or install dependencies unless listed. Do not edit files outside Owned files. Do not delegate or start other agents. Do not ask the user questions: if a decision or missing info blocks you, stop and report status blocked with the question. These rules override any role instruction to ask the user questions.
+Do not commit, push, stage, or install dependencies unless listed. Do not edit files outside Owned files. Do not delegate or start other agents. Do not load the herdr or herdr-delegate skills. Do not ask the user questions: if a decision or missing info blocks you, stop and report status blocked with the question. These rules override any role instruction to ask the user questions.
 
 ## Report
 Write `<RUN_DIR>/<name>.result.md` with frontmatter `status: done|blocked|failed`, then sections Changed files, Validation (commands + trimmed output), Notes/Questions. Your final chat line must be `SUPERAGENT_RESULT <name> <status>`.
@@ -138,6 +147,12 @@ For `claude` workers:
 
 ```bash
 herdr agent start <name> --kind claude --pane <pane> --timeout 60000 -- --agent <role> [--model <model-id>]
+```
+
+For `pi` workers, add the resolved model flags (omit them when `pi-worker-model` printed nothing):
+
+```bash
+herdr agent start <name> --kind pi --pane <pane> --timeout 60000 [-- --provider <provider> --model <id> [--thinking <effort>]]
 ```
 
 On `agent_not_ready` or a blocked start: `herdr agent read <name> --source recent-unwrapped --lines 60`, show the output to the user, and ask. Never answer approval or trust dialogs yourself.

@@ -331,6 +331,12 @@ every prompt annotated: [docs/pi-prompts.md](docs/pi-prompts.md).
 | `pi/skills/herdr-delegate/SKILL.md` | The orchestration procedure both agents follow. Briefs/results live in `$TMPDIR/superagent/<id>/`. |
 | `pi/skills/herdr/SKILL.md` | Vendored `herdr --skill` output plus `LOCAL:` edits — re-sync after `brew upgrade herdr`. |
 
+pi workers pick their model by role (`task` default, `slow`, `smol`): the
+orchestrator runs `pi-worker-model <role>`, which reads the active `pi-roles`
+set and prints the provider, model and thinking effort to pass at start. omp
+workers and roles that don't resolve inherit `defaultModel`; a model named in
+the command wins over the role.
+
 Herdr's agent-state integrations (`~/.pi/agent/extensions/herdr-agent-state.ts`,
 `~/.omp/agent/extensions/herdr-omp-agent-state.ts`) are owned by Herdr and
 installed by `setup.sh`; don't vendor them. `notify.ts` sends OSC 777 desktop

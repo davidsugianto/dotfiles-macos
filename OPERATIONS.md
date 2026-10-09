@@ -332,7 +332,9 @@ resurface after a Homebrew self-update resets trust state), re-run
   repair before the menu can save"). That's why `pi/model-roles/*.yaml`
   are deployed with a plain `cp` (`pi/scripts/pi-roles`, see README "pi
   model-role switching"), unlike every other pi/omp config in this repo,
-  which is symlinked straight from the source of truth.
+  which is symlinked straight from the source of truth. Herdr pi workers
+  read the same deployed copy through `pi/scripts/pi-worker-model`, so
+  re-run `pi-roles` after editing a role file or workers keep the old model.
 - **`pi/extensions/subagents-pi/` is vendored, not fetched** — it isn't
   published to npm (its own README briefly claimed otherwise; the npm
   registry says 404 — trust the registry). `setup.sh`'s `pi install

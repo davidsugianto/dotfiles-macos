@@ -70,8 +70,8 @@ run at the same time. Must run inside Herdr. **Argument:** the plan.
 |---|---|
 | "You are the superagent orchestrator for: $@" | Makes this session the coordinator, not a worker |
 | 1. Invoking /superagent is permission to delegate; load `herdr-delegate` + `herdr` | The skill holds the whole procedure (slicing, briefs, start, wait, verify, cleanup); the template stays short |
-| 2. No approved plan in this conversation → slice table, stop at the plan gate | You approve the split (owned files, goals, validation) before any worker starts |
-| 3. Run herdr-delegate end to end; do non-parallel work directly | The orchestrator also handles glue work that doesn't fit a slice |
+| 2. No approved plan in this conversation → slice table (role, resolved model, owned files, goals, validation), stop at the plan gate | You approve the split and each worker's model before any worker starts |
+| 3. Run herdr-delegate end to end; do non-parallel work directly; pi slices carry a Role (`task` default, override like "worker 2 as slow") | The orchestrator also handles glue work that doesn't fit a slice; the role picks the worker model via `pi-worker-model` |
 | 4. End at review hand-off, no commit | Output goes into the normal `/review` step |
 
 **What the skill adds** (`pi/skills/herdr-delegate/SKILL.md`): at most 6

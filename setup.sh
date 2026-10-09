@@ -282,6 +282,8 @@ link "$DOTFILES_DIR/pi/profiles" "$HOME/.pi/profiles"
 mkdir -p -- "$HOME/.agents/skills"
 link "$HOME/.agents/skills" "$HOME/.pi/agent/skills"
 link "$DOTFILES_DIR/pi/scripts/pi-roles" "$HOME/.local/bin/pi-roles"
+# Resolve a pi Herdr worker's model from the active pi-model-roles config.
+link "$DOTFILES_DIR/pi/scripts/pi-worker-model" "$HOME/.local/bin/pi-worker-model"
 # Claude Code mirrors pi's setup: CLAUDE.md is the PI.md workflow, commands/
 # are the pi prompt templates as slash commands, profiles/ are `--settings`
 # overlays (claude-profile), and model-roles/ hold the role subagents that
