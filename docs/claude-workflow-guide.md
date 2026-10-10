@@ -209,16 +209,18 @@ is staged until you reply `yes` to `/commit`.
 ## Statusline
 
 `claude/scripts/claude-statusline` (linked to `~/.local/bin` by `setup.sh`,
-selected by `statusLine` in `settings.json`) is a two-line, pi-style footer:
+selected by `statusLine` in `settings.json`) is a three-line, pi-style footer:
 
 ```text
 dotfiles-macos main ●3 ↑1 │ Sonnet 5.5 · high │ $1.23
 ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:default · MCP 2
+5h ▰▰▱▱▱▱▱▱▱▱ 23% ↻ 3:40pm │ 7d ▰▰▰▰▰▰▱▱▱▱ 61% ↻ Mon 9:00am
 ```
 
 `●n` = changed files, `↑/↓` = ahead/behind upstream. Context, CPU and MEM turn
 yellow then red as they climb. Missing data shows `–`, so the height never
-changes. tps, subagent count and plan mode aren't shown — the statusline JSON
+changes. The 5h/7d line reads `rate_limits` from the JSON (Pro/Max only, filled
+after the first API response; `–` until then). tps, subagent count and plan mode aren't shown — the statusline JSON
 doesn't expose them. Needs `jq`; the MCP count reads `~/.claude.json`; git
 status is cached for 5 s.
 

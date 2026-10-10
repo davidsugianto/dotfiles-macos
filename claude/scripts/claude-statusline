@@ -4,6 +4,7 @@
 #
 #   dotfiles-macos  main ●3 ↑1 │ Sonnet 5.5 · high │ $1.23
 #   ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:default · MCP 2
+#   5h ▰▰▱▱▱▱▱▱▱▱ 23% ↻ 3:40pm │ 7d ▰▰▰▰▰▰▱▱▱▱ 61% ↻ Mon 9:00am
 #
 # Claude Code pipes a JSON blob to stdin on every refresh. Segments never
 # disappear (missing data shows "–"), so the line count stays stable. Colours
@@ -92,5 +93,25 @@ roles=–
 mcp=$(jq -r '.mcpServers // {} | length' "$HOME/.claude.json" 2>/dev/null)
 seg_env="${YEL}roles:${roles}${RST}${DIM} · ${RST}${TEAL}MCP ${mcp:-–}${RST}"
 
-printf '%s\n%s\n' "$line1" "${seg_ctx}${SEP}${seg_sys}${SEP}${seg_env}"
+# --- line 3: 5h / 7d plan usage with reset time (Pro/Max only) ---------------
+# bar pct → 10-cell bar coloured by level
+bar10() { local col; col=$(level "$1" 50 80)
+  awk -v p="$1" -v on="${col}▰" -v off="${DIM}▱" 'BEGIN{n=int(p/10+0.5); if(n>10)n=10;
+    for(i=0;i<10;i++) printf "%s", (i<n?on:off)}'; }
+
+# rate_seg label jq-key date-format
+rate_seg() {
+  local p r col reset=
+  p=$(j ".rate_limits.$2.used_percentage"); r=$(j ".rate_limits.$2.resets_at")
+  if [[ -z $p ]]; then printf '%s' "${DIM}$1 ▱▱▱▱▱▱▱▱▱▱ –${RST}"; return; fi
+  col=$(level "$p" 50 80)
+  if [[ $r =~ ^[0-9]+$ ]]; then
+    reset=$(date -r "$r" "+$3" 2>/dev/null | sed 's/AM$/am/; s/PM$/pm/; s/ 0\([0-9]:\)/ \1/; s/^0//')
+    [[ -n $reset ]] && reset=" ${DIM}↻ ${reset}${RST}"
+  fi
+  printf '%s' "${DIM}$1${RST} $(bar10 "$p")${RST} ${col}$(printf '%.0f' "$p")%${RST}${reset}"
+}
+line3="$(rate_seg 5h five_hour '%I:%M%p')${SEP}$(rate_seg 7d seven_day '%a %I:%M%p')"
+
+printf '%s\n%s\n%s\n' "$line1" "${seg_ctx}${SEP}${seg_sys}${SEP}${seg_env}" "$line3"
 exit 0
