@@ -37,6 +37,7 @@ Deferred review findings (accepted, not fixed yet):
 - `claude/skills/...`: Claude handlers (`sonnet`/`opus`, `general-purpose` subagents, `mcp__datadog__` / `mcp__jira__`). `setup.sh` links `claude/skills/*` into `~/.claude/skills` and skips any shared or pi skill of the same name.
 - Auto-update: `PREFLIGHT_FF=1` + `PREFLIGHT_LAZY=1` in `.zshrc` (pi, omp) and `claude/settings.json` `env`. preflight fast-forwards the clone only when it is clean, on `main` and merely behind; otherwise it pauses and reports.
 - `JIRA_SITE` is `unset` (the skill discovers it). Handlers hardcode `/Users/davidsugianto/...` paths because they are machine-local.
+- 2026-10-11: `sre-incident-response` onboarded the same way (`pi/skills/` + `claude/skills/`; `~/.agents/skills` and `~/.claude/skills` entries are symlinks into the repo). `SLACK_CHANNEL`, `SLACK_CANVAS_ID` and `SLACK_CANVAS_ROW` are unset (no Slack posting or canvas watch) until set in both handlers; `HUMANIZER_SKILL` is `none`. Old stale copies were not kept in the repo.
 - Regenerate a handler from `personal-skill-generator/templates/handler.SKILL.md` if a core adds placeholders; `check-skill.sh <core> <handler>` flags drift.
 
 Open:
