@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# claude-work — start Claude Code routed through the internal cekat gateway.
+#
+# Claude Code's equivalent of pi/omp `/profile work-cekataiofficial`: layers
+# ~/.claude/profiles/work-cekataiofficial.json (linked from ../profiles/) on top
+# of ~/.claude/settings.json via `claude --settings`, for this session only. The
+# profile points ANTHROPIC_BASE_URL at the LiteLLM gateway and maps the
+# sonnet/opus/haiku tiers to the gateway's GPT-6 Luna / GPT-6.1 Sol deployments.
+# The gateway key comes from $CEKAT_API_KEY (never stored in the profile) and is
+# passed to Claude Code as ANTHROPIC_AUTH_TOKEN.
+#
+# Role subagents are not switched here; run `claude-roles work-cekataiofficial`
+# so smol/slow/plan/commit/task use the gateway models too.
+#
+# Usage: claude-work [claude args]    e.g. claude-work
+#                                          claude-work -p "..."
+# ==============================================================================
+set -euo pipefail
+
+if [[ -z "${CEKAT_API_KEY:-}" ]]; then
+  echo "claude-work: CEKAT_API_KEY is not set; export it to use the cekat gateway" >&2
+  exit 1
+fi
+
+export ANTHROPIC_AUTH_TOKEN="$CEKAT_API_KEY"
+
+agents="$HOME/.claude/agents"
+if [[ -L "$agents" ]]; then
+  set_name="$(basename -- "$(readlink -- "$agents")")"
+  if [[ "$set_name" != "work-cekataiofficial" ]]; then
+    echo "claude-work: role subagents are $set_name; run \`claude-roles work-cekataiofficial\` to use the gateway models for subagents" >&2
+  fi
+fi
+
+exec claude --settings "$HOME/.claude/profiles/work-cekataiofficial.json" "$@"

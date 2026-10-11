@@ -10,7 +10,12 @@
 # through a symlink), Claude Code only reads these files, so switching is just
 # repointing the symlink.
 #
-# Usage: claude-roles default | claude-roles personal | claude-roles (show active)
+# The work-cekataiofficial set routes every role through the internal cekat
+# gateway models (GPT-6 Luna / GPT-6.1 Sol, see ../profiles/work-cekataiofficial.json
+# and claude-work). It has no `web` role: the gateway has no search-tier
+# deployment (pi's work-cekataiofficial.yaml omits it too).
+#
+# Usage: claude-roles default | personal | work | claude-roles (show active)
 #
 # Restart open claude sessions (or run /agents) to pick up the new set.
 # ==============================================================================
@@ -36,8 +41,11 @@ case "${1:-}" in
   personal | personal-labs)
     SET=personal-labs
     ;;
+  work | work-cekataiofficial)
+    SET=work-cekataiofficial
+    ;;
   *)
-    echo "usage: claude-roles [default|personal]" >&2
+    echo "usage: claude-roles [default|personal|work]" >&2
     exit 1
     ;;
 esac

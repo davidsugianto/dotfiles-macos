@@ -47,7 +47,7 @@ opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (
 herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
 omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekataiofficial) + skills/ (symlinks to pi/skills/herdr*), linked to ~/.omp/agent/ (incl. themes/, skills/) and ~/.omp/model-profiles/
 pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekataiofficial) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
-claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{default,personal-labs}/*.md (role subagents) + profiles/*.json (`--settings` overlays) + scripts/ (claude-roles, claude-profile) + settings.json, linked to ~/.claude/ and ~/.local/bin/
+claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{default,personal-labs,work-cekataiofficial}/*.md (role subagents) + profiles/*.json (`--settings` overlays, incl. `work-cekataiofficial.json` for the cekat gateway) + scripts/ (claude-roles, claude-profile, claude-work) + settings.json, linked to ~/.claude/ and ~/.local/bin/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
@@ -305,10 +305,12 @@ and model profiles as `pi/`, using Claude Code's own features. Full guide:
 |---|---|
 | `PI.md` | `claude/CLAUDE.md` → `~/.claude/CLAUDE.md` |
 | `pi/prompts/*.md` | `claude/commands/*.md` → `/plan`, `/plan-deep`, `/execute`, `/superagent`, `/delegate`, `/review`, `/fix`, `/test`, `/commit`, `/do-handoff`, `/work-on-handoff`, `/handoff` |
-| pi-model-roles + `pi-roles` | role subagents `smol`/`slow`/`plan`/`commit`/`task`/`web` in `claude/model-roles/<set>/`; `claude-roles default\|personal` repoints `~/.claude/agents` |
-| pi-profile `/profile` | `claude-profile <name>` (`claude --settings claude/profiles/<name>.json`); aliases `ccp`, `ccplan`, `ccslow`, `ccsmol` |
+| pi-model-roles + `pi-roles` | role subagents `smol`/`slow`/`plan`/`commit`/`task`/`web` in `claude/model-roles/<set>/`; `claude-roles default\|personal\|work-cekataiofficial` (alias `work`) repoints `~/.claude/agents`; the work set has no `web` role |
+| pi-profile `/profile` | `claude-profile <name>` (`claude --settings claude/profiles/<name>.json`); aliases `ccp`, `ccplan`, `ccslow`, `ccsmol`; `claude-work` runs Claude through the cekat gateway with `profiles/work-cekataiofficial.json` (needs `$CEKAT_API_KEY`) |
 
-The setup is Anthropic-only (`/login` subscription). Sonnet/Opus 5.5 run
+The default setup is Anthropic-only (`/login` subscription); the opt-in
+`work-cekataiofficial` role set + `claude-work` route a session through the
+internal cekat LiteLLM gateway instead (see the guide). Sonnet/Opus 5.5 run
 with 1M context (`[1m]`), and `settings.json` sets 128K max output and a
 922K auto-compact window to match the cekat work models in `pi/models.json`.
 `setup.sh` also links every shared skill (`~/.agents/skills`, `pi/skills`)
