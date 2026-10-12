@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# sre-skills-sync — keep the sre-ai-skills cores and this repo's handlers current.
+#
+# Cores live in the sre-ai-skills repo and are read live by every handler, so
+# a pull updates behaviour for pi, omp and Claude Code at once. What can go
+# stale is the handler (a new {{placeholder}}, a changed description) or its
+# absence (a new core). This script:
+#   1. fast-forwards the skills repo (only when on main, clean and behind),
+#   2. runs the generator's checker on every core against claude/skills and
+#      pi/skills,
+#   3. reports cores with no handler and agent links that are missing or
+#      point elsewhere.
+# It never edits a handler. Fix drift with /onboard-skills (or by hand).
+#
+# Usage: sre-skills-sync              pull, then check
+#        sre-skills-sync --no-pull    check only
+# Env:   SRE_SKILLS_DIR      skills repo (default ~/Artifacts/labs/src/sre-ai-skills)
+#        SRE_SKILLS_EXCLUDE  space-separated cores to ignore (default none)
+# Exit:  0 all consistent, 1 drift or missing handlers, 2 repo not usable
+# ==============================================================================
+set -euo pipefail
+
+DOTFILES_DIR="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/../.." &>/dev/null && pwd)"
+REPO="${SRE_SKILLS_DIR:-$HOME/Artifacts/labs/src/sre-ai-skills}"
+EXCLUDE=" ${SRE_SKILLS_EXCLUDE:-} "
+CHECKER="$REPO/personal-skill-generator/scripts/check-skill.sh"
+
+pull=1
+case "${1:-}" in
+  "") ;;
+  --no-pull) pull=0 ;;
+  *) echo "usage: sre-skills-sync [--no-pull]" >&2; exit 2 ;;
+esac
+
+[[ -d "$REPO/.git" ]] || { echo "skills repo not found: $REPO" >&2; exit 2; }
+[[ -f "$CHECKER" ]] || { echo "checker missing: $CHECKER" >&2; exit 2; }
+
+if (( pull )); then
+  branch="$(git -C "$REPO" symbolic-ref --short HEAD 2>/dev/null || echo detached)"
+  if [[ "$branch" != main ]]; then
+    echo "skip pull: $REPO is on '$branch', not main"
+  elif ! GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=10" \
+    git -C "$REPO" fetch --quiet origin main; then
+    echo "skip pull: fetch failed, repo state unverified"
+  else
+    read -r ahead behind < <(git -C "$REPO" rev-list --left-right --count HEAD...origin/main)
+    if [[ -n "$(git -C "$REPO" status --porcelain --untracked-files=no)" ]]; then
+      echo "skip pull: tracked changes in $REPO"
+    elif (( ahead > 0 )); then
+      echo "skip pull: $REPO is ahead of origin/main by $ahead"
+    elif (( behind > 0 )); then
+      before="$(git -C "$REPO" rev-parse --short HEAD)"
+      git -C "$REPO" merge --ff-only --quiet origin/main
+      echo "pulled $behind commit(s): $before -> $(git -C "$REPO" rev-parse --short HEAD)"
+      git -C "$REPO" diff --name-only "$before" HEAD | cut -d/ -f1 | sort -u | sed 's/^/  changed: /'
+    else
+      echo "skills repo already current"
+    fi
+  fi
+fi
+
+bad=0
+for dir in "$REPO"/*/; do
+  core="$(basename -- "${dir%/}")"
+  [[ -f "$dir/SKILL.md" && "$EXCLUDE" != *" $core "* ]] || continue
+  for rt in claude pi; do
+    handler="$DOTFILES_DIR/$rt/skills/$core"
+    if [[ ! -f "$handler/SKILL.md" ]]; then
+      echo "MISSING  $rt/$core: no handler (run /onboard-skills)"; bad=1; continue
+    fi
+    if ! out="$(bash "$CHECKER" "${dir%/}" "$handler" 2>&1)"; then
+      echo "DRIFT    $rt/$core"; grep -E 'ERROR|WARN' <<<"$out" | sed 's/^/           /' || true; bad=1
+    fi
+  done
+  [[ "$(readlink -- "$HOME/.agents/skills/$core" 2>/dev/null)" == "$DOTFILES_DIR/pi/skills/$core" ]] \
+    || { echo "LINK     ~/.agents/skills/$core is not linked to pi/skills (re-run setup.sh)"; bad=1; }
+  [[ "$(readlink -- "$HOME/.claude/skills/$core" 2>/dev/null)" == "$DOTFILES_DIR/claude/skills/$core" ]] \
+    || { echo "LINK     ~/.claude/skills/$core is not linked to claude/skills (re-run setup.sh)"; bad=1; }
+done
+
+(( bad )) && exit 1
+echo "all sre-ai-skills handlers consistent and linked"
