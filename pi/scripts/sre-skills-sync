@@ -10,7 +10,9 @@
 #   2. runs the generator's checker on every core against claude/skills and
 #      pi/skills,
 #   3. reports cores with no handler and agent links that are missing or
-#      point elsewhere.
+#      point elsewhere. A handler whose description was shortened because the
+#      core's is invalid for pi (over 1024 chars, or containing ": ") is a NOTE,
+#      not drift; any other description mismatch is drift.
 # It never edits a handler. Fix drift with /onboard-skills (or by hand).
 #
 # Usage: sre-skills-sync              pull, then check
@@ -60,6 +62,18 @@ if (( pull )); then
   fi
 fi
 
+# pi rejects descriptions over 1024 characters or containing ": ". The cores are
+# upstream and left alone, so a handler may carry a shortened description. That
+# is accepted only when it is the checker's sole error, the core's description
+# is pi-invalid and the handler's is valid.
+desc_of() { grep -m1 '^description: ' "$1" | cut -c14- || true; }
+pi_invalid() { (( ${#1} > 1024 )) || [[ "$1" == *": "* ]]; }
+desc_shortened_only() { # checker-output core-md handler-md
+  [[ "$(grep -c '^ERROR' <<<"$1")" == 1 ]] && grep -q '^ERROR: description differs' <<<"$1" || return 1
+  local c h; c="$(desc_of "$2")"; h="$(desc_of "$3")"
+  pi_invalid "$c" && ! pi_invalid "$h"
+}
+
 bad=0
 for dir in "$REPO"/*/; do
   core="$(basename -- "${dir%/}")"
@@ -70,7 +84,11 @@ for dir in "$REPO"/*/; do
       echo "MISSING  $rt/$core: no handler (run /onboard-skills)"; bad=1; continue
     fi
     if ! out="$(bash "$CHECKER" "${dir%/}" "$handler" 2>&1)"; then
-      echo "DRIFT    $rt/$core"; grep -E 'ERROR|WARN' <<<"$out" | sed 's/^/           /' || true; bad=1
+      if desc_shortened_only "$out" "${dir%/}/SKILL.md" "$handler/SKILL.md"; then
+        echo "NOTE     $rt/$core: description shortened for pi's 1024-char limit (core left as is)"
+      else
+        echo "DRIFT    $rt/$core"; grep -E 'ERROR|WARN' <<<"$out" | sed 's/^/           /' || true; bad=1
+      fi
     fi
   done
   [[ "$(readlink -- "$HOME/.agents/skills/$core" 2>/dev/null)" == "$DOTFILES_DIR/pi/skills/$core" ]] \
