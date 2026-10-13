@@ -206,6 +206,15 @@ omp; older entries in this file were rewritten to the new name). Added
 alias. Not live-tested against the gateway. AWS/git `cekataiofficial` names are
 the org, unchanged.
 
+## 2026-10-13: pi work sets get a `web` role
+
+Added `web` = `azure_ai/gpt-6-luna`, effort high, to `pi/model-roles/work-cekatai-default.yaml`
+and `work-cekatai-superpower.yaml` (pi only). Previously web-style tasks fell
+through to `default`. Claude Code's work sets still have no `web` role and omp's
+work profiles still fall back to the global `web` role. Redeploy with
+`pi-roles work-default` / `pi-roles work-superpower` + `/reload`. Not live-tested
+against the gateway.
+
 ## Repo structure notes (for a fresh session with no memory)
 
 - `setup.sh` — base install (Homebrew, taps, general CLI + GUI apps/fonts,

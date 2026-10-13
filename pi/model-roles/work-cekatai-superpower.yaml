@@ -7,15 +7,8 @@
 # Deploy with `pi-roles work-superpower` (dotfiles-macos/pi/scripts/pi-roles), not a
 # symlink — see that script and OPERATIONS.md. Run /reload afterwards.
 #
-# No `web` role here, unlike personal-labs.yaml: omp's own
-# work-cekatai-superpower.yml profile also skips it (no distinct
-# search-tier deployment on the office gateway) and, being a *layered*
-# omp/model-profiles override, silently falls back to config.yml's global
-# `web` role (Anthropic Haiku) when active. pi-model-roles has no such
-# layering — this file is the *entire* role set while active, so a task
-# that would classify as "web" instead falls through to "default" (Luna)
-# here. Add an explicit `web` role below if that's not the behavior you
-# want while on the work gateway.
+# `web` role uses Luna at high effort (explicit: pi-model-roles has no
+# layering, so this file is the entire role set while active).
 version: 1
 enabled: true
 selectorTimeoutMs: 8000
@@ -76,3 +69,11 @@ roles:
       provider: cekat
       id: azure_ai/gpt-6.1-sol
     effort: off
+  web:
+    description: >-
+      Use when the task is primarily researching or summarizing information
+      from the web rather than editing code.
+    model:
+      provider: cekat
+      id: azure_ai/gpt-6-luna
+    effort: high

@@ -13,7 +13,7 @@ All three tools split work into the same roles:
 | `task` | Ordinary scoped implementation work |
 | `plan` | Plans and designs, no edits |
 | `slow` | Hard, ambiguous or high-risk problems |
-| `web` | Web research and summarising (no `web` role in the work sets) |
+| `web` | Web research and summarising (work sets: pi only; Claude Code has none and omp falls back to global) |
 
 Two kinds of model sets exist:
 
@@ -79,7 +79,7 @@ set. Luna reports no thinking levels, so effort on Luna is effectively off.
 | task | Sonnet, medium | Sonnet, high | Sol, off | Sol, off |
 | plan | Sonnet, high | Opus, high | Sol, high | Sol, high |
 | slow | Sonnet, high | Opus, high | Sol, high | Sol, high |
-| web | Sonnet, medium | Haiku, medium | none | none |
+| web | Sonnet, medium | Haiku, medium | Luna, high | Luna, high |
 
 Account/identity profiles (`pi/profiles/*.json`, pi-profile `/profile <name>`)
 set a session model: one per role (`smol`, `commit`, `task`, `plan`, `slow`,

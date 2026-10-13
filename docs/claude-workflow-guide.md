@@ -85,7 +85,7 @@ the request (see [Work gateway](#work-gateway)). Full cross-tool summary: [model
 | plan | opus-5-5 / high (read-only tools) | opus-5-5 / high (read-only tools) | Sol / high (read-only tools) | Sol / high (read-only tools) |
 | commit | haiku-5-5 / high | haiku-5-5 / high | Luna | Luna |
 | task | sonnet-5-5 / high | sonnet-5-5 / high | Sol | Sol |
-| web | sonnet-5-5 / high | sonnet-5-5 / high | none (no search-tier deployment, same as pi's work set) | none |
+| web | sonnet-5-5 / high | sonnet-5-5 / high | none (not mirrored from pi; the pi work sets have a Luna `web` role) | none |
 
 All Anthropic role-set model ids carry the `[1m]` suffix. Role-set `commit` and the
 `smol`, `commit` and `web` profile overlays all use Haiku 5.5 at high effort.
