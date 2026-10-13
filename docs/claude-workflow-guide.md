@@ -52,8 +52,8 @@ Sol: 922K context, 128K output):
 - `settings.json` `env` sets `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000` and
   `CLAUDE_CODE_AUTO_COMPACT_WINDOW=922000`, so auto-compact triggers at the
   same window size the cekat models have.
-- Haiku 4.5 is capped at 200K context by the model itself and doesn't take
-  an effort setting, so its profiles and agents leave effort out.
+- Haiku 5.5 runs with the `[1m]` suffix and `high` effort, same as Sonnet and
+  Opus.
 
 ### Model profiles
 
@@ -62,7 +62,7 @@ Sol: 922K context, 128K output):
 | `default`, `personal-labs` | `claude-sonnet-5-5[1m]` | high |
 | `plan`, `slow` | `claude-opus-5-5[1m]` | high |
 | `task` | `claude-sonnet-5-5[1m]` | medium |
-| `smol`, `commit`, `web` | `claude-haiku-4-5` | — |
+| `smol`, `commit`, `web` | `claude-haiku-5-5[1m]` | high |
 | `work-cekatai-default` | `azure_ai/gpt-6-luna[1m]` (cekat gateway; start it with `claude-work`) | — |
 | `work-cekatai-superpower` | `azure_ai/gpt-6.1-sol[1m]` (cekat gateway; start it with `claude-work work-superpower`) | — |
 
@@ -83,13 +83,12 @@ the request (see [Work gateway](#work-gateway)). Full cross-tool summary: [model
 | smol | sonnet-5-5 / high | opus-5-5 / medium | Luna (`azure_ai/gpt-6-luna`) | Luna / high |
 | slow | sonnet-5-5 / high | opus-5-5 / high | Sol (`azure_ai/gpt-6.1-sol`) / high | Sol / high |
 | plan | sonnet-5-5 / high (read-only tools) | opus-5-5 / high (read-only tools) | Sol / high (read-only tools) | Sol / high (read-only tools) |
-| commit | haiku-5-5 | haiku-5-5 | Luna | Luna |
+| commit | haiku-5-5 / high | haiku-5-5 / high | Luna | Luna |
 | task | sonnet-5-5 / high | sonnet-5-5 / high | Sol | Sol |
 | web | sonnet-5-5 / high | sonnet-5-5 / high | none (no search-tier deployment, same as pi's work set) | none |
 
-All Anthropic role-set model ids carry the `[1m]` suffix. Role-set `commit` uses
-Haiku 5.5, while the `claude/profiles/*.json` overlays `smol`, `commit` and
-`web` still use `claude-haiku-4-5`.
+All Anthropic role-set model ids carry the `[1m]` suffix. Role-set `commit` and the
+`smol`, `commit` and `web` profile overlays all use Haiku 5.5 at high effort.
 
 ```bash
 claude-roles                          # show the active set
@@ -108,9 +107,9 @@ Slash-command models: `/plan` and `/execute` run on
 or high-risk work. All other commands inherit the session model. A command's
 `model:` sticks for the rest of the session, so `/execute` pins Sonnet to
 switch back after `/plan-deep`. `/commit` stays on the session model
-on purpose: a command's `model:` switches the whole conversation, and
-Haiku's 200K window can't hold a long 1M-context session. To write the
-commit message on Haiku, ask for the `commit` subagent.
+on purpose: a command's `model:` switches the whole conversation, so pinning
+Haiku would carry the rest of the session onto it. To write the commit message
+on Haiku, ask for the `commit` subagent.
 
 ### Work gateway
 
@@ -300,5 +299,4 @@ status is cached for 5 s.
 | Workers start pi instead of claude | The orchestrator pane isn't registered as `claude`. Check `herdr agent get "$HERDR_PANE_ID"` and `herdr integration status` |
 | `claude-work` says `CEKAT_API_KEY` is unset | Export it in `~/.zshrc.local` (`export CEKAT_API_KEY=...`), open a new shell and retry |
 | `claude-work` warns the role set isn't `work-cekatai-default` | Run `claude-roles work-cekatai-default` (it affects all open sessions), restart, then rerun `claude-work` |
-| Haiku profile errors about effort | Haiku 4.5 has no effort setting. Keep `effortLevel` out of Haiku profiles |
 | Statusline blank or missing | `~/.local/bin/claude-statusline` isn't linked or `jq` is missing. Re-run `setup.sh`; test with `echo '{}' \| claude-statusline` |

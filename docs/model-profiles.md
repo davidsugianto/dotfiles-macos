@@ -21,8 +21,7 @@ Two kinds of model sets exist:
 - **Work sets** (`work-cekatai-*`) route through the internal cekat LiteLLM
   gateway (`$CEKAT_API_KEY`) to GPT-6 Luna (fast) and GPT-6.1 Sol (deep).
 
-Names used below: Haiku = `claude-haiku-4-5` (Claude Code's `edith` sets use
-`claude-haiku-5-5[1m]`), Sonnet = `claude-sonnet-5-5`, Opus = `claude-opus-5-5`,
+Names used below: Haiku = `claude-haiku-4-5` (Claude Code uses `claude-haiku-5-5[1m]`), Sonnet = `claude-sonnet-5-5`, Opus = `claude-opus-5-5`,
 Luna = `azure_ai/gpt-6-luna`, Sol = `azure_ai/gpt-6.1-sol`. Effort is shown
 after the model; `-` means none is set.
 
@@ -48,7 +47,7 @@ Session overlays (`claude/profiles/*.json`, applied at launch with
 | `default`, `personal-labs` | Sonnet, high |
 | `plan`, `slow` | Opus, high |
 | `task` | Sonnet, medium |
-| `smol`, `commit`, `web` | Haiku 4.5 |
+| `smol`, `commit`, `web` | Haiku 5.5, high |
 | `work-cekatai-default` | Luna (Sonnet/Opus/Haiku tiers map to Luna/Sol/Luna) |
 | `work-cekatai-superpower` | Sol (Sonnet/Opus/Haiku tiers map to Sol/Sol/Luna) |
 
@@ -141,8 +140,6 @@ Not everything is on the 5.5 generation. These are deliberate, not drift:
 
 - pi's per-role identity profiles (`plan`, `slow`, `task`) name `claude-opus-5` /
   `claude-sonnet-5`, not the `-5-5` ids the role sets use.
-- The `claude/profiles/*.json` overlays `smol`, `commit` and `web` use Haiku 4.5,
-  while the `edith-*` role sets use Haiku 5.5 for `commit`.
 - Many skill handlers under `pi/skills/` default their `SUBAGENT_MODEL` to
   `anthropic/claude-sonnet-5`.
 
