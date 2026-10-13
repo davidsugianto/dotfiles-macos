@@ -31,7 +31,7 @@ Each arrow labelled `OK` is a gate: the agent stops and waits for your reply.
 | `PI.md` | `CLAUDE.md` (user memory, loaded into every session) | `claude/CLAUDE.md` → `~/.claude/CLAUDE.md` |
 | `pi/prompts/*.md` | Slash commands (`$ARGUMENTS`, `model:` frontmatter) | `claude/commands/` → `~/.claude/commands` |
 | pi-model-roles (`smol`/`slow`/`plan`/`commit`/`task`/`web`) | Role subagents. Each `description` routes work to its role, and the `model`/`effort` frontmatter pins the model | `claude/model-roles/<set>/` → `~/.claude/agents` |
-| `pi-roles personal\|default\|work-default\|work-superpower` | `claude-roles personal\|default\|work-cekatai-default\|work-cekatai-superpower` (aliases `work-default`, `work-superpower`; repoints the symlink) | `claude/scripts/claude-roles` |
+| `pi-roles personal\|default\|work-default\|work-superpower` | `claude-roles edith-default\|edith-superpower\|work-cekatai-default\|work-cekatai-superpower` (aliases `default`, `personal`, `work-default`, `work-superpower`; repoints the symlink) | `claude/scripts/claude-roles` |
 | pi-profile `/profile <name>` | `claude-profile <name>` (a `--settings` overlay applied at launch); `claude-work` for the cekat gateway | `claude/profiles/*.json` → `~/.claude/profiles` |
 | `pi/settings.json` | `~/.claude/settings.json` | `claude/settings.json` |
 | `pi/mcp-adapter.json` (Datadog, Jira, Slack) | user-scope MCP servers registered by `claude-mcp-sync` (they live in `~/.claude.json`, which can't be linked); log in with `/mcp` | `claude/mcp.json` |
@@ -89,7 +89,7 @@ the request (see [Work gateway](#work-gateway)).
 
 ```bash
 claude-roles                # show the active set
-claude-roles personal       # switch; restart open claude sessions afterwards
+claude-roles edith-superpower # alias: personal; switch; restart open claude sessions afterwards
 claude-roles work-cekatai-default   # alias: work-default (cekat gateway set)
 claude-roles work-cekatai-superpower # alias: work-superpower (Sol-heavy gateway set)
 ```

@@ -1,7 +1,8 @@
 ---
 name: web
 description: "Use when the task is primarily researching or summarizing information from the web rather than editing code."
-model: claude-haiku-4-5
+model: claude-sonnet-5-5[1m]
+effort: high
 tools: WebSearch, WebFetch, Read, Grep, Glob
 ---
 

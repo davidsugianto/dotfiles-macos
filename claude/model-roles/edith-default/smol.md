@@ -1,7 +1,8 @@
 ---
 name: smol
 description: "Use for small, well-specified, low-risk edits or lookups with an explicit outcome and no design decision — typos, renames, formatting, one-line fixes, short factual questions."
-model: claude-haiku-4-5
+model: claude-sonnet-5-5[1m]
+effort: high
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 

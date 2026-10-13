@@ -1,7 +1,7 @@
 ---
 name: commit
 description: "Use when the task is to write or summarize a commit message, PR description, or changelog entry from a diff — no code changes requested."
-model: claude-haiku-4-5
+model: claude-haiku-5-5[1m]
 tools: Read, Grep, Glob, Bash
 ---
 
