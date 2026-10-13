@@ -74,24 +74,29 @@ ccsmol -p "rename foo"      # aliases: ccp, ccplan, ccslow, ccsmol
 
 ### Role sets
 
-The `work-cekatai-default` model ids carry the `[1m]` suffix in the files
+The `work-cekatai-*` model ids carry the `[1m]` suffix in the files
 (`azure_ai/gpt-6-luna[1m]`, `azure_ai/gpt-6.1-sol[1m]`); it is stripped before
-the request (see [Work gateway](#work-gateway)).
+the request (see [Work gateway](#work-gateway)). Full cross-tool summary: [model-profiles.md](model-profiles.md).
 
-| Role | `default` set | `personal` set | `work-cekatai-default` set |
-|---|---|---|---|
-| smol | haiku-4-5 | sonnet-5-5 / medium | Luna (`azure_ai/gpt-6-luna`) |
-| slow | sonnet-5-5 / high | opus-5-5 / high | Sol (`azure_ai/gpt-6.1-sol`) / high |
-| plan | sonnet-5-5 / high (read-only tools) | opus-5-5 / high (read-only tools) | Sol / high (read-only tools) |
-| commit | haiku-4-5 | haiku-4-5 | Luna |
-| task | sonnet-5-5 / medium | sonnet-5-5 / high | Sol |
-| web | sonnet-5-5 / medium | haiku-4-5 | — (none; no search-tier deployment, same as pi's work set) |
+| Role | `edith-default` set | `edith-superpower` set | `work-cekatai-default` set | `work-cekatai-superpower` set |
+|---|---|---|---|---|
+| smol | sonnet-5-5 / high | opus-5-5 / medium | Luna (`azure_ai/gpt-6-luna`) | Luna / high |
+| slow | sonnet-5-5 / high | opus-5-5 / high | Sol (`azure_ai/gpt-6.1-sol`) / high | Sol / high |
+| plan | sonnet-5-5 / high (read-only tools) | opus-5-5 / high (read-only tools) | Sol / high (read-only tools) | Sol / high (read-only tools) |
+| commit | haiku-5-5 | haiku-5-5 | Luna | Luna |
+| task | sonnet-5-5 / high | sonnet-5-5 / high | Sol | Sol |
+| web | sonnet-5-5 / high | sonnet-5-5 / high | none (no search-tier deployment, same as pi's work set) | none |
+
+All Anthropic role-set model ids carry the `[1m]` suffix. Role-set `commit` uses
+Haiku 5.5, while the `claude/profiles/*.json` overlays `smol`, `commit` and
+`web` still use `claude-haiku-4-5`.
 
 ```bash
-claude-roles                # show the active set
-claude-roles edith-superpower # alias: personal; switch; restart open claude sessions afterwards
-claude-roles work-cekatai-default   # alias: work-default (cekat gateway set)
-claude-roles work-cekatai-superpower # alias: work-superpower (Sol-heavy gateway set)
+claude-roles                          # show the active set
+claude-roles edith-superpower         # alias: personal; switch; restart open claude sessions afterwards
+claude-roles edith-default            # alias: default
+claude-roles work-cekatai-default     # alias: work-default (cekat gateway set)
+claude-roles work-cekatai-superpower  # alias: work-superpower (Sol-heavy gateway set)
 ```
 
 Role sets apply to subagents and to Herdr workers: `/superagent` and
@@ -131,7 +136,7 @@ calls work on both Luna and Sol, and a `claude-work -p` session ran a file read.
 claude-roles work-cekatai-default   # alias: work-default; switch the role set first
 claude-work                         # start Claude through the gateway (default profile)
 claude-work work-superpower        # same, with the work-cekatai-superpower profile
-claude-roles personal               # switch back when you are done
+claude-roles edith-superpower       # switch back when you are done
 ```
 
 Caveats:
@@ -156,7 +161,7 @@ Caveats:
   workers start as plain `claude --agent <role>` in new panes, so they inherit
   neither the gateway env nor the overlay. With the work role set active they
   would send gateway model names to Anthropic and fail. Orchestrate from a normal
-  session (`claude-roles personal`), or use the `personal`/`default` set for workers.
+  session (`claude-roles edith-superpower`), or use the `edith-superpower`/`edith-default` set for workers.
 
 ## Three kinds of helpers
 
@@ -173,7 +178,7 @@ Caveats:
 ```bash
 herdr integration status        # claude: current
 ls -la ~/.claude                # CLAUDE.md, commands, agents, profiles, settings.json -> repo
-claude-roles                    # active set is default
+claude-roles                    # active set is edith-default
 claude-profile                  # lists profiles
 ```
 
@@ -273,7 +278,7 @@ selected by `statusLine` in `settings.json`) is a three-line, pi-style footer:
 
 ```text
 dotfiles-macos main ●3 ↑1 │ Sonnet 5.5 · high │ $1.23
-ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:default · MCP 2
+ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:edith-default · MCP 2
 5h ▰▰▱▱▱▱▱▱▱▱ 23% ↻ 3:40pm │ 7d ▰▰▰▰▰▰▱▱▱▱ 61% ↻ Mon 9:00am
 ```
 
@@ -289,7 +294,7 @@ status is cached for 5 s.
 | Symptom | Cause / fix |
 |---|---|
 | `/plan`, `/plan-deep` etc. missing from the slash menu | `~/.claude/commands` isn't linked. Re-run `setup.sh` |
-| Role agents missing from `/agents` | No set linked. Run `claude-roles default` and restart Claude |
+| Role agents missing from `/agents` | No set linked. Run `claude-roles edith-default` and restart Claude |
 | `~/.claude/settings.json` is a regular file again | Something replaced the symlink when it saved. Copy it back with `cp ~/.claude/settings.json claude/settings.json`, review with `git diff`, then re-run `setup.sh` |
 | Orca/Herdr hook changes show up in `git diff claude/settings.json` | Expected: settings.json is linked wholesale. Commit them or revert them deliberately |
 | Workers start pi instead of claude | The orchestrator pane isn't registered as `claude`. Check `herdr agent get "$HERDR_PANE_ID"` and `herdr integration status` |
