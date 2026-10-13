@@ -112,7 +112,7 @@ model has no suffix.
 | smol | Haiku, auto | Haiku, auto | Sonnet, auto | Luna | Luna, high |
 | commit | Haiku, auto | Haiku, auto | Haiku, auto | Luna | Luna |
 | task | Sonnet, auto | Sonnet, auto | Sonnet, high | Sol | Sol |
-| plan | Opus, high | Sonnet, high | Opus, high | Sol, high | Sol, high |
+| plan | Opus, high | Opus, high | Opus, high | Sol, high | Sol, high |
 | slow | Opus, high | Sonnet, high | Opus, high | Sol, high | Sol, high |
 | web | Haiku, auto | Sonnet, auto | falls back to global | falls back to global | falls back to global |
 
