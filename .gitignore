@@ -25,3 +25,7 @@ pi/extensions/*/node_modules/
 claude/*.lock
 claude/*.tmp*
 claude/*.bak*
+
+# pi-profile writes the currently active profile name here at runtime
+# (machine state, changes on every /profile switch) — not config
+pi/profiles/.active
