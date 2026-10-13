@@ -1,7 +1,7 @@
 ---
 name: slow
 description: "Use for hard, ambiguous, or high-risk problems that need deep multi-step reasoning — tricky bugs, unclear requirements, security or correctness review, architecture trade-offs."
-model: claude-sonnet-5-5[1m]
+model: claude-opus-5-5[1m]
 effort: high
 ---
 

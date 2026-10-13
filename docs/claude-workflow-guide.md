@@ -81,7 +81,7 @@ the request (see [Work gateway](#work-gateway)). Full cross-tool summary: [model
 | Role | `edith-default` set | `edith-superpower` set | `work-cekatai-default` set | `work-cekatai-superpower` set |
 |---|---|---|---|---|
 | smol | sonnet-5-5 / high | opus-5-5 / medium | Luna (`azure_ai/gpt-6-luna`) | Luna / high |
-| slow | sonnet-5-5 / high | opus-5-5 / high | Sol (`azure_ai/gpt-6.1-sol`) / high | Sol / high |
+| slow | opus-5-5 / high | opus-5-5 / high | Sol (`azure_ai/gpt-6.1-sol`) / high | Sol / high |
 | plan | sonnet-5-5 / high (read-only tools) | opus-5-5 / high (read-only tools) | Sol / high (read-only tools) | Sol / high (read-only tools) |
 | commit | haiku-5-5 / high | haiku-5-5 / high | Luna | Luna |
 | task | sonnet-5-5 / high | sonnet-5-5 / high | Sol | Sol |
