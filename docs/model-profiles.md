@@ -35,7 +35,7 @@ Role subagents in `claude/model-roles/<set>/*.md`. All models carry the `[1m]`
 | smol | Sonnet, high | Opus, medium | Luna | Luna, high |
 | commit | Haiku 5.5, high | Haiku 5.5, high | Luna | Luna |
 | task | Sonnet, high | Sonnet, high | Sol | Sol |
-| plan | Sonnet, high | Opus, high | Sol, high | Sol, high |
+| plan | Opus, high | Opus, high | Sol, high | Sol, high |
 | slow | Opus, high | Opus, high | Sol, high | Sol, high |
 | web | Sonnet, high | Sonnet, high | none | none |
 

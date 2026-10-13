@@ -1,7 +1,7 @@
 ---
 name: plan
 description: "Use when the task is to produce a plan, design, or strategy before any code changes — breaking down multi-step work, evaluating approaches, writing an implementation plan."
-model: claude-sonnet-5-5[1m]
+model: claude-opus-5-5[1m]
 effort: high
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 ---
