@@ -55,8 +55,8 @@ this machine). See `docs/claude-workflow-guide.md`.
 
 - `claude/CLAUDE.md`: port of `PI.md`, using TodoWrite, the Agent tool and role subagents, and `~/.claude/handoffs`.
 - `claude/commands/`: port of `pi/prompts/` (`$ARGUMENTS`, `~/.claude/CLAUDE.md`), plus `/handoff`. `/plan` is pinned to `claude-opus-5-5[1m]`.
-- `claude/model-roles/{default,personal-labs,work-cekataiofficial}/`: role subagents generated from `pi/model-roles/*.yaml` (same descriptions, models and effort; the work set has no `web` role). `claude-roles` repoints the `~/.claude/agents` symlink.
-- `claude/profiles/*.json` + `claude-profile`: `--settings` overlays, Anthropic-only except the opt-in `work-cekataiofficial` profile via `claude-work`.
+- `claude/model-roles/{default,personal-labs,work-cekatai-default}/`: role subagents generated from `pi/model-roles/*.yaml` (same descriptions, models and effort; the work set has no `web` role). `claude-roles` repoints the `~/.claude/agents` symlink.
+- `claude/profiles/*.json` + `claude-profile`: `--settings` overlays, Anthropic-only except the opt-in `work-cekatai-default` profile via `claude-work`.
 - `claude/settings.json`: the live file captured wholesale (Orca + Herdr hooks, autoMode, statusLine — now `claude-statusline`, a custom two-line script, replacing ccstatusline). I added `model: claude-sonnet-5-5[1m]`, `effortLevel: high`, and `env` `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000` / `CLAUDE_CODE_AUTO_COMPACT_WINDOW=922000` to match the cekat work models (922K/128K). The pre-link original is backed up in `~/.claude/backups/dotfiles-claude-20261008-121957/`.
 - `pi/skills/herdr-delegate`: `KIND` now accepts `claude`, so a Claude orchestrator starts Claude workers.
 - `setup.sh`: Claude links, per-entry skill links into `~/.claude/skills` (that directory keeps claude.ai's `synced/`), seeding of `claude-roles default`, the `claude-work` link into `~/.local/bin`, and `herdr integration install claude`.
@@ -67,7 +67,7 @@ Verified: the smol profile runs on Haiku 4.5; the default runs on `claude-sonnet
 - The `setup.sh` skills loop now prunes dangling `~/.claude/skills` links.
 - `claude/themes/`: the 8 Catppuccin themes (+ MIT licence) vendored from matcra587/claude-themes `plugins/catppuccin` @ 4ae1032, linked to `~/.claude/themes` (already applied). `settings.json` sets `"theme": "custom:catppuccin-mocha"` (slug = file stem). Vendored rather than `/plugin install` so it is versioned with the repo and needs no marketplace.
 
-- 2026-10-11, work gateway: added `claude/model-roles/work-cekataiofficial/` (Luna for smol/commit, Sol for slow/plan/task; no `web`), `claude/profiles/work-cekataiofficial.json` (`ANTHROPIC_BASE_URL=https://llm.cekat.id`, Luna as model, Sonnet/Opus/Haiku default-model vars mapped to Luna/Sol/Luna; no secrets) and `claude/scripts/claude-work` (needs `$CEKAT_API_KEY` from `~/.zshrc.local`, exported as `ANTHROPIC_AUTH_TOKEN`). Use `claude-roles work-cekataiofficial` (alias `work`), then `claude-work`. It is an overlay, not a separate config dir (skills, MCP, settings, hooks and history are shared), and `claude-roles` repoints the global `~/.claude/agents` symlink, so it affects every open session until `claude-roles personal`. Claude Code talks the Anthropic Messages API; the gateway's LiteLLM `/v1/messages` route serves it. The model ids carry a `[1m]` suffix (stripped before the request; makes Claude Code assume a 1M window instead of 200K) and the profile sets `CLAUDE_CODE_AUTO_COMPACT_WINDOW=922000` / `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000` to match the real 922K/128K limits; keep these, they are not accidental (max output still displays as 32K). Verified 2026-10-11: plain + tool-use calls on Luna and Sol, and `claude-work -p` ran a file read. Not yet tested: subagents on the gateway models. Caveats: run it via `claude-work`, not `claude-profile` (no token), and don't run `/superagent` from a `claude-work` session (workers are plain `claude --agent <role>` and get neither the gateway env nor the overlay).
+- 2026-10-11, work gateway: added `claude/model-roles/work-cekatai-default/` (Luna for smol/commit, Sol for slow/plan/task; no `web`), `claude/profiles/work-cekatai-default.json` (`ANTHROPIC_BASE_URL=https://llm.cekat.id`, Luna as model, Sonnet/Opus/Haiku default-model vars mapped to Luna/Sol/Luna; no secrets) and `claude/scripts/claude-work` (needs `$CEKAT_API_KEY` from `~/.zshrc.local`, exported as `ANTHROPIC_AUTH_TOKEN`). Use `claude-roles work-cekatai-default` (alias `work-default`), then `claude-work`. It is an overlay, not a separate config dir (skills, MCP, settings, hooks and history are shared), and `claude-roles` repoints the global `~/.claude/agents` symlink, so it affects every open session until `claude-roles personal`. Claude Code talks the Anthropic Messages API; the gateway's LiteLLM `/v1/messages` route serves it. The model ids carry a `[1m]` suffix (stripped before the request; makes Claude Code assume a 1M window instead of 200K) and the profile sets `CLAUDE_CODE_AUTO_COMPACT_WINDOW=922000` / `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000` to match the real 922K/128K limits; keep these, they are not accidental (max output still displays as 32K). Verified 2026-10-11: plain + tool-use calls on Luna and Sol, and `claude-work -p` ran a file read. Not yet tested: subagents on the gateway models. Caveats: run it via `claude-work`, not `claude-profile` (no token), and don't run `/superagent` from a `claude-work` session (workers are plain `claude --agent <role>` and get neither the gateway env nor the overlay).
 
 Open:
 - Authenticate datadog and slack via `/mcp`.
@@ -178,7 +178,7 @@ config is separately copied, not symlinked.
 Validation completed with live tool calls: pi Luna and Sol each passed single
 and sequential two-command bash tool calls; pi Terra passed a regression tool
 call. Omp Luna and Sol each passed a bash tool call. JSON/YAML syntax and the
-pi models symlink were checked. `pi-roles work` was deployed and compared with
+pi models symlink were checked. `pi-roles work-default` was deployed and compared with
 the repository role file, then the original `personal-labs` role config was
 restored and compared. Open pi sessions may need `/reload` to pick up a role
 config switch; model catalog changes reload when `/model` is opened.
@@ -187,13 +187,24 @@ config switch; model catalog changes reload when `/model` is opened.
 
 Added `azure_ai/gpt-6.1-sol` (`api: openai-responses`, copied from `gpt-6-sol`;
 not live-tested) to `pi/models.json` and `omp/models.yml`. The
-`work-cekataiofficial` profile now uses `gpt-6.1-sol` for slow/plan/task and
+`work-cekatai-default` profile now uses `gpt-6.1-sol` for slow/plan/task and
 `gpt-6-luna` for default/smol/commit in both tools (omp: `omp/model-profiles/`;
 pi: `pi/model-roles/` + `pi/profiles/`). `gpt-5.6-terra` is no longer referenced
 by the work profile but stays in the model catalogs. Effort: `default`
 (Luna), `slow`, `plan` = high; omp via `:high` suffix, pi via `effort:`.
 pi `settings.json` now has `defaultModel: azure_ai/gpt-6-luna` and
-`defaultThinkingLevel: high`. Redeploy pi roles with `pi-roles work` + `/reload`.
+`defaultThinkingLevel: high`. Redeploy pi roles with `pi-roles work-default` + `/reload`.
+
+## 2026-10-13: work profile rename and work-cekatai-superpower
+
+Renamed `work-cekataiofficial` -> `work-cekatai-default` everywhere (pi, claude,
+omp; older entries in this file were rewritten to the new name). Added
+`work-cekatai-superpower` in all three: default/slow/plan/task = `gpt-6.1-sol`
+(slow/plan high), smol = `gpt-6-luna` high, commit = `gpt-6-luna`. Deploy with
+`pi-roles work-superpower`, `claude-roles work-superpower` + `claude-work work-superpower` (the short aliases are `work-default`/`work-superpower` in both tools), or
+`/profile work-cekatai-superpower` in omp/pi. The old name is not kept as an
+alias. Not live-tested against the gateway. AWS/git `cekataiofficial` names are
+the org, unchanged.
 
 ## Repo structure notes (for a fresh session with no memory)
 

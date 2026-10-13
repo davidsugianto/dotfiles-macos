@@ -2,19 +2,22 @@
 # ==============================================================================
 # claude-work — start Claude Code routed through the internal cekat gateway.
 #
-# Claude Code's equivalent of pi/omp `/profile work-cekataiofficial`: layers
-# ~/.claude/profiles/work-cekataiofficial.json (linked from ../profiles/) on top
+# Claude Code's equivalent of pi/omp `/profile work-cekatai-default`: layers
+# ~/.claude/profiles/work-cekatai-default.json (linked from ../profiles/) on top
 # of ~/.claude/settings.json via `claude --settings`, for this session only. The
 # profile points ANTHROPIC_BASE_URL at the LiteLLM gateway and maps the
 # sonnet/opus/haiku tiers to the gateway's GPT-6 Luna / GPT-6.1 Sol deployments.
 # The gateway key comes from $CEKAT_API_KEY (never stored in the profile) and is
 # passed to Claude Code as ANTHROPIC_AUTH_TOKEN.
 #
-# Role subagents are not switched here; run `claude-roles work-cekataiofficial`
+# Role subagents are not switched here; run `claude-roles work-cekatai-default`
 # so smol/slow/plan/commit/task use the gateway models too.
 #
-# Usage: claude-work [claude args]    e.g. claude-work
-#                                          claude-work -p "..."
+# An optional first argument picks the profile: `work-default` (work-cekatai-default,
+# the default) or `work-superpower` (work-cekatai-superpower, Sol for the main model).
+#
+# Usage: claude-work [work-default|work-superpower] [claude args]    e.g. claude-work
+#                                          claude-work work-superpower -p "..."
 # ==============================================================================
 set -euo pipefail
 
@@ -25,12 +28,18 @@ fi
 
 export ANTHROPIC_AUTH_TOKEN="$CEKAT_API_KEY"
 
+profile=work-cekatai-default
+case "${1:-}" in
+  work-default | work-cekatai-default) shift ;;
+  work-superpower | work-cekatai-superpower) profile=work-cekatai-superpower; shift ;;
+esac
+
 agents="$HOME/.claude/agents"
 if [[ -L "$agents" ]]; then
   set_name="$(basename -- "$(readlink -- "$agents")")"
-  if [[ "$set_name" != "work-cekataiofficial" ]]; then
-    echo "claude-work: role subagents are $set_name; run \`claude-roles work-cekataiofficial\` to use the gateway models for subagents" >&2
+  if [[ "$set_name" != "$profile" ]]; then
+    echo "claude-work: role subagents are $set_name; run \`claude-roles $profile\` to use the gateway models for subagents" >&2
   fi
 fi
 
-exec claude --settings "$HOME/.claude/profiles/work-cekataiofficial.json" "$@"
+exec claude --settings "$HOME/.claude/profiles/$profile.json" "$@"

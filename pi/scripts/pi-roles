@@ -8,10 +8,10 @@
 # omp/model-profiles/ is linked wholesale. Instead the two variants live
 # in ../model-roles/ as the source of truth and get copied into place on
 # demand, same idea as omp's `/profile personal-labs` /
-# `/profile work-cekataiofficial` but a plain copy instead of a live
+# `/profile work-cekatai-default` but a plain copy instead of a live
 # in-session command (pi-model-roles has no such command).
 #
-# Usage: pi-roles personal | pi-roles default | pi-roles work
+# Usage: pi-roles personal | default | work-default | work-superpower
 #
 # After switching, run /reload in every open pi session (or restart it) to
 # pick up the new file — pi-model-roles has no file watcher.
@@ -30,11 +30,14 @@ case "${1:-}" in
   default)
     SRC="$DOTFILES_PI_DIR/model-roles/default.yaml"
     ;;
-  work | work-cekataiofficial)
-    SRC="$DOTFILES_PI_DIR/model-roles/work-cekataiofficial.yaml"
+  work-default | work-cekatai-default)
+    SRC="$DOTFILES_PI_DIR/model-roles/work-cekatai-default.yaml"
+    ;;
+  work-superpower | work-cekatai-superpower)
+    SRC="$DOTFILES_PI_DIR/model-roles/work-cekatai-superpower.yaml"
     ;;
   *)
-    echo "usage: pi-roles <personal|default|work>" >&2
+    echo "usage: pi-roles <personal|default|work-default|work-superpower>" >&2
     exit 1
     ;;
 esac

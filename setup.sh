@@ -273,7 +273,7 @@ link "$DOTFILES_DIR/pi/mcp-adapter.json" "$HOME/.pi/agent/mcp-adapter.json"
 # profiles/*.json are switched between at runtime with `/profile <name>`
 # (pi-profile extension, installed below) — one profile per model role
 # (default/smol/slow/plan/commit/task/web) plus personal-labs/
-# work-cekataiofficial account switches, kept in this repo so they're
+# work-cekatai-default account switches, kept in this repo so they're
 # versioned next to the models.json provider they reference.
 link "$DOTFILES_DIR/pi/profiles" "$HOME/.pi/profiles"
 # Skills live in the tool-neutral ~/.agents/skills, which omp's `agents`
@@ -326,7 +326,7 @@ link "$DOTFILES_DIR/git/.gitconfig-work"     "$HOME/.gitconfig-work"
 
 # ------------------------------------------------------------------------------
 # omp-model-profiles — https://github.com/rezhajulio/omp-model-profiles
-# `/profile personal-labs` / `/profile work-cekataiofficial` switch modelRoles
+# `/profile personal-labs` / `/profile work-cekatai-default` switch modelRoles
 # in-session (see omp/model-profiles/). Installed via omp's own npm-backed
 # plugin manager, which shells out to bun (tapped/installed above).
 # ------------------------------------------------------------------------------

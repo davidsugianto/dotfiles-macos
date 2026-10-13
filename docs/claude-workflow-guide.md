@@ -31,7 +31,7 @@ Each arrow labelled `OK` is a gate: the agent stops and waits for your reply.
 | `PI.md` | `CLAUDE.md` (user memory, loaded into every session) | `claude/CLAUDE.md` → `~/.claude/CLAUDE.md` |
 | `pi/prompts/*.md` | Slash commands (`$ARGUMENTS`, `model:` frontmatter) | `claude/commands/` → `~/.claude/commands` |
 | pi-model-roles (`smol`/`slow`/`plan`/`commit`/`task`/`web`) | Role subagents. Each `description` routes work to its role, and the `model`/`effort` frontmatter pins the model | `claude/model-roles/<set>/` → `~/.claude/agents` |
-| `pi-roles personal\|default` | `claude-roles personal\|default\|work-cekataiofficial` (alias `work`; repoints the symlink) | `claude/scripts/claude-roles` |
+| `pi-roles personal\|default\|work-default\|work-superpower` | `claude-roles personal\|default\|work-cekatai-default\|work-cekatai-superpower` (aliases `work-default`, `work-superpower`; repoints the symlink) | `claude/scripts/claude-roles` |
 | pi-profile `/profile <name>` | `claude-profile <name>` (a `--settings` overlay applied at launch); `claude-work` for the cekat gateway | `claude/profiles/*.json` → `~/.claude/profiles` |
 | `pi/settings.json` | `~/.claude/settings.json` | `claude/settings.json` |
 | `pi/mcp-adapter.json` (Datadog, Jira, Slack) | user-scope MCP servers registered by `claude-mcp-sync` (they live in `~/.claude.json`, which can't be linked); log in with `/mcp` | `claude/mcp.json` |
@@ -40,7 +40,7 @@ Each arrow labelled `OK` is a gate: the agent stops and waits for your reply.
 | `~/.pi/agent/handoffs` | `~/.claude/handoffs` | — |
 
 Profiles and role sets are Anthropic-only (your `/login` subscription), except
-the opt-in `work-cekataiofficial` role set and profile, which route through the
+the opt-in `work-cekatai-default` role set and profile, which route through the
 internal cekat gateway (see [Work gateway](#work-gateway)).
 
 ### Token limits
@@ -63,7 +63,8 @@ Sol: 922K context, 128K output):
 | `plan`, `slow` | `claude-opus-5-5[1m]` | high |
 | `task` | `claude-sonnet-5-5[1m]` | medium |
 | `smol`, `commit`, `web` | `claude-haiku-4-5` | — |
-| `work-cekataiofficial` | `azure_ai/gpt-6-luna[1m]` (cekat gateway; start it with `claude-work`) | — |
+| `work-cekatai-default` | `azure_ai/gpt-6-luna[1m]` (cekat gateway; start it with `claude-work`) | — |
+| `work-cekatai-superpower` | `azure_ai/gpt-6.1-sol[1m]` (cekat gateway; start it with `claude-work work-superpower`) | — |
 
 ```bash
 claude-profile              # list profiles
@@ -73,11 +74,11 @@ ccsmol -p "rename foo"      # aliases: ccp, ccplan, ccslow, ccsmol
 
 ### Role sets
 
-The `work-cekataiofficial` model ids carry the `[1m]` suffix in the files
+The `work-cekatai-default` model ids carry the `[1m]` suffix in the files
 (`azure_ai/gpt-6-luna[1m]`, `azure_ai/gpt-6.1-sol[1m]`); it is stripped before
 the request (see [Work gateway](#work-gateway)).
 
-| Role | `default` set | `personal` set | `work-cekataiofficial` set |
+| Role | `default` set | `personal` set | `work-cekatai-default` set |
 |---|---|---|---|
 | smol | haiku-4-5 | sonnet-5-5 / medium | Luna (`azure_ai/gpt-6-luna`) |
 | slow | sonnet-5-5 / high | opus-5-5 / high | Sol (`azure_ai/gpt-6.1-sol`) / high |
@@ -89,7 +90,8 @@ the request (see [Work gateway](#work-gateway)).
 ```bash
 claude-roles                # show the active set
 claude-roles personal       # switch; restart open claude sessions afterwards
-claude-roles work-cekataiofficial   # alias: work (cekat gateway set)
+claude-roles work-cekatai-default   # alias: work-default (cekat gateway set)
+claude-roles work-cekatai-superpower # alias: work-superpower (Sol-heavy gateway set)
 ```
 
 Role sets apply to subagents and to Herdr workers: `/superagent` and
@@ -107,27 +109,28 @@ commit message on Haiku, ask for the `commit` subagent.
 
 ### Work gateway
 
-The `work-cekataiofficial` role set and profile route a Claude Code session
+The `work-cekatai-default` role set and profile route a Claude Code session
 through the internal cekat LiteLLM gateway (`https://llm.cekat.id`) instead of
 Anthropic. Claude Code talks the Anthropic Messages API, which the gateway's
 LiteLLM `/v1/messages` route serves. Verified 2026-10-11: plain and tool-use
 calls work on both Luna and Sol, and a `claude-work -p` session ran a file read.
 
-- `claude/model-roles/work-cekataiofficial/{commit,plan,slow,smol,task}.md`:
+- `claude/model-roles/work-cekatai-default/{commit,plan,slow,smol,task}.md`:
   Luna for smol/commit, Sol for slow/plan/task. No `web` role.
-- `claude/profiles/work-cekataiofficial.json`: a `--settings` overlay that sets
+- `claude/profiles/work-cekatai-default.json`: a `--settings` overlay that sets
   `ANTHROPIC_BASE_URL`, the model (Luna) and the Sonnet/Opus/Haiku default-model
   vars (mapped to Luna/Sol/Luna). It holds no secrets.
 - `claude/scripts/claude-work` (linked to `~/.local/bin/claude-work` by
   `setup.sh`): requires `$CEKAT_API_KEY` (from `~/.zshrc.local`), exports it as
   `ANTHROPIC_AUTH_TOKEN` and runs
-  `claude --settings ~/.claude/profiles/work-cekataiofficial.json "$@"`. It
-  warns if the active role set isn't `work-cekataiofficial` but never switches
+  `claude --settings ~/.claude/profiles/work-cekatai-default.json "$@"`. It
+  warns if the active role set isn't `work-cekatai-default` but never switches
   it.
 
 ```bash
-claude-roles work-cekataiofficial   # alias: work; switch the role set first
-claude-work                         # start Claude through the gateway
+claude-roles work-cekatai-default   # alias: work-default; switch the role set first
+claude-work                         # start Claude through the gateway (default profile)
+claude-work work-superpower        # same, with the work-cekatai-superpower profile
 claude-roles personal               # switch back when you are done
 ```
 
@@ -146,7 +149,7 @@ Caveats:
   real limit. Max output still reports 32K even with
   `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000`; if replies get cut off near 32K, look
   there.
-- Run this profile with `claude-work`, not `claude-profile work-cekataiofficial`:
+- Run this profile with `claude-work`, not `claude-profile work-cekatai-default`:
   `claude-profile` passes only the `--settings` overlay and no
   `ANTHROPIC_AUTH_TOKEN`, so the gateway model names go to Anthropic and fail.
 - Don't run `/superagent` or `/delegate` from a `claude-work` session. Herdr
@@ -291,6 +294,6 @@ status is cached for 5 s.
 | Orca/Herdr hook changes show up in `git diff claude/settings.json` | Expected: settings.json is linked wholesale. Commit them or revert them deliberately |
 | Workers start pi instead of claude | The orchestrator pane isn't registered as `claude`. Check `herdr agent get "$HERDR_PANE_ID"` and `herdr integration status` |
 | `claude-work` says `CEKAT_API_KEY` is unset | Export it in `~/.zshrc.local` (`export CEKAT_API_KEY=...`), open a new shell and retry |
-| `claude-work` warns the role set isn't `work-cekataiofficial` | Run `claude-roles work-cekataiofficial` (it affects all open sessions), restart, then rerun `claude-work` |
+| `claude-work` warns the role set isn't `work-cekatai-default` | Run `claude-roles work-cekatai-default` (it affects all open sessions), restart, then rerun `claude-work` |
 | Haiku profile errors about effort | Haiku 4.5 has no effort setting. Keep `effortLevel` out of Haiku profiles |
 | Statusline blank or missing | `~/.local/bin/claude-statusline` isn't linked or `jq` is missing. Re-run `setup.sh`; test with `echo '{}' \| claude-statusline` |

@@ -1,14 +1,14 @@
 # Work roles — routes through the internal cekat LiteLLM gateway
 # (../models.json, $CEKAT_API_KEY) using the internal GPT-6 / GPT-6.1
 # deployments, tiered by capability like dotfiles-macos/omp's work profile:
-#   Luna  = fast/small  -> default, smol, commit (everyday driver, cheap roles)
-#   Sol   = deep/large   -> slow, plan, task (GPT-6.1 Sol; thinking-heavy work)
+#   Sol   = deep/large   -> default, slow, plan, task (GPT-6.1 Sol everywhere)
+#   Luna  = fast/small  -> smol (high effort), commit
 #
-# Deploy with `pi-roles work` (dotfiles-macos/pi/scripts/pi-roles), not a
+# Deploy with `pi-roles work-superpower` (dotfiles-macos/pi/scripts/pi-roles), not a
 # symlink — see that script and OPERATIONS.md. Run /reload afterwards.
 #
 # No `web` role here, unlike personal-labs.yaml: omp's own
-# work-cekataiofficial.yml profile also skips it (no distinct
+# work-cekatai-superpower.yml profile also skips it (no distinct
 # search-tier deployment on the office gateway) and, being a *layered*
 # omp/model-profiles override, silently falls back to config.yml's global
 # `web` role (Anthropic Haiku) when active. pi-model-roles has no such
@@ -29,8 +29,8 @@ roles:
   default:
     model:
       provider: cekat
-      id: azure_ai/gpt-6-luna
-    effort: high
+      id: azure_ai/gpt-6.1-sol
+    effort: off
   smol:
     description: >-
       Use for small, well-specified, low-risk edits or lookups with an
@@ -39,7 +39,7 @@ roles:
     model:
       provider: cekat
       id: azure_ai/gpt-6-luna
-    effort: off
+    effort: high
   slow:
     description: >-
       Use for hard, ambiguous, or high-risk problems that need deep

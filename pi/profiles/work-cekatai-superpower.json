@@ -1,0 +1,7 @@
+{
+  "name": "work-cekatai-superpower",
+  "label": "🏢 Work (cekat gateway)",
+  "description": "Office LiteLLM gateway (cekat) — internal GPT-6.1 Sol deployment, matches the work-cekatai-superpower model-roles set.",
+  "model": { "provider": "cekat", "model": "azure_ai/gpt-6.1-sol" },
+  "sessionName": "Work"
+}
