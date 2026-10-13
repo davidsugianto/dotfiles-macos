@@ -59,8 +59,8 @@ Sol: 922K context, 128K output):
 
 | Profile | Model | Effort |
 |---|---|---|
-| `default`, `personal-labs` | `claude-sonnet-5-5[1m]` | high |
-| `plan`, `slow` | `claude-opus-5-5[1m]` | high |
+| `edith-default` | `claude-sonnet-5-5[1m]` | high |
+| `edith-superpower`, `plan`, `slow` | `claude-opus-5-5[1m]` | high |
 | `task` | `claude-sonnet-5-5[1m]` | medium |
 | `smol`, `commit`, `web` | `claude-haiku-5-5[1m]` | high |
 | `work-cekatai-default` | `azure_ai/gpt-6-luna[1m]` (cekat gateway; start it with `claude-work`) | — |

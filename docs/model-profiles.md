@@ -33,7 +33,7 @@ Role subagents in `claude/model-roles/<set>/*.md`. All models carry the `[1m]`
 | Role | `edith-default` (alias `default`) | `edith-superpower` (alias `personal`) | `work-cekatai-default` (alias `work-default`) | `work-cekatai-superpower` (alias `work-superpower`) |
 |---|---|---|---|---|
 | smol | Sonnet, high | Opus, medium | Luna | Luna, high |
-| commit | Haiku 5.5 | Haiku 5.5 | Luna | Luna |
+| commit | Haiku 5.5, high | Haiku 5.5, high | Luna | Luna |
 | task | Sonnet, high | Sonnet, high | Sol | Sol |
 | plan | Sonnet, high | Opus, high | Sol, high | Sol, high |
 | slow | Sonnet, high | Opus, high | Sol, high | Sol, high |
@@ -44,7 +44,8 @@ Session overlays (`claude/profiles/*.json`, applied at launch with
 
 | Overlay | Main model |
 |---|---|
-| `default`, `personal-labs` | Sonnet, high |
+| `edith-default` | Sonnet, high |
+| `edith-superpower` | Opus, high |
 | `plan`, `slow` | Opus, high |
 | `task` | Sonnet, medium |
 | `smol`, `commit`, `web` | Haiku 5.5, high |
@@ -55,7 +56,7 @@ Switching:
 
 ```bash
 claude-roles                        # show the active role set
-claude-roles edith-superpower       # or: default | personal | work-default | work-superpower
+claude-roles edith-superpower       # or: edith-default | work-default | work-superpower
 claude-profile plan                 # one session on an overlay
 claude-work [work-default|work-superpower]   # session through the cekat gateway
 ```
@@ -126,7 +127,7 @@ global role, so the work profiles use Anthropic Haiku for `web`.
   `personal-labs`. The work sets share one name everywhere.
 - **Same intent, different mix.** `personal-labs`/`edith-superpower` put Opus on
   plan and slow in every tool. Claude Code additionally puts Opus on `smol` and
-  uses Haiku 5.5 for `commit`.
+  uses Haiku 5.5 (high) for `commit`.
 - **Where each is applied.** Claude Code and pi apply role sets to subagents and
   Herdr workers; omp applies them to its own role routing.
 - **Gateway quirk.** The cekat gateway rejects tool calls on

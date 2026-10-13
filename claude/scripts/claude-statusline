@@ -3,7 +3,7 @@
 # claude-statusline — two-line Claude Code status line (pi statusline-pi style).
 #
 #   dotfiles-macos  main ●3 ↑1 │ Sonnet 5.5 · high │ $1.23
-#   ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:default · MCP 2
+#   ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:edith-default · MCP 2
 #   5h ▰▰▱▱▱▱▱▱▱▱ 23% ↻ 3:40pm │ 7d ▰▰▰▰▰▰▱▱▱▱ 61% ↻ Mon 9:00am
 #
 # Claude Code pipes a JSON blob to stdin on every refresh. Segments never

@@ -492,12 +492,12 @@ step "Registering Claude Code MCP servers"
 "$DOTFILES_DIR/claude/scripts/claude-mcp-sync"
 
 # Seed Claude Code's role subagents only if no set is linked yet, so a re-run
-# never undoes a live `claude-roles personal` switch.
+# never undoes a live `claude-roles edith-superpower` switch.
 step "Linking default Claude Code role subagents"
 if [[ -e "$HOME/.claude/agents" || -L "$HOME/.claude/agents" ]]; then
-  skip "~/.claude/agents already present (claude-roles default|personal to switch)"
+  skip "~/.claude/agents already present (claude-roles edith-default|edith-superpower to switch)"
 else
-  "$DOTFILES_DIR/claude/scripts/claude-roles" default
+  "$DOTFILES_DIR/claude/scripts/claude-roles" edith-default
   ok "default role subagents linked"
 fi
 
