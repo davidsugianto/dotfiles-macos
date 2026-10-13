@@ -1,3 +1,13 @@
+# Handover — 2026-10-13 (pi statusline, uncommitted until reviewed)
+
+The pi statusline now lives in `pi/extensions/statusline/` and replaces `npm:statusline-pi` (dropped from `pi/settings.json` `packages` and `setup.sh` `PI_PACKAGES`; loaded via `extensions` in `pi/settings.json`).
+
+- 2 lines, fixed Catppuccin Mocha colours matching `claude/scripts/claude-statusline`. Profile comes from `~/.pi/profiles/.active`, the roles selector state from pi-model-roles' live `model-roles` status (`auto-selector=enabled|disabled`; the config file's `enabled:` is only a default), the MCP count from `mcp-adapter.json`.
+- `/statusline on|off|toggle` command.
+- Files: `pi/extensions/statusline/{index,git,format}.ts`. Test: `bash pi/tests/statusline.sh` (the `index.ts` footer part needs bun and is skipped otherwise).
+- Refresh: git state is read at most every 5s, and after a `tool_result` at most once per second (trailing re-render). Git calls are read-only (`GIT_OPTIONAL_LOCKS=0`, `-c core.fsmonitor=false`). Cost is recomputed on mount, `message_end`, `model_select` and the 5s tick. The profile name and MCP count are read on the git refresh; the profile is also re-read when pi-profile's `profile` status text changes, so `/profile` shows at once. Roles state comes from the live `model-roles` status.
+- README no longer lists `statusline-pi`; the footer hides the `model-roles` and `mcp` (line 2) and `profile` (line 1) extension statuses because it already shows them itself. Other extension statuses (e.g. `subagents:0`) still print below the two lines.
+
 # Handover — 2026-10-08 (Jira MCP)
 
 Added a `jira` MCP server (Atlassian Rovo, `https://mcp.atlassian.com/v1/mcp/authv2`,

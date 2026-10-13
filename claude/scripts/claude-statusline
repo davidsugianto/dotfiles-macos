@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# claude-statusline — two-line Claude Code status line (pi statusline-pi style).
+# claude-statusline — three-line Claude Code status line; the pi footer in
+# pi/extensions/statusline mirrors its look (two lines, same Catppuccin Mocha colours).
 #
 #   dotfiles-macos  main ●3 ↑1 │ Sonnet 5.5 · high │ $1.23
 #   ctx ▰▰▰▰▱▱▱▱▱▱ 42% 392k/922k │ CPU 12% MEM 79% │ roles:edith-default · MCP 2

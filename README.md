@@ -46,7 +46,7 @@ k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
 omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekatai-default) + skills/ (symlinks to pi/skills/herdr*), linked to ~/.omp/agent/ (incl. themes/, skills/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekatai-default) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekatai-default) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
 claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{edith-default,edith-superpower,work-cekatai-default,work-cekatai-superpower}/*.md (role subagents) + profiles/*.json (`--settings` overlays, incl. `work-cekatai-default.json` for the cekat gateway) + scripts/ (claude-roles, claude-profile, claude-work) + settings.json, linked to ~/.claude/ and ~/.local/bin/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
@@ -119,7 +119,7 @@ cd ~/dotfiles-macos
    ten vendored switchable themes in `pi/themes/` (eight from
    [pi-extensions](https://github.com/luongnv89/pi-extensions), two from
    [awesome-pi-themes](https://github.com/isashi/awesome-pi-themes)),
-   [statusline-pi/timestamp-pi](https://github.com/luongnv89/pi-extensions),
+   [timestamp-pi](https://github.com/luongnv89/pi-extensions),
    [pi-subagents](https://github.com/tintinweb/pi-subagents), and
    [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) packages
    via `pi install`, plus the vendored `pi/extensions/subagents-pi/` fleet
@@ -275,9 +275,9 @@ All from [luongnv89/pi-extensions](https://github.com/luongnv89/pi-extensions)
 
 | Extension | What you get | Source |
 |---|---|---|
-| [statusline-pi](https://github.com/luongnv89/pi-extensions/tree/main/extensions/statusline-pi) | Footer: git branch/changed files, PR number, session cost, CPU/MEM, context tokens/%, tok/s, model | npm |
 | [timestamp-pi](https://github.com/luongnv89/pi-extensions/tree/main/extensions/timestamp-pi) | Timestamp under every message + a prompt-cache TTL countdown in the footer | npm |
 | [@tintinweb/pi-subagents](https://github.com/tintinweb/pi-subagents) | Orchestration engine — spawning, FleetView, the `Agent` tool | npm |
+| [statusline](pi/extensions/statusline) | Two-line footer in the Claude statusline style, fixed Catppuccin Mocha colours: repo/branch/dirty, model · thinking, cost, profile, ctx bar, CPU/MEM, roles state, MCP count | **in-repo**, loaded via `extensions` in `pi/settings.json` |
 | [subagents-pi](pi/extensions/subagents-pi) | Fleet metrics panel (context, TPS, model, thinking) per managed subagent — companion to the extension above | **vendored**, not on npm |
 
 `subagents-pi` isn't published to npm (confirmed against the npm registry,
@@ -293,7 +293,7 @@ though `settings.json` is symlinked there) — portable as long as
 `git pull`. Re-sync the vendored copy by hand if upstream changes; nothing
 here pulls updates automatically.
 
-Toggle commands once installed: `/statusline-pi`, `/statusline-refresh`,
+Toggle commands once installed: `/statusline` (in-repo footer, `pi/extensions/statusline`),
 `/timestamp-pi`, `/subagents-pi`, `/subagents-pi-refresh`.
 
 ## Claude Code workflow (mirrors pi)

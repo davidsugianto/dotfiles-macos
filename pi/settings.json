@@ -6,7 +6,6 @@
   "packages": [
     "git:github.com/spksoft/pi-model-roles",
     "npm:pi-profile",
-    "npm:statusline-pi",
     "npm:timestamp-pi",
     "npm:@tintinweb/pi-subagents",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/subagents-pi",
@@ -20,6 +19,7 @@
   "extensions": [
     "-builtin:mcp",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/herdr-agent",
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/statusline",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/notify.ts",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/todo.ts",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/manage-handoff.ts"

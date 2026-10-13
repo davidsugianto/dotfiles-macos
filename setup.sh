@@ -342,7 +342,9 @@ fi
 # pi packages — role-based model routing and instant profile switching.
 # https://github.com/spksoft/pi-model-roles, https://github.com/Eddie0521/pi-profile.
 # Themes from luongnv89/pi-extensions are vendored under pi/themes and linked
-# above, so they do not need package installation.
+# above, so they do not need package installation. The statusline is the
+# in-repo extension pi/extensions/statusline (loaded through `extensions` in
+# pi/settings.json), so no package install is needed for it.
 # Installed via pi's own package manager, which writes the declaration back
 # into the symlinked pi/settings.json (same idea as `omp plugin install`
 # above writing into omp's config).
@@ -351,7 +353,6 @@ step "Installing pi packages"
 PI_PACKAGES=(
   "pi-model-roles:git:github.com/spksoft/pi-model-roles"
   "pi-profile:npm:pi-profile"
-  "statusline-pi:npm:statusline-pi"
   "timestamp-pi:npm:timestamp-pi"
   "pi-subagents:npm:@tintinweb/pi-subagents"
   "subagents-pi:$DOTFILES_DIR/pi/extensions/subagents-pi"
