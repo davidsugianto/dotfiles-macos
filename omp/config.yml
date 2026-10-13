@@ -5,7 +5,7 @@ modelRoles:
   slow: anthropic/claude-opus-5-5:high
   plan: anthropic/claude-opus-5-5:high
   commit: anthropic/claude-haiku-4-5:auto
-  task: anthropic/claude-sonnet-5:auto
+  task: anthropic/claude-sonnet-5-5:auto
   web: anthropic/claude-haiku-4-5:auto
 defaultThinkingLevel: auto
 theme:

@@ -111,7 +111,7 @@ model has no suffix.
 | default | Sonnet, auto | Sonnet, auto | Sonnet, high | Luna, high | Sol |
 | smol | Haiku, auto | Haiku, auto | Sonnet, auto | Luna | Luna, high |
 | commit | Haiku, auto | Haiku, auto | Haiku, auto | Luna | Luna |
-| task | `claude-sonnet-5`, auto | Sonnet, auto | Sonnet, high | Sol | Sol |
+| task | Sonnet, auto | Sonnet, auto | Sonnet, high | Sol | Sol |
 | plan | Opus, high | Sonnet, high | Opus, high | Sol, high | Sol, high |
 | slow | Opus, high | Sonnet, high | Opus, high | Sol, high | Sol, high |
 | web | Haiku, auto | Sonnet, auto | falls back to global | falls back to global | falls back to global |
@@ -135,11 +135,15 @@ global role, so the work profiles use Anthropic Haiku for `web`.
   `api: openai-responses` in `pi/models.json` and `omp/models.yml`. See the
   "Cekat model tool-call routing" section in `README.md`.
 
-## Known inconsistencies
+## Older model ids kept on purpose
 
-- `omp/config.yml` sets `task` to `anthropic/claude-sonnet-5`, while every other
-  place uses `claude-sonnet-5-5`.
-- pi's per-role identity profiles (`plan`, `slow`, `task`) name
-  `claude-opus-5` / `claude-sonnet-5`, not the `-5-5` ids used in the role sets.
-- `claude/profiles/*.json` overlays for the Anthropic sets still use Haiku 4.5,
-  not the Haiku 5.5 used by the `edith-*` role sets.
+Not everything is on the 5.5 generation. These are deliberate, not drift:
+
+- pi's per-role identity profiles (`plan`, `slow`, `task`) name `claude-opus-5` /
+  `claude-sonnet-5`, not the `-5-5` ids the role sets use.
+- The `claude/profiles/*.json` overlays `smol`, `commit` and `web` use Haiku 4.5,
+  while the `edith-*` role sets use Haiku 5.5 for `commit`.
+- Many skill handlers under `pi/skills/` default their `SUBAGENT_MODEL` to
+  `anthropic/claude-sonnet-5`.
+
+Upgrade any of these by editing the file named above; nothing else depends on them.
