@@ -48,6 +48,7 @@ herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resum
 omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (default, personal-labs, work-cekatai-default) + skills/ (symlinks to pi/skills/herdr*), linked to ~/.omp/agent/ (incl. themes/, skills/) and ~/.omp/model-profiles/
 pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (personal-labs, default, work-cekatai-default) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
 claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{edith-default,edith-superpower,work-cekatai-default,work-cekatai-superpower}/*.md (role subagents) + profiles/*.json (`--settings` overlays, incl. `work-cekatai-default.json` for the cekat gateway) + scripts/ (claude-roles, claude-profile, claude-work) + settings.json, linked to ~/.claude/ and ~/.local/bin/
+rtk/           rtk.ts (pi + omp extension, upstream v1.0.0) + RTK.md (Claude awareness note), linked to ~/.pi/agent/extensions/, ~/.omp/agent/extensions/ and ~/.claude/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
 zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
 .zshrc         Shell entry point
@@ -316,6 +317,32 @@ with 1M context (`[1m]`), and `settings.json` sets 128K max output and a
 922K auto-compact window to match the cekat work models in `pi/models.json`.
 `setup.sh` also links every shared skill (`~/.agents/skills`, `pi/skills`)
 into `~/.claude/skills/` one by one, so claude.ai's `synced/` dir is left alone.
+
+## rtk (Claude Code + pi + omp)
+
+[rtk](https://github.com/rtk-ai/rtk) rewrites an agent's shell commands to
+`rtk <cmd>` (`git status` -> `rtk git status`) so the model reads condensed
+output; upstream claims 60-90% fewer tokens on common dev commands. Only
+Bash tool calls are affected, not Read/Grep/Glob.
+
+- Edition: `rtk-ai/tap/rtk-oss` (Apache-2.0 only, hooks + filters, no BUSL
+  compression engine), installed by `setup.sh`. `rtk-proxy` and `rtk claude`
+  are not used.
+- Claude Code: `claude/settings.json` has a `PreToolUse` `Bash` hook running
+  `rtk hook claude`; `claude/CLAUDE.md` ends with `@RTK.md` (`rtk/RTK.md`
+  linked to `~/.claude/RTK.md`). The hook only auto-allows a rewritten command
+  when one of your allow rules matches; otherwise Claude still prompts.
+- pi and omp share `rtk/rtk.ts` (verbatim from upstream `hooks/pi/rtk.ts` at
+  v1.0.0), linked into both `extensions/` dirs; omp loads it through its
+  pi-compat layer. The extension is fail-open and shows "RTK disabled" in the
+  status line if `rtk` is missing or older than 0.23.0.
+- **Do not run `rtk init -g`.** It rewrites `~/.claude/settings.json`
+  atomically, which can replace the repo symlink with a plain file. The hand
+  wiring above matches its layout, so `rtk init -g --dry-run` reports nothing to
+  change. To upgrade the extension, copy the new upstream file over `rtk/rtk.ts`.
+- Usage: `rtk gain` / `rtk gain --history` (savings), `rtk bypass <cmd>` (one
+  unfiltered command), `RTK_DISABLED=1` (pi/omp extension off). Telemetry is off
+  by default; leave it.
 
 ## Herdr superagent (pi + omp + claude)
 

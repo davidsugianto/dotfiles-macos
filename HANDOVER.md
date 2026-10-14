@@ -1,3 +1,12 @@
+# Handover — 2026-10-14 (rtk, uncommitted until reviewed)
+
+rtk-oss 1.0.0 wired into Claude Code, pi and omp by hand (see README "rtk"). Files: `rtk/{rtk.ts,RTK.md}` (verbatim upstream v1.0.0), `setup.sh` (tap, formula, 3 links), `claude/settings.json` (`PreToolUse` `Bash` -> `rtk hook claude`), `claude/CLAUDE.md` (`@RTK.md`), `.gitignore` (`rtk/.rtk-agents`).
+
+- Never run `rtk init -g` (clobbers the settings.json symlink). `rtk init -g [--agent pi|omp] --dry-run` writes nothing; pi/omp print an "ownership state" warning only because no `.rtk-agents` file exists.
+- Verified: `rtk hook claude` rewrites `git status`; this Claude session's own Bash calls appear in `rtk gain --history`.
+- Open: confirm pi and omp actually rewrite (start a session, run `git status` through bash, check `rtk gain --history` and that no "RTK disabled" status shows). A nested `claude -p` smoke test was blocked by auto mode and not retried.
+- Open: rtk 1.0.0 is a day old; watch for churn. jq is no longer needed by the Claude hook (native `rtk hook claude`).
+
 # Handover — 2026-10-13 (pi statusline, uncommitted until reviewed)
 
 The pi statusline now lives in `pi/extensions/statusline/` and replaces `npm:statusline-pi` (dropped from `pi/settings.json` `packages` and `setup.sh` `PI_PACKAGES`; loaded via `extensions` in `pi/settings.json`).

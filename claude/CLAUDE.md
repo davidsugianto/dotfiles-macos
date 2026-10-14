@@ -35,3 +35,5 @@ Each step has a slash command (`/plan`, `/execute`, `/superagent`, `/delegate`, 
 
 ## Long-running work
 - Before ending a session with unfinished work, run /do-handoff; resume later with /work-on-handoff <file>. Handoffs live in `~/.claude/handoffs`; /handoff lists them and archives finished ones.
+
+@RTK.md

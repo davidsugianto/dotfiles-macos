@@ -44,7 +44,7 @@ fi
 # `brew tap` call errors out and rolls back, rather than just refusing the
 # one formula later. Trust each tap before tapping it, not after.
 step "Trusting third-party Homebrew taps used by this repo"
-brew trust --tap FelixKratz/formulae nikitabobko/tap anomalyco/tap can1357/tap stablyai/orca oven-sh/bun >/dev/null
+brew trust --tap FelixKratz/formulae nikitabobko/tap anomalyco/tap can1357/tap stablyai/orca oven-sh/bun rtk-ai/tap >/dev/null
 ok "Trusted"
 
 step "Tapping custom Homebrew repositories"
@@ -54,6 +54,7 @@ brew tap anomalyco/tap
 brew tap can1357/tap      # omp — coding agent CLI
 brew tap stablyai/orca    # Orca — agent development environment (ADE)
 brew tap oven-sh/bun      # bun — JS runtime required by omp's plugin manager (omp/model-profiles below)
+brew tap rtk-ai/tap       # rtk-oss — token-saving command-output proxy for Claude Code, pi and omp
 
 step "Installing command-line tools"
 FORMULAE=(
@@ -90,6 +91,7 @@ FORMULAE=(
   oven-sh/bun/bun # JS runtime `omp plugin install` shells out to
   herdr # agent runtime: persistent workspaces/panes; /superagent workers run here
   jq # parses herdr CLI JSON in the herdr / herdr-delegate skills
+  rtk-ai/tap/rtk-oss # Apache-2.0-only rtk edition (no BUSL engine); hooks wired below, never via `rtk init -g`
 )
 for formula in "${FORMULAE[@]}"; do
   if brew list --formula "$formula" &>/dev/null; then
@@ -312,6 +314,19 @@ link "$DOTFILES_DIR/claude/scripts/claude-profile" "$HOME/.local/bin/claude-prof
 link "$DOTFILES_DIR/claude/scripts/claude-mcp-sync" "$HOME/.local/bin/claude-mcp-sync"
 link "$DOTFILES_DIR/claude/scripts/claude-statusline" "$HOME/.local/bin/claude-statusline"
 link "$DOTFILES_DIR/claude/scripts/claude-work" "$HOME/.local/bin/claude-work"
+
+# rtk (token-saving command-output filter) is wired by hand, in the exact layout
+# `rtk init -g` would create, so a later `rtk init -g --dry-run` reports
+# "already present". Do NOT run `rtk init -g` itself: it rewrites
+# ~/.claude/settings.json atomically (replacing the symlink above with a plain
+# file) and would write its .rtk-agents state file into rtk/ via the links below.
+# - Claude Code: PreToolUse "Bash" hook `rtk hook claude` in claude/settings.json
+#   plus @RTK.md in claude/CLAUDE.md, so only RTK.md is linked here.
+# - pi + omp share one extension (omp loads it via its legacy-pi-compat layer).
+link "$DOTFILES_DIR/rtk/RTK.md" "$HOME/.claude/RTK.md"
+link "$DOTFILES_DIR/rtk/rtk.ts" "$HOME/.pi/agent/extensions/rtk.ts"
+link "$DOTFILES_DIR/rtk/rtk.ts" "$HOME/.omp/agent/extensions/rtk.ts"
+
 link "$DOTFILES_DIR/starship.toml"   "$HOME/.config/starship.toml"
 link "$OH_MY_TMUX_DIR/.tmux.conf"    "$HOME/.config/tmux/tmux.conf"
 link "$DOTFILES_DIR/tmux/tmux.conf.local" "$HOME/.config/tmux/tmux.conf.local"
