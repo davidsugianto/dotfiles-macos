@@ -1,9 +1,21 @@
 #!/usr/bin/env bash
-# Open a WezTerm pane whose kubectl/helm helpers target Sofka's active context.
+# Open a terminal pane whose kubectl/helm helpers target Sofka's active context.
+# Inside Tern ($TERN_PANE is the block Sofka runs in) split that block; otherwise
+# split the current WezTerm pane.
 set -euo pipefail
 
 context=$1
 namespace=$2
+banner='printf "Sofka context: %s  namespace: %s\n" "$SOFKA_CONTEXT" "$SOFKA_NAMESPACE"; printf "k … runs kubectl against this context/namespace; helm … does the same.\n"; exec zsh -i'
+
+if [[ -n ${TERN_PANE:-} ]]; then
+  exec tern split "$TERN_PANE" down \
+    --cwd "$PWD" \
+    -- \
+    env "SOFKA_CONTEXT=$context" "SOFKA_NAMESPACE=$namespace" \
+    zsh -ic "$banner"
+fi
+
 # A long-lived tmux server can preserve the socket path of a WezTerm GUI
 # that has since quit. Probe without starting a mux server; if stale, let the
 # CLI discover the currently running GUI instead.
@@ -17,4 +29,4 @@ exec wezterm cli split-pane \
   --percent 30 \
   -- \
   env "SOFKA_CONTEXT=$context" "SOFKA_NAMESPACE=$namespace" \
-  zsh -ic 'printf "Sofka context: %s  namespace: %s\n" "$SOFKA_CONTEXT" "$SOFKA_NAMESPACE"; printf "k … runs kubectl against this context/namespace; helm … does the same.\n"; exec zsh -i'
+  zsh -ic "$banner"

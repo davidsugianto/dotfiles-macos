@@ -21,7 +21,8 @@ name = "NODE"
 builtin = "NODE"
 
 # ------------------------------------------------------------------------------
-# Ctrl-T opens a bottom WezTerm pane. The Sofka placeholders are passed as
+# Ctrl-T opens a bottom pane: a Tern block split when run inside Tern
+# ($TERN_PANE), else a WezTerm pane. The Sofka placeholders are passed as
 # whole arguments; sofka-pane exports them before launching interactive zsh.
 # The zsh wrappers below make kubectl/helm inherit that context and namespace.
 # ------------------------------------------------------------------------------
@@ -34,4 +35,4 @@ args = ["$CONTEXT", "$NAMESPACE"]
 target = "context"
 mutating = false
 output = "background"
-requires = ["wezterm", "zsh", "sofka-pane"]
+requires = ["zsh", "sofka-pane"]
