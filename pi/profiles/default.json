@@ -1,6 +1,0 @@
-{
-  "name": "default",
-  "label": "🧭 Default (Cekat)",
-  "description": "Baseline identity — no model override; uses Pi's configured startup default (settings.json: Cekat GPT-6 Luna, effective effort off).",
-  "sessionName": "Default"
-}

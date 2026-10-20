@@ -17,7 +17,8 @@ All three tools split work into the same roles:
 
 Two kinds of model sets exist:
 
-- **Anthropic sets** use your Claude OAuth login (`/login`), never the cekat gateway.
+- **Anthropic sets** (Claude Code and omp only; pi has none) use your Claude OAuth
+  login (`/login`), never the cekat gateway.
 - **Work sets** (`work-cekatai-*`) route through the internal cekat LiteLLM
   gateway (`$CEKAT_API_KEY`) to GPT-6 Luna (fast) and GPT-6.1 Sol (deep).
 
@@ -71,27 +72,26 @@ Role sets in `pi/model-roles/*.yaml` (the pi-model-roles extension). Pi's
 startup default model is Luna (`settings.json`) and is independent of the role
 set. Luna reports no thinking levels, so effort on Luna is effectively off.
 
-| Role | `default` | `personal-labs` (alias `personal`) | `work-cekatai-default` (alias `work-default`) | `work-cekatai-superpower` (alias `work-superpower`) |
-|---|---|---|---|---|
-| default | Sonnet, medium | Sonnet, high | Luna, high | Sol, off |
-| smol | Haiku, medium | Sonnet, medium | Luna, off | Luna, high |
-| commit | Haiku, medium | Haiku, medium | Luna, off | Luna, off |
-| task | Sonnet, medium | Sonnet, high | Sol, off | Sol, off |
-| plan | Sonnet, high | Opus, high | Sol, high | Sol, high |
-| slow | Sonnet, high | Opus, high | Sol, high | Sol, high |
-| web | Sonnet, medium | Haiku, medium | Luna, high | Luna, high |
+| Role | `work-cekatai-default` (alias `work-default`) | `work-cekatai-superpower` (alias `work-superpower`) |
+|---|---|---|
+| default | Luna, high | Sol, off |
+| smol | Luna, off | Luna, high |
+| commit | Luna, off | Luna, off |
+| task | Sol, off | Sol, off |
+| plan | Sol, high | Sol, high |
+| slow | Sol, high | Sol, high |
+| web | Luna, high | Luna, high |
 
 Account/identity profiles (`pi/profiles/*.json`, pi-profile `/profile <name>`)
 set a session model: one per role (`smol`, `commit`, `task`, `plan`, `slow`,
-`web`), plus `default` (no override, uses the startup default),
-`personal-labs` (Anthropic), `work-cekatai-default` (Luna) and
-`work-cekatai-superpower` (Sol). `pi/profiles/.active` is runtime state and is
-git-ignored.
+`web`), plus `work-cekatai-default` (Luna) and `work-cekatai-superpower` (Sol).
+`pi/profiles/.active` is runtime state and is git-ignored. pi has no Anthropic
+sets; use omp or Claude Code for those.
 
 Switching:
 
 ```bash
-pi-roles personal            # or: default | work-default | work-superpower
+pi-roles work-default            # or: work-superpower
 # then /reload in every open pi session
 /profile work-cekatai-superpower   # inside pi
 ```
@@ -123,11 +123,11 @@ global role.
 ## Cross-tool differences
 
 - **Names are not fully aligned.** Claude Code and omp call their Anthropic sets
-  `edith-default` / `edith-superpower` (omp follows Claude Code's model mix, with `:auto` effort);
-  pi still calls theirs `default` / `personal-labs`. The work sets share one name
+  `edith-default` / `edith-superpower` (omp follows Claude Code's model mix, with
+  `:auto` effort); pi has no Anthropic sets. The work sets share one name
   everywhere.
-- **Same intent, different mix.** The personal set (`edith-superpower`, pi's
-  `personal-labs`) puts Opus on plan and slow in every tool. Claude Code runs
+- **Same intent, different mix.** `edith-superpower` puts Opus on plan and slow
+  in both tools that have it. Claude Code runs
   every role at `high` (Opus on `smol`, Sonnet on `task`). omp's edith profiles
   use the same models except in `edith-superpower`, which swaps them (Sonnet on
   `smol`, Opus on `task`), and run every role at `:auto`.

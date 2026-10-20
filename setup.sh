@@ -274,8 +274,8 @@ link "$DOTFILES_DIR/pi/models.json" "$HOME/.pi/agent/models.json"
 link "$DOTFILES_DIR/pi/mcp-adapter.json" "$HOME/.pi/agent/mcp-adapter.json"
 # profiles/*.json are switched between at runtime with `/profile <name>`
 # (pi-profile extension, installed below) — one profile per model role
-# (default/smol/slow/plan/commit/task/web) plus personal-labs/
-# work-cekatai-default account switches, kept in this repo so they're
+# (smol/slow/plan/commit/task/web) plus work-cekatai-default/
+# work-cekatai-superpower account switches, kept in this repo so they're
 # versioned next to the models.json provider they reference.
 link "$DOTFILES_DIR/pi/profiles" "$HOME/.pi/profiles"
 # Skills live in the tool-neutral ~/.agents/skills, which omp's `agents`
@@ -444,12 +444,12 @@ fi
 # config is deployed with a plain copy instead of `link` — see
 # pi/scripts/pi-roles for why. Only seed it if nothing is there yet, so a
 # re-run never clobbers a live switch to the work profile.
-step "Deploying default pi-model-roles config (personal)"
+step "Deploying default pi-model-roles config (work-default)"
 if [[ -f "$HOME/.pi/agent/extensions/pi-model-roles/config.yaml" ]]; then
-  skip "pi-model-roles config already deployed (pi-roles personal|default|work to switch)"
+  skip "pi-model-roles config already deployed (pi-roles work-default|work-superpower to switch)"
 else
-  "$DOTFILES_DIR/pi/scripts/pi-roles" personal
-  ok "personal-labs model roles deployed"
+  "$DOTFILES_DIR/pi/scripts/pi-roles" work-default
+  ok "work-cekatai-default model roles deployed"
 fi
 
 # Claude Code skills: ~/.claude/skills also holds claude.ai's own synced/
