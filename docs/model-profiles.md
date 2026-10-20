@@ -13,7 +13,7 @@ All three tools split work into the same roles:
 | `task` | Ordinary scoped implementation work |
 | `plan` | Plans and designs, no edits |
 | `slow` | Hard, ambiguous or high-risk problems |
-| `web` | Web research and summarising (work sets: pi only; Claude Code has none and omp falls back to global) |
+| `web` | Web research and summarising (work sets: pi and omp; Claude Code has none) |
 
 Two kinds of model sets exist:
 
@@ -21,7 +21,7 @@ Two kinds of model sets exist:
 - **Work sets** (`work-cekatai-*`) route through the internal cekat LiteLLM
   gateway (`$CEKAT_API_KEY`) to GPT-6 Luna (fast) and GPT-6.1 Sol (deep).
 
-Names used below: Haiku = `claude-haiku-4-5` (Claude Code uses `claude-haiku-5-5[1m]`), Sonnet = `claude-sonnet-5-5`, Opus = `claude-opus-5-5`,
+Names used below: Haiku = `claude-haiku-4-5` (Claude Code and the omp edith profiles use `claude-haiku-5-5`), Sonnet = `claude-sonnet-5-5`, Opus = `claude-opus-5-5`,
 Luna = `azure_ai/gpt-6-luna`, Sol = `azure_ai/gpt-6.1-sol`. Effort is shown
 after the model; `-` means none is set.
 
@@ -106,28 +106,31 @@ Model profiles in `omp/model-profiles/*.yml`, layered over the global roles in
 `omp/config.yml`. Effort is a suffix: `:high`, or `:auto` (omp picks). A bare
 model has no suffix.
 
-| Role | `config.yml` (global) | `default` | `personal-labs` | `work-cekatai-default` | `work-cekatai-superpower` |
+| Role | `config.yml` (global) | `edith-default` | `edith-superpower` | `work-cekatai-default` | `work-cekatai-superpower` |
 |---|---|---|---|---|---|
-| default | Sonnet, auto | Sonnet, auto | Sonnet, high | Luna, high | Sol |
-| smol | Haiku, auto | Haiku, auto | Sonnet, auto | Luna | Luna, high |
-| commit | Haiku, auto | Haiku, auto | Haiku, auto | Luna | Luna |
-| task | Sonnet, auto | Sonnet, auto | Sonnet, high | Sol | Sol |
-| plan | Opus, high | Opus, high | Opus, high | Sol, high | Sol, high |
-| slow | Opus, high | Sonnet, high | Opus, high | Sol, high | Sol, high |
-| web | Haiku, auto | Sonnet, auto | falls back to global | falls back to global | falls back to global |
+| default | Sonnet, auto | Sonnet, auto | Opus, auto | Luna, auto | Sol, auto |
+| smol | Haiku, auto | Sonnet, auto | Sonnet, auto | Luna, auto | Luna, auto |
+| commit | Haiku, auto | Haiku 5.5, auto | Haiku 5.5, auto | Luna, auto | Luna, auto |
+| task | Sonnet, auto | Sonnet, auto | Opus, auto | Sol, auto | Sol, auto |
+| plan | Opus, high | Opus, auto | Opus, auto | Sol, auto | Sol, auto |
+| slow | Opus, high | Opus, auto | Opus, auto | Sol, auto | Sol, auto |
+| web | Haiku, auto | Sonnet, auto | Sonnet, auto | Luna, auto | Sol, auto |
 
 omp has no alias layer: switch in-session with `/profile <name>` (the
 omp-model-profiles plugin). A profile that omits a role falls back to the
-global role, so the work profiles use Anthropic Haiku for `web`.
+global role.
 
 ## Cross-tool differences
 
-- **Names are not fully aligned.** Claude Code's Anthropic sets are
-  `edith-default` / `edith-superpower`; pi and omp still call theirs `default` /
-  `personal-labs`. The work sets share one name everywhere.
-- **Same intent, different mix.** `personal-labs`/`edith-superpower` put Opus on
-  plan and slow in every tool. Claude Code additionally puts Opus on `smol` and
-  uses Haiku 5.5 (high) for `commit`.
+- **Names are not fully aligned.** Claude Code and omp call their Anthropic sets
+  `edith-default` / `edith-superpower` (omp follows Claude Code's model mix, with `:auto` effort);
+  pi still calls theirs `default` / `personal-labs`. The work sets share one name
+  everywhere.
+- **Same intent, different mix.** The personal set (`edith-superpower`, pi's
+  `personal-labs`) puts Opus on plan and slow in every tool. Claude Code runs
+  every role at `high` (Opus on `smol`, Sonnet on `task`). omp's edith profiles
+  use the same models except in `edith-superpower`, which swaps them (Sonnet on
+  `smol`, Opus on `task`), and run every role at `:auto`.
 - **Where each is applied.** Claude Code and pi apply role sets to subagents and
   Herdr workers; omp applies them to its own role routing.
 - **Gateway quirk.** The cekat gateway rejects tool calls on

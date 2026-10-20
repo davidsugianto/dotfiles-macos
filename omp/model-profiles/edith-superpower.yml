@@ -1,0 +1,14 @@
+# Edith superpower profile — Anthropic direct. Based on Claude Code's
+# `edith-superpower` role set (claude/model-roles/edith-superpower): Opus 5.5 for
+# default/slow/plan/task, Sonnet 5.5 for smol/web, Haiku 5.5 for commit. Unlike
+# Claude Code, task is Opus (Sonnet there), smol is Sonnet (Opus there), and every
+# role runs at `:auto` so omp picks the effort. Switch to this with
+# `/profile edith-superpower`.
+modelRoles:
+  default: anthropic/claude-opus-5-5:auto
+  smol: anthropic/claude-sonnet-5-5:auto
+  slow: anthropic/claude-opus-5-5:auto
+  plan: anthropic/claude-opus-5-5:auto
+  commit: anthropic/claude-haiku-5-5:auto
+  task: anthropic/claude-opus-5-5:auto
+  web: anthropic/claude-sonnet-5-5:auto

@@ -1,7 +1,8 @@
 # Work profile — routes through the internal cekat LiteLLM gateway
 # deployments, tiered by capability like the Anthropic profile:
-#   Luna  = fast/small  -> default, smol, commit, task (primary agent and high-volume roles)
-#   Sol   = deep/large   -> slow, plan (thinking-heavy work)
+#   Luna  = fast/small  -> default, smol, commit, web (primary agent and high-volume roles)
+#   Sol   = deep/large   -> slow, plan, task (thinking-heavy and implementation work)
+# Every role runs at `:auto` effort.
 # The Cekat chat-completions route (`/v1/chat/completions`) rejects tool
 # calls whenever any reasoning_effort value is present for gpt-6-luna/sol —
 # litellm attaches its own server-side default even if the client omits the
@@ -12,9 +13,10 @@
 # `/v1/responses` instead, which has no such restriction.
 # Switch to this with `/profile work-cekatai-default`.
 modelRoles:
-  default: cekat/azure_ai/gpt-6-luna:high
-  smol: cekat/azure_ai/gpt-6-luna
-  slow: cekat/azure_ai/gpt-6.1-sol:high
-  plan: cekat/azure_ai/gpt-6.1-sol:high
-  commit: cekat/azure_ai/gpt-6-luna
-  task: cekat/azure_ai/gpt-6.1-sol
+  default: cekat/azure_ai/gpt-6-luna:auto
+  smol: cekat/azure_ai/gpt-6-luna:auto
+  slow: cekat/azure_ai/gpt-6.1-sol:auto
+  plan: cekat/azure_ai/gpt-6.1-sol:auto
+  commit: cekat/azure_ai/gpt-6-luna:auto
+  task: cekat/azure_ai/gpt-6.1-sol:auto
+  web: cekat/azure_ai/gpt-6-luna:auto

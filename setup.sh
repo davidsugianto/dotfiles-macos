@@ -341,7 +341,7 @@ link "$DOTFILES_DIR/git/.gitconfig-work"     "$HOME/.gitconfig-work"
 
 # ------------------------------------------------------------------------------
 # omp-model-profiles — https://github.com/rezhajulio/omp-model-profiles
-# `/profile personal-labs` / `/profile work-cekatai-default` switch modelRoles
+# `/profile edith-default` / `/profile edith-superpower` / `/profile work-cekatai-default` switch modelRoles
 # in-session (see omp/model-profiles/). Installed via omp's own npm-backed
 # plugin manager, which shells out to bun (tapped/installed above).
 # ------------------------------------------------------------------------------

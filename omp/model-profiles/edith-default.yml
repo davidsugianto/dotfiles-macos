@@ -1,0 +1,13 @@
+# Edith default profile — Anthropic direct. Mirrors Claude Code's `edith-default`
+# role set (claude/model-roles/edith-default) model-for-model: Sonnet 5.5 for
+# default/smol/task/web, Opus 5.5 for slow/plan, Haiku 5.5 for commit. Unlike
+# Claude Code (high everywhere), every role runs at `:auto` so omp picks the
+# effort. Switch to this with `/profile edith-default`.
+modelRoles:
+  default: anthropic/claude-sonnet-5-5:auto
+  smol: anthropic/claude-sonnet-5-5:auto
+  slow: anthropic/claude-opus-5-5:auto
+  plan: anthropic/claude-opus-5-5:auto
+  commit: anthropic/claude-haiku-5-5:auto
+  task: anthropic/claude-sonnet-5-5:auto
+  web: anthropic/claude-sonnet-5-5:auto
