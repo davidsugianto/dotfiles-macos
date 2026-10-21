@@ -30,6 +30,9 @@ local icon_overrides = {
   -- Orca (onorca.dev) has no glyph in the font yet; ":dolphin:" is the
   -- closest cetacean icon it ships (the font's KDE Dolphin glyph).
   ["Orca"] = ":dolphin:",
+  -- Tern (terminal) has no glyph either; ":eagle:" is the closest bird the
+  -- font ships (a tern is a seabird).
+  ["Tern"] = ":eagle:",
 }
 for app, glyph in pairs(icon_overrides) do
   icon_map[app] = glyph
