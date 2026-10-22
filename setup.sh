@@ -407,6 +407,10 @@ SKILL_SOURCES=(
   "aws/agent-toolkit-for-aws:aws-iam aws-containers aws-networking aws-observability aws-billing-and-cost-management aws-cdk aws-cloudformation aws-deployment aws-security aws-well-architected-review aws-fault-injection-service troubleshooting-application-failures setting-up-cloudwatch-alarm-notifications"
   "google/skills:gke-basics gke-upgrades gke-networking gke-golden-path gke-reliability gke-observability gke-workload-troubleshooting gke-node-notready gke-platform-security gke-productionize gke-cost-optimization google-cloud-waf-reliability google-cloud-slo-alert-configuration cloud-monitoring-promql-query"
   "github/awesome-copilot:multi-stage-dockerfile github-actions-hardening devops-rollout-plan github-actions-efficiency import-infrastructure-as-code security-review aws-cloudwatch-investigation"
+  # impeccable's launcher downloads a checksum-verified engine binary from
+  # GitHub releases into ~/.impeccable on first use. Its optional design hook
+  # edits ~/.claude/settings.json (a repo symlink) at user scope; use project scope.
+  "pbakaus/impeccable:impeccable"
 )
 for entry in "${SKILL_SOURCES[@]}"; do
   repo="${entry%%:*}"
