@@ -251,6 +251,10 @@ link "$DOTFILES_DIR/omp/themes" "$HOME/.omp/agent/themes"
 # skills/ holds omp's user skills (scanned as ~/.omp/agent/skills/*/SKILL.md,
 # non-recursive); entries symlink to the agent-agnostic skills in pi/skills.
 link "$DOTFILES_DIR/omp/skills" "$HOME/.omp/agent/skills"
+# commands/*.md are omp's native user slash commands (e.g. /superagent, the
+# Tern-based one). Separate from pi's prompts and Claude's commands, which omp
+# does not load by default.
+link "$DOTFILES_DIR/omp/commands" "$HOME/.omp/agent/commands"
 # pi reads its settings from the agent directory, ~/.pi/agent, by default.
 # Only the two files this repo owns are symlinked (not the whole
 # directory) — pi writes its own runtime state into ~/.pi/agent too
