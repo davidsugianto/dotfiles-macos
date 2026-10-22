@@ -27,33 +27,8 @@ statusLine:
 retry:
   fallbackChains:
     web:
-      - web/duckduckgo
-      - web/startpage
-      - web/google
-      - web/parallel
-      - web/perplexity
-      - google/gemini-2.5-flash
-      - google-antigravity/gemini-2.5-flash
-      - openai-codex/gpt-5.6-luna
-      - openai-codex/gpt-5.6
-      - openai-codex/gpt-5.5
-      - xai/grok-4.5
-      - xai-oauth/grok-4.5
-      - web/zai
-      - web/exa
-      - web/tinyfish
-      - web/jina
-      - web/kagi
-      - web/tavily
-      - web/firecrawl
-      - web/brave
-      - web/kimi
-      - web/synthetic
-      - web/ollama
-      - web/searxng
-      - web/ecosia
-      - web/mojeek
-      - web/public
+      - cekat/azure_ai/gpt-6.1-sol
+      - cekat/azure_ai/gpt-6-luna
 extendedContext: true
 dev:
   autoqaConsent: granted
