@@ -2,6 +2,7 @@
 # (../models.json, $CEKAT_API_KEY) using the internal GPT-6 / GPT-6.1
 # deployments, tiered by capability like dotfiles-macos/omp's work profile:
 #   Sol   = deep/large   -> default, slow, plan, task (GPT-6.1 Sol everywhere)
+#   (Sol rejects effort "off"; roles use low/medium/high — see models.json)
 #   Luna  = fast/small  -> smol (high effort), commit
 #
 # Deploy with `pi-roles work-superpower` (dotfiles-macos/pi/scripts/pi-roles), not a
@@ -23,7 +24,7 @@ roles:
     model:
       provider: cekat
       id: azure_ai/gpt-6.1-sol
-    effort: off
+    effort: medium
   smol:
     description: >-
       Use for small, well-specified, low-risk edits or lookups with an
@@ -68,7 +69,7 @@ roles:
     model:
       provider: cekat
       id: azure_ai/gpt-6.1-sol
-    effort: off
+    effort: low
   web:
     description: >-
       Use when the task is primarily researching or summarizing information

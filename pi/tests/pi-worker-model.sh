@@ -63,15 +63,15 @@ rc=0
 check "no args exits 2" "2" "$rc"
 
 work="$repo_root/pi/model-roles/work-cekatai-default.yaml"
-check "work task" "cekat azure_ai/gpt-6.1-sol off" "$(run "$work" task)"
+check "work task" "cekat azure_ai/gpt-6.1-sol low" "$(run "$work" task)"
 check "work slow" "cekat azure_ai/gpt-6.1-sol high" "$(run "$work" slow)"
 
 sp="$repo_root/pi/model-roles/work-cekatai-superpower.yaml"
-check "superpower default" "cekat azure_ai/gpt-6.1-sol off" "$(run "$sp" default)"
+check "superpower default" "cekat azure_ai/gpt-6.1-sol medium" "$(run "$sp" default)"
 check "superpower smol" "cekat azure_ai/gpt-6-luna high" "$(run "$sp" smol)"
 check "superpower commit" "cekat azure_ai/gpt-6-luna off" "$(run "$sp" commit)"
 check "superpower slow" "cekat azure_ai/gpt-6.1-sol high" "$(run "$sp" slow)"
 check "superpower plan" "cekat azure_ai/gpt-6.1-sol high" "$(run "$sp" plan)"
-check "superpower task" "cekat azure_ai/gpt-6.1-sol off" "$(run "$sp" task)"
+check "superpower task" "cekat azure_ai/gpt-6.1-sol low" "$(run "$sp" task)"
 
 exit "$fail"

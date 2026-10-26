@@ -68,7 +68,7 @@ roles:
     model:
       provider: cekat
       id: azure_ai/gpt-6.1-sol
-    effort: off
+    effort: low
   web:
     description: >-
       Use when the task is primarily researching or summarizing information
