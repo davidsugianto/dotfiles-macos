@@ -45,8 +45,9 @@ yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (edith-default, edith-superpower, work-cekatai-default, work-cekatai-superpower) + commands/ (omp-only slash commands: /superagent via Tern) + skills/ (symlinks to pi/skills/herdr* and pi/skills/prompt-forge, plus tern-delegate), linked to ~/.omp/agent/ (incl. themes/, commands/, skills/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (work-cekatai-default, work-cekatai-superpower) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate, prompt-forge) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
+agent/         skills/ (tool-neutral skills shared by Claude Code, pi and omp, e.g. prompt-forge), linked into ~/.agents/skills/ by setup.sh
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (edith-default, edith-superpower, work-cekatai-default, work-cekatai-superpower) + commands/ (omp-only slash commands: /superagent via Tern) + skills/ (symlinks to pi/skills/herdr*, plus tern-delegate), linked to ~/.omp/agent/ (incl. themes/, commands/, skills/) and ~/.omp/model-profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (work-cekatai-default, work-cekatai-superpower) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
 claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{edith-default,edith-superpower,work-cekatai-default,work-cekatai-superpower}/*.md (role subagents) + profiles/*.json (`--settings` overlays, incl. `work-cekatai-default.json` for the cekat gateway) + scripts/ (claude-roles, claude-profile, claude-work) + settings.json, linked to ~/.claude/ and ~/.local/bin/
 rtk/           rtk.ts (pi + omp extension, upstream v1.0.0) + RTK.md (Claude awareness note), linked to ~/.pi/agent/extensions/, ~/.omp/agent/extensions/ and ~/.claude/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
@@ -312,8 +313,8 @@ The default setup is Anthropic-only (`/login` subscription); the opt-in
 internal cekat LiteLLM gateway instead (see the guide). Sonnet/Opus 5.5 run
 with 1M context (`[1m]`), and `settings.json` sets 128K max output and a
 922K auto-compact window to match the cekat work models in `pi/models.json`.
-`setup.sh` also links every shared skill (`~/.agents/skills`, `pi/skills`)
-into `~/.claude/skills/` one by one, so claude.ai's `synced/` dir is left alone.
+`setup.sh` also links every shared skill (`~/.agents/skills`, which also holds
+the `agent/skills` and `pi/skills` entries) into `~/.claude/skills/` one by one, so claude.ai's `synced/` dir is left alone.
 
 ## rtk (Claude Code + pi + omp)
 

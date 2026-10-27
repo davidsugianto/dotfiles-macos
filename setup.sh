@@ -249,7 +249,9 @@ link "$DOTFILES_DIR/omp/mcp.json" "$HOME/.omp/agent/mcp.json"
 # `/settings` -> Appearance. Linked wholesale, same as pi/themes below.
 link "$DOTFILES_DIR/omp/themes" "$HOME/.omp/agent/themes"
 # skills/ holds omp's user skills (scanned as ~/.omp/agent/skills/*/SKILL.md,
-# non-recursive); entries symlink to the agent-agnostic skills in pi/skills.
+# non-recursive); entries symlink to the agent-agnostic skills in pi/skills
+# (herdr). New tool-neutral skills go in agent/skills and reach omp through
+# ~/.agents/skills instead (linked below).
 link "$DOTFILES_DIR/omp/skills" "$HOME/.omp/agent/skills"
 # commands/*.md are omp's native user slash commands (e.g. /superagent, the
 # Tern-based one). Separate from pi's prompts and Claude's commands, which omp
@@ -291,6 +293,14 @@ link "$HOME/.agents/skills" "$HOME/.pi/agent/skills"
 # ~/.pi/agent/skills/<name>/SKILL.md; a whole-directory link would be wiped by
 # the `skills` CLI.
 for skill_dir in "$DOTFILES_DIR"/pi/skills/*/; do
+  [[ -d "$skill_dir" ]] || continue
+  skill_dir="${skill_dir%/}"
+  link "$skill_dir" "$HOME/.agents/skills/$(basename -- "$skill_dir")"
+done
+# agent/skills holds tool-neutral skills (no model ids or agent-specific tools).
+# Linking them into ~/.agents/skills reaches pi, omp and, through the Claude
+# Code loop below, ~/.claude/skills, with no per-agent symlink in the repo.
+for skill_dir in "$DOTFILES_DIR"/agent/skills/*/; do
   [[ -d "$skill_dir" ]] || continue
   skill_dir="${skill_dir%/}"
   link "$skill_dir" "$HOME/.agents/skills/$(basename -- "$skill_dir")"
