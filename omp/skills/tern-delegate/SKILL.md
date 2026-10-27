@@ -4,7 +4,7 @@ description: "Delegate work to omp worker agents in a dedicated Tern session (on
 license: MIT
 ---
 
-<!-- Tern port of herdr-delegate (pi/skills/herdr-delegate); verified against tern 0.9.5. -->
+<!-- Tern port of herdr-delegate (agent/skills/herdr-delegate); verified against tern 0.9.5. -->
 
 # Tern delegate
 

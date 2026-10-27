@@ -76,7 +76,7 @@ slow"), or a model ("workers on cekat/azure_ai/gpt-6.1-sol").
 | 3. Run herdr-delegate end to end; do non-parallel work directly; pi slices carry a Role (`task` default, override like "worker 2 as slow") | The orchestrator also handles glue work that doesn't fit a slice; the role picks the worker model via `pi-worker-model` |
 | 4. End at review hand-off, no commit | Output goes into the normal `/review` step |
 
-**What the skill adds** (`pi/skills/herdr-delegate/SKILL.md`): 6 workers by
+**What the skill adds** (`agent/skills/herdr-delegate/SKILL.md`): 6 workers by
 default (a number you name is a ceiling, capped at 12); each owns a disjoint
 file set; one `sa-<id>` workspace with one tab
 per worker; briefs and results as files under `$TMPDIR/superagent/<id>/`; a
@@ -198,7 +198,7 @@ the active ones).
 | `/handoff [title]` | `pi/extensions/manage-handoff.ts` | No title: lists active handoffs and archives `done` ones. With a title: creates a handoff file |
 | `/herdr-agents` | `pi/extensions/herdr-agent/` | One line per Herdr agent: name, kind, status, cwd |
 | `/agents` | `@tintinweb/pi-subagents` | Subagent manager: running agents, conversation viewer, custom types, settings |
-| `/skill:herdr-delegate`, `/skill:herdr` | `pi/skills/` (also omp via `omp/skills/`) | Load the skill by hand, e.g. in omp |
+| `/skill:herdr-delegate`, `/skill:herdr` | `agent/skills/` (pi, omp and Claude Code via `~/.agents/skills`) | Load the skill by hand, e.g. in omp |
 
 ## Editing a template
 

@@ -68,6 +68,6 @@ To guarantee a particular skill is requested, invoke it explicitly using the syn
 ## If a skill command is unavailable
 
 - Check that the skill is installed for that tool and that its directory contains `SKILL.md`.
-- In this dotfiles setup, Pi skills are under `pi/skills/` and Claude Code skills are under `claude/skills/`; shared skills may also be linked into the respective user skill directories.
+- In this dotfiles setup, Pi skills are under `pi/skills/` and Claude Code skills are under `claude/skills/`, and skills shared as one file by every agent are under `agent/skills/`; shared skills may also be linked into the respective user skill directories.
 - In Pi, skill commands use `/skill:<name>`. If a newly added or changed skill is not showing up, reload Pi with `/reload` or start a new session.
 - In Claude Code, check the `/` command menu for the skill name; a newly installed skill may require a new session to appear.

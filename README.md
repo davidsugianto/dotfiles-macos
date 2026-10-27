@@ -45,9 +45,9 @@ yazi/          Terminal file manager config
 k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
-agent/         skills/ (tool-neutral skills shared by Claude Code, pi and omp, e.g. prompt-forge), linked into ~/.agents/skills/ by setup.sh
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (edith-default, edith-superpower, work-cekatai-default, work-cekatai-superpower) + commands/ (omp-only slash commands: /superagent via Tern) + skills/ (symlinks to pi/skills/herdr*, plus tern-delegate), linked to ~/.omp/agent/ (incl. themes/, commands/, skills/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (work-cekatai-default, work-cekatai-superpower) + profiles/*.json + prompts/*.md (slash commands) + skills/ (herdr, herdr-delegate) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
+agent/         skills/ (skills shared as one file by Claude Code, pi and omp: herdr, herdr-delegate, prompt-forge), linked into ~/.agents/skills/ by setup.sh
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (edith-default, edith-superpower, work-cekatai-default, work-cekatai-superpower) + commands/ (omp-only slash commands: /superagent via Tern) + skills/ (symlinks to the pi/skills sre handlers datadog-investigate and jira-space-keeper, plus tern-delegate), linked to ~/.omp/agent/ (incl. themes/, commands/, skills/) and ~/.omp/model-profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (work-cekatai-default, work-cekatai-superpower) + profiles/*.json + prompts/*.md (slash commands) + skills/ (sre-ai-skills handlers) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
 claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{edith-default,edith-superpower,work-cekatai-default,work-cekatai-superpower}/*.md (role subagents) + profiles/*.json (`--settings` overlays, incl. `work-cekatai-default.json` for the cekat gateway) + scripts/ (claude-roles, claude-profile, claude-work) + settings.json, linked to ~/.claude/ and ~/.local/bin/
 rtk/           rtk.ts (pi + omp extension, upstream v1.0.0) + RTK.md (Claude awareness note), linked to ~/.pi/agent/extensions/, ~/.omp/agent/extensions/ and ~/.claude/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
@@ -358,8 +358,8 @@ omp has its own `/superagent` that runs workers in Tern tabs instead of Herdr; s
 | `/delegate [constraints]` | Same, using the open `/todos` items as slices; toggles each todo after its worker is verified. |
 | `/herdr-agents` | Lists live Herdr agents. The footer shows `sa ● N working · ◐ N blocked · ✓ N ready` while workers run, with a warning when one blocks. |
 | `/todos`, `/handoff`, `/do-handoff`, `/work-on-handoff` | Session todo list; handoff docs in `~/.pi/agent/handoffs` (`/handoff` archives `status: done` ones). |
-| `pi/skills/herdr-delegate/SKILL.md` | The orchestration procedure both agents follow. Briefs/results live in `$TMPDIR/superagent/<id>/`. |
-| `pi/skills/herdr/SKILL.md` | Vendored `herdr --skill` output plus `LOCAL:` edits — re-sync after `brew upgrade herdr`. |
+| `agent/skills/herdr-delegate/SKILL.md` | The orchestration procedure both agents follow. Briefs/results live in `$TMPDIR/superagent/<id>/`. |
+| `agent/skills/herdr/SKILL.md` | Vendored `herdr --skill` output plus `LOCAL:` edits — re-sync after `brew upgrade herdr`. |
 
 pi workers pick their model by role (`task` default, `slow`, `smol`): the
 orchestrator runs `pi-worker-model <role>`, which reads the active `pi-roles`

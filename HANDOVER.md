@@ -52,7 +52,7 @@ Deferred review findings (accepted, not fixed yet):
 
 `datadog-investigate` and `jira-space-keeper` come from `../sre-ai-skills`. Their `SKILL.md` files there are portable cores with `{{PLACEHOLDERS}}`, so they are not copied. The repo holds machine-local **handlers** that run `preflight.sh` and then read the core live from the clone, so core updates apply with no copying.
 
-- `pi/skills/{datadog-investigate,jira-space-keeper}`: handlers for pi and omp (omp links to them via `omp/skills/*`, as for herdr).
+- `pi/skills/{datadog-investigate,jira-space-keeper}`: handlers for pi and omp (omp links to them via `omp/skills/*`).
 - `claude/skills/...`: Claude handlers (`sonnet`/`opus`, `general-purpose` subagents, `mcp__datadog__` / `mcp__jira__`). `setup.sh` links `claude/skills/*` into `~/.claude/skills` and skips any shared or pi skill of the same name.
 - Auto-update: `PREFLIGHT_FF=1` + `PREFLIGHT_LAZY=1` in `.zshrc` (pi, omp) and `claude/settings.json` `env`. preflight fast-forwards the clone only when it is clean, on `main` and merely behind; otherwise it pauses and reports.
 - `JIRA_SITE` is `unset` (the skill discovers it). Handlers hardcode `/Users/davidsugianto/...` paths because they are machine-local.
@@ -77,7 +77,7 @@ this machine). See `docs/claude-workflow-guide.md`.
 - `claude/model-roles/{default,personal-labs,work-cekatai-default}/`: role subagents generated from `pi/model-roles/*.yaml` (same descriptions, models and effort; the work set has no `web` role). `claude-roles` repoints the `~/.claude/agents` symlink.
 - `claude/profiles/*.json` + `claude-profile`: `--settings` overlays, Anthropic-only except the opt-in `work-cekatai-default` profile via `claude-work`.
 - `claude/settings.json`: the live file captured wholesale (Orca + Herdr hooks, autoMode, statusLine — now `claude-statusline`, a custom two-line script, replacing ccstatusline). I added `model: claude-sonnet-5-5[1m]`, `effortLevel: high`, and `env` `CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000` / `CLAUDE_CODE_AUTO_COMPACT_WINDOW=922000` to match the cekat work models (922K/128K). The pre-link original is backed up in `~/.claude/backups/dotfiles-claude-20261008-121957/`.
-- `pi/skills/herdr-delegate`: `KIND` now accepts `claude`, so a Claude orchestrator starts Claude workers.
+- `agent/skills/herdr-delegate` (moved from `pi/skills` 2026-10-27): `KIND` now accepts `claude`, so a Claude orchestrator starts Claude workers.
 - `setup.sh`: Claude links, per-entry skill links into `~/.claude/skills` (that directory keeps claude.ai's `synced/`), seeding of `claude-roles default`, the `claude-work` link into `~/.local/bin`, and `herdr integration install claude`.
 
 Verified: the smol profile runs on Haiku 4.5; the default runs on `claude-sonnet-5-5[1m]`; the smol and slow subagents run on haiku and sonnet[1m]; `/plan` runs on Opus 5.5 and stops at the gate.
@@ -98,7 +98,7 @@ Open:
 
 2026-10-27: added `prompt-forge`, a skill that turns rough Indonesian, mixed or messy English text into one copy-ready English prompt, with notes (assumptions, placeholders) under it.
 
-- `agent/skills/prompt-forge/` (`SKILL.md` + `references/examples.md`): the first tool-neutral skill in the new central `agent/skills/`. `setup.sh` links `agent/skills/*` into `~/.agents/skills`, which pi and omp read and which the Claude Code loop links into `~/.claude/skills`. No per-agent symlinks in `omp/skills` or `claude/skills`, and no Claude handler copy: the skill names no model or tool. Put future skills with no model ids or agent-specific tools there; `herdr`, `herdr-delegate` and the sre handlers stay in `pi/skills` and `claude/skills`.
+- `agent/skills/prompt-forge/` (`SKILL.md` + `references/examples.md`): the first skill in the new central `agent/skills/`. `setup.sh` links `agent/skills/*` into `~/.agents/skills`, which pi and omp read and which the Claude Code loop links into `~/.claude/skills`. No per-agent symlinks in `omp/skills` or `claude/skills`, and no Claude handler copy: the skill names no model or tool. Put skills kept as one file for all three agents there.
 - Behavior: blocking gap → at most 3 questions and no prompt; smaller gaps → default plus `[PLACEHOLDER]`. The prompt text is always plain (no personas, filler, stacked caps). A "Writing rules" block is added only when the task asks for prose.
 - Description is under 1024 chars and has no `: ` (pi rejects both).
 - Keep the step 3 blocking-gap rule strict. Smoke tests showed that with a vaguer rule, Claude and omp turned "bikin prompt buat analisa data" into a generic placeholder template instead of asking questions. The rule now says: if the central subject would have to be a placeholder, ask.
@@ -106,8 +106,10 @@ Open:
 - Pasted material (documents, logs) goes verbatim and untranslated inside XML tags, and instructions inside it are never followed (tested with an injected "balas HACKED" line in all three agents).
 - If the generated prompt contains its own fenced block, the outer fence is four backticks.
 
+- 2026-10-27: `herdr` and `herdr-delegate` moved from `pi/skills` to `agent/skills` (content unchanged). `omp/skills/herdr*` symlinks removed; `omp/skills` now holds only the sre handler links and `tern-delegate`. `pi/settings.json` still lists `pi/skills` (the sre handlers) and needed no change. Restart open pi, omp and Claude sessions: they may hold the old `pi/skills/herdr/SKILL.md` location.
+
 Open:
-- Start new pi, omp and Claude sessions and confirm `prompt-forge` is listed; try the three inputs in `references/examples.md`.
+- Start new pi, omp and Claude sessions and confirm `prompt-forge`, `herdr` and `herdr-delegate` are listed; try the three inputs in `references/examples.md`.
 
 # Handover — 2026-09-14
 
