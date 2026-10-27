@@ -40,7 +40,7 @@ needs your approval.
 ```bash
 herdr --version                 # 0.9.x
 herdr integration status        # pi: current, omp: current
-ls ~/.omp/agent/skills          # herdr  herdr-delegate
+ls ~/.omp/agent/skills          # herdr  herdr-delegate  prompt-forge ...
 ```
 
 Inside pi, the prompts show up as `/plan`, `/execute`, `/superagent`, … and

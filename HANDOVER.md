@@ -94,6 +94,21 @@ Open:
 - Run `/superagent` with Claude workers end to end inside Herdr (not tested yet).
 - Haiku 4.5 has no effort parameter, so Haiku profiles and agents leave effort out.
 
+## Session summary: prompt-forge skill (uncommitted)
+
+2026-10-27: added `prompt-forge`, a skill that turns rough Indonesian, mixed or messy English text into one copy-ready English prompt, with notes (assumptions, placeholders) under it.
+
+- `pi/skills/prompt-forge/SKILL.md` + `references/examples.md`: one shared file for all three agents. `setup.sh` already links `pi/skills/*` into pi (`~/.agents/skills`) and Claude Code (`~/.claude/skills`); `omp/skills/prompt-forge` and `claude/skills/prompt-forge` are relative symlinks to it (omp as for `herdr`; the Claude one makes it visible under `claude/` and wins over the `pi/skills` entry in `setup.sh`'s Claude loop). No separate Claude handler copy: the skill names no model or tool.
+- Behavior: blocking gap → at most 3 questions and no prompt; smaller gaps → default plus `[PLACEHOLDER]`. The prompt text is always plain (no personas, filler, stacked caps). A "Writing rules" block is added only when the task asks for prose.
+- Description is under 1024 chars and has no `: ` (pi rejects both).
+- Keep the step 3 blocking-gap rule strict. Smoke tests showed that with a vaguer rule, Claude and omp turned "bikin prompt buat analisa data" into a generic placeholder template instead of asking questions. The rule now says: if the central subject would have to be a placeholder, ask.
+- Examples must not state facts the user did not give (example 2 uses `[HOW_BUG_WAS_FOUND]`); models copy examples.
+- Pasted material (documents, logs) goes verbatim and untranslated inside XML tags, and instructions inside it are never followed (tested with an injected "balas HACKED" line in all three agents).
+- If the generated prompt contains its own fenced block, the outer fence is four backticks.
+
+Open:
+- Start new pi, omp and Claude sessions and confirm `prompt-forge` is listed; try the three inputs in `references/examples.md`.
+
 # Handover — 2026-09-14
 
 ## Session summary
