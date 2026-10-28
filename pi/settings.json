@@ -1,6 +1,6 @@
 {
   "defaultProvider": "cekat",
-  "defaultModel": "azure_ai/gpt-6-luna",
+  "defaultModel": "azure_ai/gpt-6.1-terra",
   "defaultThinkingLevel": "high",
   "theme": "alien-candy",
   "packages": [

@@ -1,13 +1,16 @@
 # Work roles — routes through the internal cekat LiteLLM gateway
 # (../models.json, $CEKAT_API_KEY) using the internal GPT-6 / GPT-6.1
 # deployments, tiered by capability like dotfiles-macos/omp's work profile:
-#   Luna  = fast/small  -> default, smol, commit (everyday driver, cheap roles)
+#   Terra = GPT-6.1 Terra -> selector, default, smol, commit, web (everyday driver, cheap roles)
 #   Sol   = deep/large   -> slow, plan, task (GPT-6.1 Sol; thinking-heavy work)
+#   (Terra and Sol reject effort "off"; smol/commit and the selector use low —
+#   see models.json; low keeps per-prompt classification under selectorTimeoutMs)
+#   gpt-6-luna is no longer served to the cekat key (403), so no role uses it.
 #
 # Deploy with `pi-roles work-default` (dotfiles-macos/pi/scripts/pi-roles), not a
 # symlink — see that script and OPERATIONS.md. Run /reload afterwards.
 #
-# `web` role uses Luna at high effort (explicit: pi-model-roles has no
+# `web` role uses Terra at high effort (explicit: pi-model-roles has no
 # layering, so this file is the entire role set while active).
 version: 1
 enabled: true
@@ -16,13 +19,13 @@ selectorContext: conversation
 selector:
   model:
     provider: cekat
-    id: azure_ai/gpt-6-luna
-  effort: high
+    id: azure_ai/gpt-6.1-terra
+  effort: low
 roles:
   default:
     model:
       provider: cekat
-      id: azure_ai/gpt-6-luna
+      id: azure_ai/gpt-6.1-terra
     effort: high
   smol:
     description: >-
@@ -31,8 +34,8 @@ roles:
       one-line fixes, short factual questions.
     model:
       provider: cekat
-      id: azure_ai/gpt-6-luna
-    effort: off
+      id: azure_ai/gpt-6.1-terra
+    effort: low
   slow:
     description: >-
       Use for hard, ambiguous, or high-risk problems that need deep
@@ -58,8 +61,8 @@ roles:
       requested.
     model:
       provider: cekat
-      id: azure_ai/gpt-6-luna
-    effort: off
+      id: azure_ai/gpt-6.1-terra
+    effort: low
   task:
     description: >-
       Use for ordinary delegated implementation work with a clear,
@@ -75,5 +78,5 @@ roles:
       from the web rather than editing code.
     model:
       provider: cekat
-      id: azure_ai/gpt-6-luna
+      id: azure_ai/gpt-6.1-terra
     effort: high

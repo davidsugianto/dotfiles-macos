@@ -20,10 +20,11 @@ Two kinds of model sets exist:
 - **Anthropic sets** (Claude Code and omp only; pi has none) use your Claude OAuth
   login (`/login`), never the cekat gateway.
 - **Work sets** (`work-cekatai-*`) route through the internal cekat LiteLLM
-  gateway (`$CEKAT_API_KEY`) to GPT-6 Luna (fast) and GPT-6.1 Sol (deep).
+  gateway (`$CEKAT_API_KEY`) to GPT-6.1 Terra (fast/everyday) and GPT-6.1 Sol
+  (deep). GPT-6 Luna is no longer served to the key (403).
 
 Names used below: Haiku = `claude-haiku-4-5` (Claude Code and the omp edith profiles use `claude-haiku-5-5`), Sonnet = `claude-sonnet-5-5`, Opus = `claude-opus-5-5`,
-Luna = `azure_ai/gpt-6-luna`, Sol = `azure_ai/gpt-6.1-sol`. Effort is shown
+Luna = `azure_ai/gpt-6-luna` (withdrawn, unused), Sol = `azure_ai/gpt-6.1-sol`, Terra = `azure_ai/gpt-6.1-terra`. Effort is shown
 after the model; `-` means none is set.
 
 ## Claude Code
@@ -33,8 +34,8 @@ Role subagents in `claude/model-roles/<set>/*.md`. All models carry the `[1m]`
 
 | Role | `edith-default` (alias `default`) | `edith-superpower` (alias `personal`) | `work-cekatai-default` (alias `work-default`) | `work-cekatai-superpower` (alias `work-superpower`) |
 |---|---|---|---|---|
-| smol | Sonnet, high | Opus, medium | Luna | Luna, high |
-| commit | Haiku 5.5, high | Haiku 5.5, high | Luna | Luna |
+| smol | Sonnet, high | Opus, medium | Terra | Terra, high |
+| commit | Haiku 5.5, high | Haiku 5.5, high | Terra | Terra |
 | task | Sonnet, high | Sonnet, high | Sol | Sol |
 | plan | Opus, high | Opus, high | Sol, high | Sol, high |
 | slow | Opus, high | Opus, high | Sol, high | Sol, high |
@@ -50,8 +51,8 @@ Session overlays (`claude/profiles/*.json`, applied at launch with
 | `plan`, `slow` | Opus, high |
 | `task` | Sonnet, medium |
 | `smol`, `commit`, `web` | Haiku 5.5, high |
-| `work-cekatai-default` | Luna (Sonnet/Opus/Haiku tiers map to Luna/Sol/Luna) |
-| `work-cekatai-superpower` | Sol (Sonnet/Opus/Haiku tiers map to Sol/Sol/Luna) |
+| `work-cekatai-default` | Terra (Sonnet/Opus/Haiku tiers map to Terra/Sol/Terra) |
+| `work-cekatai-superpower` | Sol (Sonnet/Opus/Haiku tiers map to Sol/Sol/Terra) |
 
 Switching:
 
@@ -69,22 +70,26 @@ active role set does not match the profile.
 ## pi
 
 Role sets in `pi/model-roles/*.yaml` (the pi-model-roles extension). Pi's
-startup default model is Luna (`settings.json`) and is independent of the role
-set. Luna reports no thinking levels, so effort on Luna is effectively off.
+startup default model is Terra at `high` effort (`settings.json`:
+`defaultModel`, `defaultThinkingLevel`; Terra supports thinking) and is
+independent of the role set. The `selector` is the routing classifier model;
+Terra rejects effort `off`, so the former `off` roles use `low`; the selector
+also uses `low` so per-prompt classification stays under `selectorTimeoutMs`.
 
 | Role | `work-cekatai-default` (alias `work-default`) | `work-cekatai-superpower` (alias `work-superpower`) |
 |---|---|---|
-| default | Luna, high | Sol, off |
-| smol | Luna, off | Luna, high |
-| commit | Luna, off | Luna, off |
-| task | Sol, off | Sol, off |
+| selector | Terra, low | Terra, low |
+| default | Terra, high | Sol, medium |
+| smol | Terra, low | Terra, high |
+| commit | Terra, low | Terra, low |
+| task | Sol, low | Sol, low |
 | plan | Sol, high | Sol, high |
 | slow | Sol, high | Sol, high |
-| web | Luna, high | Luna, high |
+| web | Terra, high | Terra, high |
 
 Account/identity profiles (`pi/profiles/*.json`, pi-profile `/profile <name>`)
 set a session model: one per role (`smol`, `commit`, `task`, `plan`, `slow`,
-`web`), plus `work-cekatai-default` (Luna) and `work-cekatai-superpower` (Sol).
+`web`), plus `work-cekatai-default` (Terra) and `work-cekatai-superpower` (Sol).
 `pi/profiles/.active` is runtime state and is git-ignored. pi has no Anthropic
 sets; use omp or Claude Code for those.
 
@@ -108,17 +113,18 @@ model has no suffix.
 
 | Role | `config.yml` (global) | `edith-default` | `edith-superpower` | `work-cekatai-default` | `work-cekatai-superpower` |
 |---|---|---|---|---|---|
-| default | Sonnet, auto | Sonnet, auto | Opus, auto | Luna, auto | Sol, auto |
-| smol | Haiku, auto | Sonnet, auto | Sonnet, auto | Luna, auto | Luna, auto |
-| commit | Haiku, auto | Haiku 5.5, auto | Haiku 5.5, auto | Luna, auto | Luna, auto |
+| default | Sonnet, auto | Sonnet, auto | Opus, auto | Terra, auto | Sol, auto |
+| smol | Haiku, auto | Sonnet, auto | Sonnet, auto | Terra, auto | Terra, auto |
+| commit | Haiku, auto | Haiku 5.5, auto | Haiku 5.5, auto | Terra, auto | Terra, auto |
 | task | Sonnet, auto | Sonnet, auto | Opus, auto | Sol, auto | Sol, auto |
 | plan | Opus, high | Opus, auto | Opus, auto | Sol, auto | Sol, auto |
 | slow | Opus, high | Opus, auto | Opus, auto | Sol, auto | Sol, auto |
-| web | Haiku, auto | Sonnet, auto | Sonnet, auto | Luna, auto | Sol, auto |
+| web | Haiku, auto | Sonnet, auto | Sonnet, auto | Terra, auto | Sol, auto |
 
 omp has no alias layer: switch in-session with `/profile <name>` (the
 omp-model-profiles plugin). A profile that omits a role falls back to the
-global role.
+global role. `config.yml` `retry.fallbackChains` has `web` -> [Sol, Terra] and a
+chain `cekat/azure_ai/gpt-6-luna` -> [Terra] for leftover Luna requests.
 
 ## Cross-tool differences
 
@@ -134,8 +140,9 @@ global role.
 - **Where each is applied.** Claude Code and pi apply role sets to subagents and
   Herdr workers; omp applies them to its own role routing.
 - **Gateway quirk.** The cekat gateway rejects tool calls on
-  `/v1/chat/completions` for Luna and Sol, so both are routed via
-  `api: openai-responses` in `pi/models.json` and `omp/models.yml`. See the
+  `/v1/chat/completions` for Luna (since withdrawn) and Sol, so both (and Terra,
+  by assumption) are routed via `api: openai-responses` in `pi/models.json` and
+  `omp/models.yml`. See the
   "Cekat model tool-call routing" section in `README.md`.
 
 ## Older model ids kept on purpose

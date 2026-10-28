@@ -45,7 +45,7 @@ internal cekat gateway (see [Work gateway](#work-gateway)).
 
 ### Token limits
 
-These mirror the cekat work models in `pi/models.json` (GPT-6 Luna / 6.1
+These mirror the cekat work models in `pi/models.json` (GPT-6.1 Terra /
 Sol: 922K context, 128K output):
 
 - Sonnet 5.5 and Opus 5.5 run with the `[1m]` suffix (1M context window).
@@ -63,7 +63,7 @@ Sol: 922K context, 128K output):
 | `edith-superpower`, `plan`, `slow` | `claude-opus-5-5[1m]` | high |
 | `task` | `claude-sonnet-5-5[1m]` | medium |
 | `smol`, `commit`, `web` | `claude-haiku-5-5[1m]` | high |
-| `work-cekatai-default` | `azure_ai/gpt-6-luna[1m]` (cekat gateway; start it with `claude-work`) | — |
+| `work-cekatai-default` | `azure_ai/gpt-6.1-terra[1m]` (cekat gateway; start it with `claude-work`) | — |
 | `work-cekatai-superpower` | `azure_ai/gpt-6.1-sol[1m]` (cekat gateway; start it with `claude-work work-superpower`) | — |
 
 ```bash
@@ -75,17 +75,17 @@ ccsmol -p "rename foo"      # aliases: ccp, ccplan, ccslow, ccsmol
 ### Role sets
 
 The `work-cekatai-*` model ids carry the `[1m]` suffix in the files
-(`azure_ai/gpt-6-luna[1m]`, `azure_ai/gpt-6.1-sol[1m]`); it is stripped before
+(`azure_ai/gpt-6.1-terra[1m]`, `azure_ai/gpt-6.1-sol[1m]`); it is stripped before
 the request (see [Work gateway](#work-gateway)). Full cross-tool summary: [model-profiles.md](model-profiles.md).
 
 | Role | `edith-default` set | `edith-superpower` set | `work-cekatai-default` set | `work-cekatai-superpower` set |
 |---|---|---|---|---|
-| smol | sonnet-5-5 / high | opus-5-5 / medium | Luna (`azure_ai/gpt-6-luna`) | Luna / high |
+| smol | sonnet-5-5 / high | opus-5-5 / medium | Terra (`azure_ai/gpt-6.1-terra`) | Terra / high |
 | slow | opus-5-5 / high | opus-5-5 / high | Sol (`azure_ai/gpt-6.1-sol`) / high | Sol / high |
 | plan | opus-5-5 / high (read-only tools) | opus-5-5 / high (read-only tools) | Sol / high (read-only tools) | Sol / high (read-only tools) |
-| commit | haiku-5-5 / high | haiku-5-5 / high | Luna | Luna |
+| commit | haiku-5-5 / high | haiku-5-5 / high | Terra | Terra |
 | task | sonnet-5-5 / high | sonnet-5-5 / high | Sol | Sol |
-| web | sonnet-5-5 / high | sonnet-5-5 / high | none (not mirrored from pi; the pi work sets have a Luna `web` role) | none |
+| web | sonnet-5-5 / high | sonnet-5-5 / high | none (not mirrored from pi; the pi work sets have a Terra `web` role) | none |
 
 All Anthropic role-set model ids carry the `[1m]` suffix. Role-set `commit` and the
 `smol`, `commit` and `web` profile overlays all use Haiku 5.5 at high effort.
@@ -117,13 +117,13 @@ The `work-cekatai-default` role set and profile route a Claude Code session
 through the internal cekat LiteLLM gateway (`https://llm.cekat.id`) instead of
 Anthropic. Claude Code talks the Anthropic Messages API, which the gateway's
 LiteLLM `/v1/messages` route serves. Verified 2026-10-11: plain and tool-use
-calls work on both Luna and Sol, and a `claude-work -p` session ran a file read.
+calls work on both Luna and Sol (before Luna was withdrawn), and a `claude-work -p` session ran a file read.
 
 - `claude/model-roles/work-cekatai-default/{commit,plan,slow,smol,task}.md`:
-  Luna for smol/commit, Sol for slow/plan/task. No `web` role.
+  Terra for smol/commit, Sol for slow/plan/task. No `web` role.
 - `claude/profiles/work-cekatai-default.json`: a `--settings` overlay that sets
-  `ANTHROPIC_BASE_URL`, the model (Luna) and the Sonnet/Opus/Haiku default-model
-  vars (mapped to Luna/Sol/Luna). It holds no secrets.
+  `ANTHROPIC_BASE_URL`, the model (Terra) and the Sonnet/Opus/Haiku default-model
+  vars (mapped to Terra/Sol/Terra). It holds no secrets.
 - `claude/scripts/claude-work` (linked to `~/.local/bin/claude-work` by
   `setup.sh`): requires `$CEKAT_API_KEY` (from `~/.zshrc.local`), exports it as
   `ANTHROPIC_AUTH_TOKEN` and runs

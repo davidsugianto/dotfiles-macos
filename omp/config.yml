@@ -28,7 +28,11 @@ retry:
   fallbackChains:
     web:
       - cekat/azure_ai/gpt-6.1-sol
-      - cekat/azure_ai/gpt-6-luna
+      - cekat/azure_ai/gpt-6.1-terra
+    # gpt-6-luna is no longer served to the cekat key (403): send any leftover
+    # Luna request (old sessions, manual picks) to Terra.
+    cekat/azure_ai/gpt-6-luna:
+      - cekat/azure_ai/gpt-6.1-terra
 extendedContext: true
 dev:
   autoqaConsent: granted

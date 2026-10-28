@@ -1,7 +1,7 @@
 ---
 name: smol
 description: "Use for small, well-specified, low-risk edits or lookups with an explicit outcome and no design decision — typos, renames, formatting, one-line fixes, short factual questions."
-model: azure_ai/gpt-6-luna[1m]
+model: azure_ai/gpt-6.1-terra[1m]
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 

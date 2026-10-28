@@ -251,6 +251,42 @@ work profiles still fall back to the global `web` role. Redeploy with
 `pi-roles work-default` / `pi-roles work-superpower` + `/reload`. Not live-tested
 against the gateway.
 
+## 2026-10-28: gpt-6.1-terra as the work-cekatai-default default role
+
+Added `azure_ai/gpt-6.1-terra` (`api: openai-responses`) to `pi/models.json` and
+`omp/models.yml`. Cost comes from the gateway `/model/info` (input 2, output 7.5,
+cacheRead 0.1, cacheWrite 2.5 per 1M). The gateway reports no context or output
+limits, so `contextWindow` 922000 / `maxTokens` 128000 (and pi's
+`thinkingLevelMap`) are copied from `gpt-6.1-sol` and unverified. The
+`work-cekatai-default` `default` role now uses Terra in pi (`effort: high`,
+`pi/model-roles/`) and omp (`:auto`, `omp/model-profiles/`). Unchanged: pi's
+`pi/profiles/work-cekatai-default.json` session model and `settings.json`
+`defaultModel` (both still Luna), the pi role selector (Luna), and Claude Code.
+Redeployed pi roles with `pi-roles work-default` (`/reload` open pi sessions).
+Not live-tested against the gateway.
+
+## 2026-10-28: gpt-6-luna withdrawn from the cekat key; Terra replaces it
+
+The gateway started returning 403 for `azure_ai/gpt-6-luna` ("not available for this API key");
+the key's `/v1/models` now lists only `gpt-5.6-luna`, `gpt-5.6-terra`, `gpt-6.1-sol` and
+`gpt-6.1-terra`. Every live Luna use moved to `azure_ai/gpt-6.1-terra`:
+- pi: both work role sets (selector, smol, commit, web; former `off` effort -> `low`, since
+  Terra rejects `off`; the selector drops from `high` to `low` because Terra really thinks,
+  unlike Luna, and classification runs per prompt under the 8 s `selectorTimeoutMs`),
+  `settings.json` `defaultModel`, `pi/profiles/work-cekatai-default.json`.
+  Tests updated first (`pi/tests/settings-defaults.sh`, `pi/tests/pi-worker-model.sh`).
+- omp: work profiles (smol, commit, web), `config.yml` `retry.fallbackChains.web` -> [Sol, Terra],
+  plus a new `cekat/azure_ai/gpt-6-luna` -> [Terra] chain for leftover Luna requests.
+- Claude Code: work-cekatai-* `smol`/`commit` agents and the Haiku/small-fast (and default-set
+  Sonnet/main) model vars in `claude/profiles/`.
+- opencode: the cekat model list swaps Luna for `gpt-6.1-terra`. It reaches cekat via
+  `@ai-sdk/openai-compatible` (`/v1/chat/completions`), which the gateway rejects for tool calls
+  on the GPT-6 models, so Terra/Sol tool calls likely fail there. Config left as is; nothing
+  selects them by default.
+The Luna catalog entries stay in `pi/models.json` / `omp/models.yml` (the omp fallback key needs
+it). Terra costs more than Luna (output $7.5 vs $0.75 per 1M). Redeployed pi roles with
+`pi-roles work-default`; restart `claude-work` sessions and `/reload` pi. Not live-tested.
+
 ## Repo structure notes (for a fresh session with no memory)
 
 - `setup.sh` — base install (Homebrew, taps, general CLI + GUI apps/fonts,

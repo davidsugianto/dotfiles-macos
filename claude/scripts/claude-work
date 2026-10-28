@@ -6,7 +6,7 @@
 # ~/.claude/profiles/work-cekatai-default.json (linked from ../profiles/) on top
 # of ~/.claude/settings.json via `claude --settings`, for this session only. The
 # profile points ANTHROPIC_BASE_URL at the LiteLLM gateway and maps the
-# sonnet/opus/haiku tiers to the gateway's GPT-6 Luna / GPT-6.1 Sol deployments.
+# sonnet/opus/haiku tiers to the gateway's GPT-6.1 Terra / GPT-6.1 Sol deployments.
 # The gateway key comes from $CEKAT_API_KEY (never stored in the profile) and is
 # passed to Claude Code as ANTHROPIC_AUTH_TOKEN.
 #

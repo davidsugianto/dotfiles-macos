@@ -47,6 +47,16 @@
           "cost": { "input": 2, "output": 10, "cacheRead": 0.1, "cacheWrite": 2.5 }
         },
         {
+          "id": "azure_ai/gpt-6.1-terra",
+          "name": "GPT-6.1 Terra",
+          "api": "openai-responses",
+          "reasoning": true,
+          "thinkingLevelMap": { "off": null, "minimal": null },
+          "contextWindow": 922000,
+          "maxTokens": 128000,
+          "cost": { "input": 2, "output": 7.5, "cacheRead": 0.1, "cacheWrite": 2.5 }
+        },
+        {
           "id": "azure_ai/kimi-k2.6",
           "name": "Kimi K2.6",
           "contextWindow": 262144,

@@ -1,7 +1,8 @@
 # Work profile — routes through the internal cekat LiteLLM gateway
 # deployments, tiered by capability like the Anthropic profile:
-#   Luna  = fast/small  -> default, smol, commit, web (primary agent and high-volume roles)
+#   Terra = GPT-6.1 Terra -> default, smol, commit, web (primary agent and high-volume roles)
 #   Sol   = deep/large   -> slow, plan, task (thinking-heavy and implementation work)
+#   gpt-6-luna is no longer served to the cekat key (403), so no role uses it.
 # Every role runs at `:auto` effort.
 # The Cekat chat-completions route (`/v1/chat/completions`) rejects tool
 # calls whenever any reasoning_effort value is present for gpt-6-luna/sol —
@@ -9,14 +10,14 @@
 # field, so client-side `compat.supportsReasoningEffort: false` (or forcing
 # reasoning_effort to "none") does NOT help. The real fix lives in
 # models.yml: `api: openai-responses` on the azure_ai/gpt-6-luna and the
-# azure_ai/gpt-6-sol / gpt-6.1-sol entries, routing those models through
+# azure_ai/gpt-6-sol / gpt-6.1-sol / gpt-6.1-terra entries, routing those models through
 # `/v1/responses` instead, which has no such restriction.
 # Switch to this with `/profile work-cekatai-default`.
 modelRoles:
-  default: cekat/azure_ai/gpt-6-luna:auto
-  smol: cekat/azure_ai/gpt-6-luna:auto
+  default: cekat/azure_ai/gpt-6.1-terra:auto
+  smol: cekat/azure_ai/gpt-6.1-terra:auto
   slow: cekat/azure_ai/gpt-6.1-sol:auto
   plan: cekat/azure_ai/gpt-6.1-sol:auto
-  commit: cekat/azure_ai/gpt-6-luna:auto
+  commit: cekat/azure_ai/gpt-6.1-terra:auto
   task: cekat/azure_ai/gpt-6.1-sol:auto
-  web: cekat/azure_ai/gpt-6-luna:auto
+  web: cekat/azure_ai/gpt-6.1-terra:auto

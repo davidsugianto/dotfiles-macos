@@ -63,15 +63,20 @@ rc=0
 check "no args exits 2" "2" "$rc"
 
 work="$repo_root/pi/model-roles/work-cekatai-default.yaml"
+check "work default" "cekat azure_ai/gpt-6.1-terra high" "$(run "$work" default)"
+check "work smol" "cekat azure_ai/gpt-6.1-terra low" "$(run "$work" smol)"
+check "work commit" "cekat azure_ai/gpt-6.1-terra low" "$(run "$work" commit)"
 check "work task" "cekat azure_ai/gpt-6.1-sol low" "$(run "$work" task)"
 check "work slow" "cekat azure_ai/gpt-6.1-sol high" "$(run "$work" slow)"
+check "work web" "cekat azure_ai/gpt-6.1-terra high" "$(run "$work" web)"
 
 sp="$repo_root/pi/model-roles/work-cekatai-superpower.yaml"
 check "superpower default" "cekat azure_ai/gpt-6.1-sol medium" "$(run "$sp" default)"
-check "superpower smol" "cekat azure_ai/gpt-6-luna high" "$(run "$sp" smol)"
-check "superpower commit" "cekat azure_ai/gpt-6-luna off" "$(run "$sp" commit)"
+check "superpower smol" "cekat azure_ai/gpt-6.1-terra high" "$(run "$sp" smol)"
+check "superpower commit" "cekat azure_ai/gpt-6.1-terra low" "$(run "$sp" commit)"
 check "superpower slow" "cekat azure_ai/gpt-6.1-sol high" "$(run "$sp" slow)"
 check "superpower plan" "cekat azure_ai/gpt-6.1-sol high" "$(run "$sp" plan)"
 check "superpower task" "cekat azure_ai/gpt-6.1-sol low" "$(run "$sp" task)"
+check "superpower web" "cekat azure_ai/gpt-6.1-terra high" "$(run "$sp" web)"
 
 exit "$fail"

@@ -113,10 +113,10 @@ not commit. Next: [Step 5](#step-5-review).
 1. **Slice table.** The orchestrator prints one row per worker:
 
    ```text
-   | Worker | Role | Model                          | Owned files              | Goal             | Validation         |
-   |--------|------|--------------------------------|--------------------------|------------------|--------------------|
-   | 1      | task | cekat/azure_ai/gpt-6.1-sol off | src/server/health.ts ... | /health endpoint | npm test -- health |
-   | 2      | smol | cekat/azure_ai/gpt-6-luna off  | src/ui/StatusBadge.tsx … | status badge     | npm test -- Badge  |
+   | Worker | Role | Model                            | Owned files              | Goal             | Validation         |
+   |--------|------|----------------------------------|--------------------------|------------------|--------------------|
+   | 1      | task | cekat/azure_ai/gpt-6.1-sol low   | src/server/health.ts ... | /health endpoint | npm test -- health |
+   | 2      | smol | cekat/azure_ai/gpt-6.1-terra low | src/ui/StatusBadge.tsx … | status badge     | npm test -- Badge  |
    ```
 
    Check that no file appears in two rows and that each validation command is

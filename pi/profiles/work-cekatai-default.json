@@ -1,7 +1,7 @@
 {
   "name": "work-cekatai-default",
   "label": "🏢 Work (cekat gateway)",
-  "description": "Office LiteLLM gateway (cekat) — internal GPT-6 Luna deployment, matches the work-cekatai-default model-roles set.",
-  "model": { "provider": "cekat", "model": "azure_ai/gpt-6-luna" },
+  "description": "Office LiteLLM gateway (cekat) — internal GPT-6.1 Terra deployment, matches the work-cekatai-default model-roles set's default role.",
+  "model": { "provider": "cekat", "model": "azure_ai/gpt-6.1-terra" },
   "sessionName": "Work"
 }
