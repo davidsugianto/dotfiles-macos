@@ -67,6 +67,9 @@ fi
 # is accepted only when it is the checker's sole error, the core's description
 # is pi-invalid and the handler's is valid.
 desc_of() { grep -m1 '^description: ' "$1" | cut -c14- || true; }
+# The checker only sees that the AGENT_SELECTION_FILE row exists; the file it
+# names must exist too, or every subagent tier lookup in that handler fails.
+sel_of() { grep -m1 '^| `AGENT_SELECTION_FILE` |' "$1" | cut -d'|' -f3 | sed 's/^ *`//; s/` *$//' || true; }
 pi_invalid() { (( ${#1} > 1024 )) || [[ "$1" == *": "* ]]; }
 desc_shortened_only() { # checker-output core-md handler-md
   [[ "$(grep -c '^ERROR' <<<"$1")" == 1 ]] && grep -q '^ERROR: description differs' <<<"$1" || return 1
@@ -89,6 +92,10 @@ for dir in "$REPO"/*/; do
       else
         echo "DRIFT    $rt/$core"; grep -E 'ERROR|WARN' <<<"$out" | sed 's/^/           /' || true; bad=1
       fi
+    fi
+    sel="$(sel_of "$handler/SKILL.md")"
+    if [[ -n "$sel" && ! -f "$sel" ]]; then
+      echo "DRIFT    $rt/$core"; echo "           AGENT_SELECTION_FILE missing: $sel"; bad=1
     fi
   done
   [[ "$(readlink -- "$HOME/.agents/skills/$core" 2>/dev/null)" == "$DOTFILES_DIR/pi/skills/$core" ]] \

@@ -23,10 +23,13 @@ check() { # name expected actual
 #   ddd  core fine, handler edited by hand              -> DRIFT
 #   eee  core contains ": ", handler clean              -> NOTE
 #   fff  core too long, handler still too long          -> DRIFT
+#   ggg  checker passes, AGENT_SELECTION_FILE is missing -> DRIFT
+#   hhh  checker passes, AGENT_SELECTION_FILE exists     -> clean
 mkdir -p "$tmp/dot/pi/scripts" "$tmp/home"
 cp "$repo_root/pi/scripts/sre-skills-sync" "$tmp/dot/pi/scripts/"
 repo="$tmp/skills"
-mkdir -p "$repo/personal-skill-generator/scripts" "$repo/aaa" "$repo/bbb" "$repo/ccc" "$repo/ddd" "$repo/eee" "$repo/fff"
+mkdir -p "$repo/personal-skill-generator/scripts" "$repo/aaa" "$repo/bbb" "$repo/ccc" "$repo/ddd" "$repo/eee" "$repo/fff" "$repo/ggg" "$repo/hhh"
+: >"$tmp/policy.md"
 git -C "$repo" init -q -b main
 cat >"$repo/personal-skill-generator/scripts/check-skill.sh" <<'CHK'
 #!/usr/bin/env bash
@@ -39,7 +42,7 @@ fi
 exit 0
 CHK
 long="$(printf 'x%.0s' $(seq 1 1100))"
-for c in aaa bbb ccc ddd eee fff; do
+for c in aaa bbb ccc ddd eee fff ggg hhh; do
   d="short"
   [[ "$c" == ccc ]] && d="$long"                  # core too long for pi, handler shortened
   [[ "$c" == ddd ]] && d="fine core description"   # core fine, handler differs
@@ -53,6 +56,8 @@ for c in aaa bbb ccc ddd eee fff; do
     [[ "$c" == ddd ]] && sed -i.bak 's/^description: .*/description: edited by hand/' "$tmp/dot/$rt/skills/$c/SKILL.md"
     [[ "$c" == eee ]] && sed -i.bak 's/^description: .*/description: Use it for incidents/' "$tmp/dot/$rt/skills/$c/SKILL.md"
     [[ "$c" == fff ]] && sed -i.bak "s/^description: .*/description: ${long}y/" "$tmp/dot/$rt/skills/$c/SKILL.md"
+    [[ "$c" == ggg ]] && printf '| `AGENT_SELECTION_FILE` | `%s` | tiers |\n' "$tmp/missing.md" >>"$tmp/dot/$rt/skills/$c/SKILL.md"
+    [[ "$c" == hhh ]] && printf '| `AGENT_SELECTION_FILE` | `%s` | tiers |\n' "$tmp/policy.md" >>"$tmp/dot/$rt/skills/$c/SKILL.md"
   done
 done
 
@@ -72,6 +77,13 @@ check "core with ': ' and clean handler is tolerated" 0 "$(grep -c 'DRIFT .*eee'
 check "core with ': ' is noted" 2 "$(grep -c 'NOTE .*eee' <<<"$out")"
 check "handler that is still too long stays drift" 2 "$(grep -c 'DRIFT .*fff' <<<"$out")"
 check "too-long handler is not noted" 0 "$(grep -c 'NOTE .*fff' <<<"$out")"
+
+# A handler's AGENT_SELECTION_FILE row must point at a file that exists; the
+# checker only sees that the row is present.
+check "missing AGENT_SELECTION_FILE is drift" 2 "$(grep -c 'DRIFT .*ggg' <<<"$out")"
+check "missing file is named" 2 "$(grep -c 'AGENT_SELECTION_FILE.*missing.md' <<<"$out")"
+check "existing AGENT_SELECTION_FILE is clean" 0 "$(grep -c 'DRIFT .*hhh' <<<"$out")"
+check "handlers without the row are not checked" 0 "$(grep -c 'DRIFT .*bbb' <<<"$out")"
 
 # An unreachable origin skips the pull instead of hanging or failing.
 git -C "$repo" remote add origin "$tmp/nowhere"

@@ -33,9 +33,13 @@ computer and this agent setup. The general instructions live in the shared core.
 4. Run every shell command for this skill from `WORKDIR`, using absolute paths,
    and write outputs under `OUTPUT_DIR` unless the core says otherwise.
 5. Resolve secrets only as described under "Secrets" below, and never print them.
-6. When the core tells you to spawn subagents, give each one the model in
-   `SUBAGENT_MODEL` (and the type in `SUBAGENT_TYPE` if the table defines one).
-   Never let a subagent inherit this skill's model unless the core says to.
+6. When the core tells you to spawn subagents, pick the tier for each one's job from
+   `AGENT_SELECTION_FILE` and pass that tier's model and effort; in pi and omp that
+   file resolves each tier from the active model roles. `SUBAGENT_MODEL` below is only
+   a pi fallback on an Anthropic session; when the roles can't be resolved otherwise,
+   ask. A row for a specific role (such as `SUBAGENT_TYPE` or a `*_SUBAGENT_MODEL`)
+   overrides the tier for that role. Never let a subagent inherit this skill's model
+   unless the core says to.
 7. Follow the core's instructions from there.
 
 ## Local variables
@@ -49,7 +53,8 @@ computer and this agent setup. The general instructions live in the shared core.
 | `PREFLIGHT_SCRIPT` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/personal-skill-generator/scripts/preflight.sh` | Script that checks branch and freshness before every run |
 | `MODEL` | `anthropic/claude-sonnet-5-5` | Model for this skill (same as frontmatter) |
 | `EFFORT` | `high` | Effort for this skill (same as frontmatter) |
-| `SUBAGENT_MODEL` | `anthropic/claude-sonnet-5` | Model passed to subagents this skill spawns, as the subagent tool accepts it |
+| `SUBAGENT_MODEL` | `anthropic/claude-sonnet-5-5` | Fallback executor model for pi on an Anthropic session, used only when the active `task` role cannot be read (see `AGENT_SELECTION_FILE`) |
+| `AGENT_SELECTION_FILE` | `/Users/davidsugianto/Artifacts/labs/src/dotfiles-macos/agent/agent-selection.md` | Model and effort for the planner, executor and scanner tiers |
 | `WORKDIR` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills` | Working directory for this skill's commands |
 | `OUTPUT_DIR` | `/Users/davidsugianto/Artifacts/labs/tmp/sre-reports/personal-skill-generator` | Where this skill writes its outputs |
 | `REPO_DIR` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills` | Root of the default skills repo: holds this generator and any skill whose subject has no route |
@@ -57,7 +62,7 @@ computer and this agent setup. The general instructions live in the shared core.
 | `SKILLS_DIR` | `/Users/davidsugianto/.agents/skills` | Directory the agent runtime reads personal skills from |
 | `DEFAULT_MODEL` | `anthropic/claude-sonnet-5-5` | Model ID given to a new skill when the user names none |
 | `DEFAULT_EFFORT` | `high` | Effort level given to a new skill when the user names none |
-| `DEFAULT_SUBAGENT_MODEL` | `anthropic/claude-sonnet-5` | Subagent model given to a new skill when the user names none, in the form the runtime's subagent tool accepts |
+| `DEFAULT_SUBAGENT_MODEL` | `anthropic/claude-sonnet-5-5` | Subagent model given to a new skill when the user names none, in the form the runtime's subagent tool accepts |
 | `DEFAULT_WORKDIR` | `/Users/davidsugianto/Artifacts/labs` | Working directory given to a new skill when the user names none |
 | `MODEL_ALIASES` | `sonnet = anthropic/claude-sonnet-5-5; opus = anthropic/claude-opus-5; haiku = anthropic/claude-haiku-4-5` | Mapping from spoken model names to model IDs |
 | `WORKSPACES_DIR` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/.workspaces` | Scratch area for test runs, outside the skills directory and git-ignored |
