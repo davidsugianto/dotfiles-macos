@@ -167,3 +167,9 @@ unset _rc
 if [[ -o interactive && -z "$TMUX" ]] && command -v fastfetch >/dev/null 2>&1; then
   fastfetch
 fi
+
+# AsyncAPI CLI Autocomplete
+
+ASYNCAPI_AC_ZSH_SETUP_PATH=/Users/davidsugianto/Library/Caches/@asyncapi/cli/autocomplete/zsh_setup && test -f $ASYNCAPI_AC_ZSH_SETUP_PATH && source $ASYNCAPI_AC_ZSH_SETUP_PATH; # asyncapi autocomplete setup
+
+
