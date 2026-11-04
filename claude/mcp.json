@@ -16,6 +16,10 @@
         "callbackPort": 3118
       },
       "_clientSecretEnv": "SLACK_MCP_CLIENT_SECRET"
+    },
+    "cloudflare": {
+      "type": "http",
+      "url": "https://mcp.cloudflare.com/mcp"
     }
   }
 }

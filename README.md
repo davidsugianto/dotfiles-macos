@@ -46,8 +46,8 @@ k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
 opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
 herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
 agent/         skills/ (skills shared as one file by Claude Code, pi and omp: herdr, herdr-delegate, prompt-forge), linked into ~/.agents/skills/ by setup.sh; agent-selection.md (planner/executor/scanner model tiers, the AGENT_SELECTION_FILE of the sre-ai-skills handlers, read by absolute path)
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (edith-default, edith-superpower, work-cekatai-default, work-cekatai-superpower) + commands/ (omp-only slash commands: /superagent via Tern) + skills/ (symlinks to the pi/skills sre handlers datadog-investigate and jira-space-keeper, plus tern-delegate), linked to ~/.omp/agent/ (incl. themes/, commands/, skills/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (work-cekatai-default, work-cekatai-superpower) + profiles/*.json + prompts/*.md (slash commands) + skills/ (sre-ai-skills handlers) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
+omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack + Cloudflare MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (edith-default, edith-superpower, work-cekatai-default, work-cekatai-superpower) + commands/ (omp-only slash commands: /superagent via Tern) + skills/ (symlinks to the pi/skills sre handlers datadog-investigate and jira-space-keeper, plus tern-delegate), linked to ~/.omp/agent/ (incl. themes/, commands/, skills/) and ~/.omp/model-profiles/
+pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack + Cloudflare MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (work-cekatai-default, work-cekatai-superpower) + profiles/*.json + prompts/*.md (slash commands) + skills/ (sre-ai-skills handlers) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
 claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{edith-default,edith-superpower,work-cekatai-default,work-cekatai-superpower}/*.md (role subagents) + profiles/*.json (`--settings` overlays, incl. `work-cekatai-default.json` for the cekat gateway) + scripts/ (claude-roles, claude-profile, claude-work) + settings.json, linked to ~/.claude/ and ~/.local/bin/
 rtk/           rtk.ts (pi + omp extension, upstream v1.0.0) + RTK.md (Claude awareness note), linked to ~/.pi/agent/extensions/, ~/.omp/agent/extensions/ and ~/.claude/
 git/           .gitconfig, .gitconfig-personal, .gitconfig-work
@@ -524,6 +524,33 @@ One-time setup:
      vars are set, and hands the secret to Claude via `MCP_CLIENT_SECRET`, which
      stores it in the keychain and not in JSON), then `/mcp` → `slack` → Authenticate.
      Claude's `oauth.callbackPort: 3118` matches the same redirect URL.
+
+## Cloudflare MCP
+
+All three agents also talk to Cloudflare's hosted API
+[MCP server](https://github.com/cloudflare/mcp)
+(`https://mcp.cloudflare.com/mcp`, Streamable HTTP) as a `cloudflare` server
+in `omp/mcp.json`, `pi/mcp-adapter.json` and `claude/mcp.json` — keep the
+three entries identical.
+
+Auth is browser OAuth with your Cloudflare login. Dynamic client registration
+is supported, so there is no app, API token or env var. At login you pick the
+account and permission scopes; if a call needs a scope you didn't grant, the
+server asks to re-authorize with it added. Tokens are stored per agent (omp:
+`agent.db`; pi and Claude Code: the macOS keychain), never in this repo.
+
+The server runs in code mode by default: the whole Cloudflare API is exposed
+through a search tool and an execute tool rather than one tool per endpoint.
+Append `?codemode=false` to the URL to disable it — change it in all three
+files.
+
+First login, once per agent:
+
+- omp: `/mcp reload`, then `/mcp reauth cloudflare` → browser → approve →
+  `/mcp test cloudflare`.
+- pi: `/reload`, then `/mcp-auth cloudflare` → browser → approve.
+- Claude Code: `claude-mcp-sync` (registers only missing servers), then
+  `/mcp` → `cloudflare` → Authenticate.
 
 ## Orca agent defaults
 

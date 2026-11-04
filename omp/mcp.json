@@ -17,6 +17,10 @@
         "clientSecret": "${SLACK_MCP_CLIENT_SECRET}",
         "redirectUri": "http://localhost:3118/callback"
       }
+    },
+    "cloudflare": {
+      "type": "http",
+      "url": "https://mcp.cloudflare.com/mcp"
     }
   }
 }
