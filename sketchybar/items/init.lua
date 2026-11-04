@@ -13,6 +13,7 @@ require("items.front_app")
 
 require("items.cpu")
 require("items.spotify")
+require("items.openbot")
 require("items.volume")
 require("items.battery")
 
