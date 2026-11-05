@@ -181,7 +181,7 @@
     "refreshInterval": 10
   },
   "effortLevel": "high",
-  "theme": "custom:catppuccin-mocha",
+  "theme": "custom:dracula",
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "autoMode": {
