@@ -182,6 +182,7 @@
   },
   "effortLevel": "high",
   "theme": "custom:dracula",
+  "switchModelsOnFlag": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "autoMode": {
@@ -211,6 +212,5 @@
       "**Org-specific CLIs**: None configured",
       "No routine under <user>/ prefix qualifiers found"
     ]
-  },
-  "switchModelsOnFlag": true
+  }
 }
