@@ -34,6 +34,7 @@ $package\
 [](bg:lavender fg:teal)\
 $time\
 [](fg:lavender)\
+$kubernetes\
 $cmd_duration\
 $line_break\
 $character"""
@@ -134,6 +135,46 @@ disabled = false
 time_format = "%R"
 style = "bg:lavender fg:crust"
 format = "[ 󰥔 $time ]($style)"
+
+# Current kubectl context, shown as the cluster name only (the last segment of
+# GKE's gke_<project>_<location>_<cluster>). The env colour is picked from the
+# project part, so the pattern is matched on the full context. Patterns are
+# anchored; the first match wins. Each style is just the env colour: the rounded
+# caps use it as foreground, the body uses it inverted (colour becomes the bg).
+[kubernetes]
+disabled = false
+symbol = "☸ "
+style = "fg:mauve"
+format = " []($style)[ $symbol$context ]($style inverted)[]($style)"
+
+[[kubernetes.contexts]] # prd — red
+context_pattern = "gke_ckt-prd-.*_(?P<cluster>[^_]+)"
+context_alias = "$cluster"
+style = "fg:red"
+
+[[kubernetes.contexts]] # cekat-main (treated as prd) — red
+context_pattern = "gke_cekatai_.*_(?P<cluster>cekat-main[^_]*)"
+context_alias = "$cluster"
+style = "fg:red"
+
+[[kubernetes.contexts]] # stg — blue
+context_pattern = "gke_ckt-stg-.*_(?P<cluster>[^_]+)"
+context_alias = "$cluster"
+style = "fg:blue"
+
+[[kubernetes.contexts]] # dev — green
+context_pattern = "gke_ckt-dev-.*_(?P<cluster>[^_]+)"
+context_alias = "$cluster"
+style = "fg:green"
+
+[[kubernetes.contexts]] # cekat-dev — green
+context_pattern = "gke_cekatai_.*_(?P<cluster>cekat-dev[^_]*)"
+context_alias = "$cluster"
+style = "fg:green"
+
+[[kubernetes.contexts]] # anything else (platform, other providers) — mauve
+context_pattern = "gke_.*_(?P<cluster>[^_]+)"
+context_alias = "$cluster"
 
 [aws]
 disabled = true
