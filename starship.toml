@@ -99,6 +99,9 @@ format = " [$duration]($style) "
 
 [nodejs]
 style = "bg:teal fg:crust"
+# Applied when the node version doesn't satisfy package.json "engines" — the
+# default ("bold red") has no bg, which breaks the powerline segment.
+not_capable_style = "bg:teal fg:crust bold"
 format = "[ $symbol($version) ]($style)"
 
 [python]
