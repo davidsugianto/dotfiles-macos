@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# sre-skills-sync — keep the sre-ai-skills cores and this repo's handlers current.
+# core-ai-skills — keep the core-ai-skills cores and this repo's handlers current.
 #
-# Cores live in the sre-ai-skills repo and are read live by every handler, so
+# Cores live in the core-ai-skills repo and are read live by every handler, so
 # a pull updates behaviour for pi, omp and Claude Code at once. What can go
 # stale is the handler (a new {{placeholder}}, a changed description) or its
 # absence (a new core). This script:
@@ -15,24 +15,27 @@
 #      not drift; any other description mismatch is drift.
 # It never edits a handler. Fix drift with /onboard-skills (or by hand).
 #
-# Usage: sre-skills-sync              pull, then check
-#        sre-skills-sync --no-pull    check only
-# Env:   SRE_SKILLS_DIR      skills repo (default ~/Artifacts/labs/src/sre-ai-skills)
-#        SRE_SKILLS_EXCLUDE  space-separated cores to ignore (default none)
+# Usage: core-ai-skills              pull, then check
+#        core-ai-skills --no-pull    check only
+# Env:   CORE_AI_SKILLS_DIR      skills repo (default ~/Artifacts/labs/src/core-ai-skills)
+#        CORE_AI_SKILLS_EXCLUDE  space-separated cores to ignore (default none)
 # Exit:  0 all consistent, 1 drift or missing handlers, 2 repo not usable
 # ==============================================================================
 set -euo pipefail
 
 DOTFILES_DIR="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/../.." &>/dev/null && pwd)"
-REPO="${SRE_SKILLS_DIR:-$HOME/Artifacts/labs/src/sre-ai-skills}"
-EXCLUDE=" ${SRE_SKILLS_EXCLUDE:-} "
+REPO="${CORE_AI_SKILLS_DIR:-$HOME/Artifacts/labs/src/core-ai-skills}"
+EXCLUDE=" ${CORE_AI_SKILLS_EXCLUDE:-} "
+# Cores that need a Claude Code-only tool (wf: the Workflow tool) get a handler
+# in claude/skills only; pi/skills and ~/.agents/skills are not checked for them.
+CLAUDE_ONLY=" wf "
 CHECKER="$REPO/personal-skill-generator/scripts/check-skill.sh"
 
 pull=1
 case "${1:-}" in
   "") ;;
   --no-pull) pull=0 ;;
-  *) echo "usage: sre-skills-sync [--no-pull]" >&2; exit 2 ;;
+  *) echo "usage: core-ai-skills [--no-pull]" >&2; exit 2 ;;
 esac
 
 [[ -d "$REPO/.git" ]] || { echo "skills repo not found: $REPO" >&2; exit 2; }
@@ -81,7 +84,9 @@ bad=0
 for dir in "$REPO"/*/; do
   core="$(basename -- "${dir%/}")"
   [[ -f "$dir/SKILL.md" && "$EXCLUDE" != *" $core "* ]] || continue
-  for rt in claude pi; do
+  runtimes="claude pi"
+  [[ "$CLAUDE_ONLY" == *" $core "* ]] && runtimes="claude"
+  for rt in $runtimes; do
     handler="$DOTFILES_DIR/$rt/skills/$core"
     if [[ ! -f "$handler/SKILL.md" ]]; then
       echo "MISSING  $rt/$core: no handler (run /onboard-skills)"; bad=1; continue
@@ -98,11 +103,11 @@ for dir in "$REPO"/*/; do
       echo "DRIFT    $rt/$core"; echo "           AGENT_SELECTION_FILE missing: $sel"; bad=1
     fi
   done
-  [[ "$(readlink -- "$HOME/.agents/skills/$core" 2>/dev/null)" == "$DOTFILES_DIR/pi/skills/$core" ]] \
+  [[ "$runtimes" == claude || "$(readlink -- "$HOME/.agents/skills/$core" 2>/dev/null)" == "$DOTFILES_DIR/pi/skills/$core" ]] \
     || { echo "LINK     ~/.agents/skills/$core is not linked to pi/skills (re-run setup.sh)"; bad=1; }
   [[ "$(readlink -- "$HOME/.claude/skills/$core" 2>/dev/null)" == "$DOTFILES_DIR/claude/skills/$core" ]] \
     || { echo "LINK     ~/.claude/skills/$core is not linked to claude/skills (re-run setup.sh)"; bad=1; }
 done
 
 (( bad )) && exit 1
-echo "all sre-ai-skills handlers consistent and linked"
+echo "all core-ai-skills handlers consistent and linked"

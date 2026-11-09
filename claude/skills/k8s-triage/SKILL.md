@@ -13,7 +13,7 @@ computer and this agent setup. The general instructions live in the shared core.
 ## How to run
 
 1. **Preflight, before anything else.** Run
-   `bash /Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/personal-skill-generator/scripts/preflight.sh /Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/k8s-triage main origin` (the values of `PREFLIGHT_SCRIPT`,
+   `bash /Users/davidsugianto/Artifacts/labs/src/core-ai-skills/personal-skill-generator/scripts/preflight.sh /Users/davidsugianto/Artifacts/labs/src/core-ai-skills/k8s-triage main origin` (the values of `PREFLIGHT_SCRIPT`,
    `CORE_DIR`, `CORE_BRANCH`, `CORE_REMOTE` below). If it prints `PREFLIGHT: ok`,
    continue. If it prints `PREFLIGHT: pause`, or the script is missing or fails to
    run, **stop**: do not read the core and do not run the skill. Say so in the
@@ -23,7 +23,7 @@ computer and this agent setup. The general instructions live in the shared core.
    the checkout (no switch, pull, stash, or reset); fixing it is the user's call.
    Then wait. If the user answers "proceed anyway", continue for this run only
    and say in your final answer that the core was not verified current.
-2. Read `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/k8s-triage/SKILL.md` in full, plus any file in that directory it tells
+2. Read `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills/k8s-triage/SKILL.md` in full, plus any file in that directory it tells
    you to read (paths in the core are relative to the core directory). If the core
    is missing, stop and tell the user the skills repo is not at that path. Do not
    improvise the skill from memory.
@@ -43,10 +43,10 @@ computer and this agent setup. The general instructions live in the shared core.
 | Variable | Value | Purpose |
 |---|---|---|
 | `SKILL_NAME` | `k8s-triage` | This skill's name |
-| `CORE_DIR` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/k8s-triage` | Where the portable core lives |
+| `CORE_DIR` | `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills/k8s-triage` | Where the portable core lives |
 | `CORE_BRANCH` | `main` | Branch the core's repo must be on |
 | `CORE_REMOTE` | `origin` | Remote the core's branch must be up to date with |
-| `PREFLIGHT_SCRIPT` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/personal-skill-generator/scripts/preflight.sh` | Script that checks branch and freshness before every run |
+| `PREFLIGHT_SCRIPT` | `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills/personal-skill-generator/scripts/preflight.sh` | Script that checks branch and freshness before every run |
 | `MODEL` | `sonnet` | Model for this skill (same as frontmatter) |
 | `EFFORT` | `high` | Effort for this skill (same as frontmatter) |
 | `SUBAGENT_MODEL` | `sonnet` | Model passed to subagents this skill spawns, as the subagent tool accepts it |

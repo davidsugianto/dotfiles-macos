@@ -26,7 +26,7 @@ check() { # name expected actual
 #   ggg  checker passes, AGENT_SELECTION_FILE is missing -> DRIFT
 #   hhh  checker passes, AGENT_SELECTION_FILE exists     -> clean
 mkdir -p "$tmp/dot/pi/scripts" "$tmp/home"
-cp "$repo_root/pi/scripts/sre-skills-sync" "$tmp/dot/pi/scripts/"
+cp "$repo_root/pi/scripts/core-ai-skills" "$tmp/dot/pi/scripts/"
 repo="$tmp/skills"
 mkdir -p "$repo/personal-skill-generator/scripts" "$repo/aaa" "$repo/bbb" "$repo/ccc" "$repo/ddd" "$repo/eee" "$repo/fff" "$repo/ggg" "$repo/hhh"
 : >"$tmp/policy.md"
@@ -61,7 +61,7 @@ for c in aaa bbb ccc ddd eee fff ggg hhh; do
   done
 done
 
-run() { HOME="$tmp/home" SRE_SKILLS_DIR="$repo" bash "$tmp/dot/pi/scripts/sre-skills-sync" "$@" 2>&1 || true; }
+run() { HOME="$tmp/home" CORE_AI_SKILLS_DIR="$repo" bash "$tmp/dot/pi/scripts/core-ai-skills" "$@" 2>&1 || true; }
 
 # A checker failure with no ERROR/WARN line must not end the run early.
 out="$(run --no-pull)"

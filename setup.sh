@@ -249,7 +249,7 @@ link "$DOTFILES_DIR/omp/mcp.json" "$HOME/.omp/agent/mcp.json"
 # `/settings` -> Appearance. Linked wholesale, same as pi/themes below.
 link "$DOTFILES_DIR/omp/themes" "$HOME/.omp/agent/themes"
 # skills/ holds omp's user skills (scanned as ~/.omp/agent/skills/*/SKILL.md,
-# non-recursive); entries symlink to the sre-ai-skills handlers in pi/skills.
+# non-recursive); entries symlink to the core-ai-skills handlers in pi/skills.
 # Skills shared by every agent (agent/skills) reach omp through ~/.agents/skills
 # instead (linked below).
 link "$DOTFILES_DIR/omp/skills" "$HOME/.omp/agent/skills"
@@ -308,7 +308,7 @@ done
 link "$DOTFILES_DIR/pi/scripts/pi-roles" "$HOME/.local/bin/pi-roles"
 # Resolve a pi Herdr worker's model from the active pi-model-roles config.
 link "$DOTFILES_DIR/pi/scripts/pi-worker-model" "$HOME/.local/bin/pi-worker-model"
-link "$DOTFILES_DIR/pi/scripts/sre-skills-sync" "$HOME/.local/bin/sre-skills-sync"
+link "$DOTFILES_DIR/pi/scripts/core-ai-skills" "$HOME/.local/bin/core-ai-skills"
 # Claude Code mirrors pi's setup: CLAUDE.md is the PI.md workflow, commands/
 # are the pi prompt templates as slash commands, profiles/ are `--settings`
 # overlays (claude-profile), and model-roles/ hold the role subagents that
@@ -506,15 +506,15 @@ for dest in "$HOME"/.claude/skills/*; do
 done
 ok "Claude Code skills linked"
 
-# sre-ai-skills cores are read live from the skills repo, so a pull updates
+# core-ai-skills cores are read live from the skills repo, so a pull updates
 # every agent. This fast-forwards that repo and checks each handler in
 # claude/skills and pi/skills against its core, reporting drift or a core
 # with no handler (fix with /onboard-skills). Informational: never fails setup.
-step "Syncing sre-ai-skills"
-if [[ -d "$HOME/Artifacts/labs/src/sre-ai-skills/.git" ]]; then
-  "$DOTFILES_DIR/pi/scripts/sre-skills-sync" || skip "sre-ai-skills handlers need attention (see above)"
+step "Syncing core-ai-skills"
+if [[ -d "$HOME/Artifacts/labs/src/core-ai-skills/.git" ]]; then
+  "$DOTFILES_DIR/pi/scripts/core-ai-skills" || skip "core-ai-skills handlers need attention (see above)"
 else
-  skip "$HOME/Artifacts/labs/src/sre-ai-skills not cloned"
+  skip "$HOME/Artifacts/labs/src/core-ai-skills not cloned"
 fi
 
 # MCP servers: Claude Code keeps user-scope servers in ~/.claude.json (runtime

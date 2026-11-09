@@ -13,7 +13,7 @@ computer and this agent setup. The general instructions live in the shared core.
 ## How to run
 
 1. **Preflight, before anything else.** Run
-   `bash /Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/personal-skill-generator/scripts/preflight.sh /Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/personal-skill-generator main origin` (the values of `PREFLIGHT_SCRIPT`,
+   `bash /Users/davidsugianto/Artifacts/labs/src/core-ai-skills/personal-skill-generator/scripts/preflight.sh /Users/davidsugianto/Artifacts/labs/src/core-ai-skills/personal-skill-generator main origin` (the values of `PREFLIGHT_SCRIPT`,
    `CORE_DIR`, `CORE_BRANCH`, `CORE_REMOTE` below). If it prints `PREFLIGHT: ok`,
    continue. If it prints `PREFLIGHT: pause`, or the script is missing or fails to
    run, **stop**: do not read the core and do not run the skill. Say so in the
@@ -23,7 +23,7 @@ computer and this agent setup. The general instructions live in the shared core.
    the checkout (no switch, pull, stash, or reset); fixing it is the user's call.
    Then wait. If the user answers "proceed anyway", continue for this run only
    and say in your final answer that the core was not verified current.
-2. Read `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/personal-skill-generator/SKILL.md` in full, plus any file in that directory it tells
+2. Read `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills/personal-skill-generator/SKILL.md` in full, plus any file in that directory it tells
    you to read (paths in the core are relative to the core directory). If the core
    is missing, stop and tell the user the skills repo is not at that path. Do not
    improvise the skill from memory.
@@ -45,25 +45,25 @@ computer and this agent setup. The general instructions live in the shared core.
 | Variable | Value | Purpose |
 |---|---|---|
 | `SKILL_NAME` | `personal-skill-generator` | This skill's name |
-| `CORE_DIR` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/personal-skill-generator` | Where the portable core lives |
+| `CORE_DIR` | `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills/personal-skill-generator` | Where the portable core lives |
 | `CORE_BRANCH` | `main` | Branch the core's repo must be on |
 | `CORE_REMOTE` | `origin` | Remote the core's branch must be up to date with |
-| `PREFLIGHT_SCRIPT` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/personal-skill-generator/scripts/preflight.sh` | Script that checks branch and freshness before every run |
+| `PREFLIGHT_SCRIPT` | `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills/personal-skill-generator/scripts/preflight.sh` | Script that checks branch and freshness before every run |
 | `MODEL` | `sonnet` | Model for this skill (same as frontmatter) |
 | `EFFORT` | `high` | Effort for this skill (same as frontmatter) |
 | `SUBAGENT_MODEL` | `sonnet` | Model passed to subagents this skill spawns, as the subagent tool accepts it |
 | `AGENT_SELECTION_FILE` | `/Users/davidsugianto/Artifacts/labs/src/dotfiles-macos/agent/agent-selection.md` | Model and effort for the planner, executor and scanner tiers |
-| `WORKDIR` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills` | Working directory for this skill's commands |
+| `WORKDIR` | `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills` | Working directory for this skill's commands |
 | `OUTPUT_DIR` | `/Users/davidsugianto/Artifacts/labs/tmp/sre-reports/personal-skill-generator` | Where this skill writes its outputs |
-| `REPO_DIR` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills` | Root of the default skills repo: holds this generator and any skill whose subject has no route |
-| `REPO_ROUTES` | `reliability, operations, kubernetes, observability, incident response, tooling = /Users/davidsugianto/Artifacts/labs/src/sre-ai-skills` | Routing from a skill's subject to the repo holding its core, as `subject = repo path` entries |
+| `REPO_DIR` | `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills` | Root of the default skills repo: holds this generator and any skill whose subject has no route |
+| `REPO_ROUTES` | `reliability, operations, kubernetes, observability, incident response, tooling = /Users/davidsugianto/Artifacts/labs/src/core-ai-skills` | Routing from a skill's subject to the repo holding its core, as `subject = repo path` entries |
 | `SKILLS_DIR` | `/Users/davidsugianto/.agents/skills` | Directory the agent runtime reads personal skills from |
 | `DEFAULT_MODEL` | `sonnet` | Model ID given to a new skill when the user names none |
 | `DEFAULT_EFFORT` | `high` | Effort level given to a new skill when the user names none |
 | `DEFAULT_SUBAGENT_MODEL` | `sonnet` | Subagent model given to a new skill when the user names none, in the form the runtime's subagent tool accepts |
 | `DEFAULT_WORKDIR` | `/Users/davidsugianto/Artifacts/labs` | Working directory given to a new skill when the user names none |
 | `MODEL_ALIASES` | `sonnet = sonnet; opus = opus; haiku = haiku` | Mapping from spoken model names to model IDs |
-| `WORKSPACES_DIR` | `/Users/davidsugianto/Artifacts/labs/src/sre-ai-skills/.workspaces` | Scratch area for test runs, outside the skills directory and git-ignored |
+| `WORKSPACES_DIR` | `/Users/davidsugianto/Artifacts/labs/src/core-ai-skills/.workspaces` | Scratch area for test runs, outside the skills directory and git-ignored |
 | `SKILL_CREATOR` | `skill-creator (the installed skill)` | Name of the installed skill-creator to delegate testing to. Skill name is the part before the parenthesis |
 | `SKILL_CREATOR_DIR` | `/Users/davidsugianto/.agents/skills/skill-creator` | Where skill-creator's scripts and eval viewer live |
 
