@@ -180,6 +180,17 @@
     "padding": 0,
     "refreshInterval": 10
   },
+  "enabledPlugins": {
+    "openbot@openbot-kit": true
+  },
+  "extraKnownMarketplaces": {
+    "openbot-kit": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/davidsugianto/Artifacts/labs/src/openbot-agent-kit/dist/claude-code"
+      }
+    }
+  },
   "effortLevel": "high",
   "theme": "custom:dracula",
   "switchModelsOnFlag": true,
