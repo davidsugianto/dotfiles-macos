@@ -93,3 +93,4 @@ Sources are commented inline: `aerospace/aerospace.toml`, `wezterm/config/keys.l
 | [docs/devops.md](docs/devops.md) | DevOps toolchain, git identity and AWS profile switching |
 | [docs/claude-workflow-guide.md](docs/claude-workflow-guide.md), [pi](docs/pi-workflow-guide.md), [omp](docs/omp-workflow-guide.md) | Step-by-step workflow guides |
 | [docs/model-profiles.md](docs/model-profiles.md), [docs/pi-prompts.md](docs/pi-prompts.md) | Model profiles and annotated prompts |
+| [docs/example-skills-cmd.md](docs/example-skills-cmd.md), [docs/prompt-skills.md](docs/prompt-skills.md) | How to invoke skills; the `prompt-forge` and `prompt-openbot` skills (rough text to a prompt, and a prompt to a command that runs an openbot-agent-kit agent) |
