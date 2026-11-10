@@ -63,7 +63,7 @@ serve() {
 }
 
 # AWS profile auto-switch by directory, mirroring git/.gitconfig's
-# includeIf identity switching (see README "git identity switching"):
+# includeIf identity switching (see docs/devops.md "git identity switching"):
 # work repos use the "cekataiofficial" SSO profile, personal repos use
 # "personal". Unset outside both trees rather than leaving a stale
 # profile active, so commands fail closed instead of silently hitting

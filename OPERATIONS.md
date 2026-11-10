@@ -281,7 +281,7 @@ resurface after a Homebrew self-update resets trust state), re-run
   Lua-style `\u{XXXX}` escapes for exactly this reason.
 - **This repo deliberately uses OpenTofu (`tofu`), never HashiCorp's
   `terraform` CLI** (BSL license — see the DevOps toolchain table in
-  README). conform.nvim's bundled `terraform_fmt` formatter hardcodes the
+  docs/devops.md). conform.nvim's bundled `terraform_fmt` formatter hardcodes the
   `terraform` binary, so `nvim/lua/plugins/formatting.lua` defines its own
   `tofu_fmt` formatter (`tofu fmt` via stdin) instead of using the bundled
   one. Anything added later that shells out to Terraform tooling should do
@@ -330,7 +330,7 @@ resurface after a Homebrew self-update resets trust state), re-run
 - **`pi-model-roles` rejects saving through a symlinked `config.yaml`**
   (its own recovery table calls out "symlinks ... may require manual
   repair before the menu can save"). That's why `pi/model-roles/*.yaml`
-  are deployed with a plain `cp` (`pi/scripts/pi-roles`, see README "pi
+  are deployed with a plain `cp` (`pi/scripts/pi-roles`, see docs/agents.md "pi
   model-role switching"), unlike every other pi/omp config in this repo,
   which is symlinked straight from the source of truth. Herdr pi workers
   read the same deployed copy through `pi/scripts/pi-worker-model`, so

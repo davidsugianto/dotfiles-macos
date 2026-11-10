@@ -143,7 +143,7 @@ chain `cekat/azure_ai/gpt-6-luna` -> [Terra] for leftover Luna requests.
   `/v1/chat/completions` for Luna (since withdrawn) and Sol, so both (and Terra,
   by assumption) are routed via `api: openai-responses` in `pi/models.json` and
   `omp/models.yml`. See the
-  "Cekat model tool-call routing" section in `README.md`.
+  "Cekat model tool-call routing" section in `docs/agents.md`.
 
 ## Older model ids kept on purpose
 

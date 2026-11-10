@@ -1,6 +1,6 @@
 # Handover — 2026-10-14 (rtk, uncommitted until reviewed)
 
-rtk-oss 1.0.0 wired into Claude Code, pi and omp by hand (see README "rtk"). Files: `rtk/{rtk.ts,RTK.md}` (verbatim upstream v1.0.0), `setup.sh` (tap, formula, 3 links), `claude/settings.json` (`PreToolUse` `Bash` -> `rtk hook claude`), `claude/CLAUDE.md` (`@RTK.md`), `.gitignore` (`rtk/.rtk-agents`).
+rtk-oss 1.0.0 wired into Claude Code, pi and omp by hand (see docs/agents.md "rtk"). Files: `rtk/{rtk.ts,RTK.md}` (verbatim upstream v1.0.0), `setup.sh` (tap, formula, 3 links), `claude/settings.json` (`PreToolUse` `Bash` -> `rtk hook claude`), `claude/CLAUDE.md` (`@RTK.md`), `.gitignore` (`rtk/.rtk-agents`).
 
 - Never run `rtk init -g` (clobbers the settings.json symlink). `rtk init -g [--agent pi|omp] --dry-run` writes nothing; pi/omp print an "ownership state" warning only because no `.rtk-agents` file exists.
 - Verified: `rtk hook claude` rewrites `git status`; this Claude session's own Bash calls appear in `rtk gain --history`.
@@ -34,7 +34,7 @@ Deferred review findings (accepted, not fixed yet):
   Server (no extra licence on Cloud; rate limits by plan, 500/h on Free). The
   only non-Rovo option is community `sooperset/mcp-atlassian` (local, API token
   or own OAuth app, no dynamic registration). Kept Rovo; revisit if needed.
-- README "Jira MCP" product list is incomplete: the server also exposes Jira
+- docs/mcp.md "Jira MCP" product list is incomplete: the server also exposes Jira
   Service Management and Bitbucket tools, not just Jira/Confluence/Compass.
   Optionally document plan rate limits.
 - Write access: scopes include `write:jira-work` and Confluence page/comment

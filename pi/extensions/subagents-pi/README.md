@@ -2,7 +2,7 @@
 
 > Vendored from [luongnv89/pi-extensions](https://github.com/luongnv89/pi-extensions/tree/main/extensions/subagents-pi)
 > (MIT) into this repo because it isn't published to npm — see
-> `dotfiles-macos/README.md`'s "pi status & subagent extensions" section for
+> `dotfiles-macos/docs/agents.md`'s "pi status & subagent extensions" section for
 > why and how it's installed (`pi install <absolute path to this directory>`,
 > not `pi install npm:subagents-pi`). Re-sync by hand from the upstream URL
 > above if it updates; nothing here pulls changes automatically.

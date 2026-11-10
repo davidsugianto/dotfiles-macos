@@ -1,607 +1,95 @@
 # dotfiles-macos
 
-A minimal, i3-style tiling workflow for macOS — without disabling SIP or
-fighting the OS's window model. One folder per tool, a single install
-script, and configs meant to be read and tweaked, not reverse-engineered.
+A minimal, i3-style tiling workflow for macOS, without disabling SIP. One
+folder per tool, one install script, and configs meant to be read and tweaked.
+Everything shares the [Catppuccin Mocha](https://catppuccin.com) palette, so
+the bar, borders, terminal and editor read as one system.
 
-Everything shares a restrained [Catppuccin Mocha](https://catppuccin.com)
-palette, so the bar, window borders, terminal, and editor all read as one
-system.
+## What's inside
 
-## Features
-
-| Tool | What it does | Why it's here |
-|---|---|---|
-| [AeroSpace](https://github.com/nikitabobko/aerospace) | i3-style tiling window manager | Real tiling on macOS without touching native Spaces or disabling SIP |
-| [JankyBorders](https://github.com/FelixKratz/JankyBorders) | Active/inactive window outlines | Makes it obvious at a glance which window is focused |
-| [SketchyBar](https://github.com/FelixKratz/SketchyBar) | Status bar, configured in Lua | Live workspace indicator wired to AeroSpace's events, plus clock/battery/wifi/volume |
-| [WezTerm](https://wezterm.org) | GPU-accelerated terminal | Fast, scriptable in Lua, tmux-style pane splitting built in |
-| [tmux](https://github.com/gpakosz/.tmux) ("Oh my tmux!") | Terminal multiplexer | Sessions that survive an SSH drop or a WezTerm restart; same vim-style pane navigation as everywhere else |
-| [Neovim](https://neovim.io) | Primary text editor | Full IDE layout (file tree, tab bar, breadcrumbs) with LSP/format/lint for Lua, Bash, C/C++, Go, Node/TS/JS, Python, YAML, JSON, and Terraform — hand-assembled via lazy.nvim, not a pre-packaged distro |
-| [Starship](https://starship.rs) | Shell prompt | Fast, minimal, easy to theme |
-| [fastfetch](https://github.com/fastfetch-cli/fastfetch) | System info on new shells | Quick at-a-glance host/CPU/memory summary, colored via the terminal's own theme |
-| [yazi](https://yazi-rs.github.io) | Terminal file manager | Fast, vim-style navigation, image previews; `y` opens it and `cd`s your shell to wherever you navigated |
-| [htop](https://htop.dev) / [btop](https://github.com/aristocratos/btop) | Process monitors | `htop` for the classic view, `btop` (aliased over `top`) for the fuller dashboard — kept both since they cover different moments |
-| [Claude Code](https://claude.com/product/claude-code) | AI coding agent CLI | `claude` in any project directory |
-| [opencode](https://opencode.ai) | AI coding agent CLI | `opencode`, an alternative agent with a different model/provider story; themed Catppuccin Mocha (transparent), matching WezTerm/Neovim/k9s (`opencode/`); also configured with a custom "cekat" provider (office LLM gateway) — its API key is read from `$CEKAT_API_KEY`, set in the git-ignored `~/.zshrc.local`, never committed |
-| [omp](https://omp.sh) | AI coding agent CLI | Another alternative agent (`omp`, aka "Oh My Pi") — subagents, plan mode, LSP/DAP wired in; installed via `can1357/tap/omp`; per-role model config (`omp/`) picks Sonnet 5.5 by default, Haiku 4.5 for smol/commit tasks, Opus 5.5 (high) for slow/plan (all Claude models via the Anthropic OAuth login, never the cekat gateway); themed Catppuccin (transparent status line), matching WezTerm/Neovim/k9s/opencode; web search tries Anthropic's native tool first (already authenticated, no extra key), then free keyless fallbacks (duckduckgo, startpage, google); also configured with the same custom "cekat" provider (office LiteLLM gateway) as opencode — `omp/models.yml`, same `$CEKAT_API_KEY` env var; [omp-model-profiles](https://github.com/rezhajulio/omp-model-profiles) plugin (installed via `omp plugin install`, needs `bun`) adds `/profile edith-default` / `/profile edith-superpower` (the Anthropic roles above, mirroring Claude Code's sets) and `/profile work-cekatai-default` (internal GPT-6.1 Terra/Sol via the cekat gateway — Terra for default/smol/commit/web, Sol for slow/plan/task) to switch the whole role set in-session — `omp/model-profiles/` |
-| [pi](https://pi.dev) | AI coding agent CLI | The minimal upstream agent `omp`/"Oh My Pi" builds on; installed via `brew install pi-coding-agent`; task-based model routing across the same default/smol/slow/plan/commit/task/web split as `omp/`, via the [pi-model-roles](https://github.com/spksoft/pi-model-roles) extension (`pi/model-roles/`, deployed with `pi-roles work-default\|work-superpower`, not symlinked — see below); Anthropic models use the `/login` OAuth subscription, never the cekat gateway; instant `/profile <name>` switching via [pi-profile](https://github.com/Eddie0521/pi-profile) (`pi/profiles/`, one profile per role plus `work-cekatai-default`/`work-cekatai-superpower`); Alien Candy by default plus ten vendored switchable themes in `pi/themes/` (eight from [pi-extensions](https://github.com/luongnv89/pi-extensions), two from [awesome-pi-themes](https://github.com/isashi/awesome-pi-themes)); also configured with the same custom "cekat" provider as opencode/omp — `pi/models.json`, same `$CEKAT_API_KEY` env var |
-| [Orca](https://www.onorca.dev) | Agent Development Environment (ADE) | Desktop app for running Claude Code/opencode/omp in parallel, each in its own isolated git worktree, with diffs viewable side by side; installed via `stablyai/orca/orca`; launch shortcut `alt+shift+r` (see [aerospace/aerospace.toml](aerospace/aerospace.toml)); default tab agent set to `omp` so new tabs use the internal "cekat" LLM gateway by default, personal Claude Code still one command away — see below |
-| git + [delta](https://dandavison.github.io/delta) | Version control, syntax-highlighted diffs | Identity/SSH key auto-switches by directory — see below |
-| zsh (no framework) | Shell | Organized, commented, no oh-my-zsh overhead — installed via Homebrew for a newer version than the one macOS ships |
-| [Obsidian](https://obsidian.md) | Knowledge base / notes | Local-first Markdown notes; launch shortcut `alt+shift+o` (see [aerospace/aerospace.toml](aerospace/aerospace.toml)) |
-
-## Repo structure
-
-```
-aerospace/     AeroSpace window manager config
-borders/       JankyBorders window outline config
-sketchybar/    SketchyBar status bar (Lua, via SbarLua)
-wezterm/       WezTerm terminal config
-tmux/          tmux.conf.local — customization layer for the vendored "Oh my tmux!"
-nvim/          Neovim config (lazy.nvim)
-fastfetch/     System info shown on new top-level shells
-yazi/          Terminal file manager config
-k9s/           k9s config.yaml + Catppuccin Mocha (transparent) skin
-opencode/      tui.json + Catppuccin Mocha (transparent) theme + opencode.json (custom provider)
-herdr/          config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
-agent/         skills/ (skills shared as one file by Claude Code, pi and omp: herdr, herdr-delegate, prompt-forge), linked into ~/.agents/skills/ by setup.sh; agent-selection.md (planner/executor/scanner model tiers, the AGENT_SELECTION_FILE of the core-ai-skills handlers, read by absolute path)
-omp/           config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack + Cloudflare MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (edith-default, edith-superpower, work-cekatai-default, work-cekatai-superpower) + commands/ (omp-only slash commands: /superagent via Tern) + skills/ (symlinks to the pi/skills sre handlers datadog-investigate and jira-space-keeper, plus tern-delegate), linked to ~/.omp/agent/ (incl. themes/, commands/, skills/) and ~/.omp/model-profiles/
-pi/            settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack + Cloudflare MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (work-cekatai-default, work-cekatai-superpower) + profiles/*.json + prompts/*.md (slash commands) + skills/ (core-ai-skills handlers) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
-claude/        Claude Code mirror of pi/: CLAUDE.md (PI.md workflow) + commands/*.md (pi prompts as slash commands) + model-roles/{edith-default,edith-superpower,work-cekatai-default,work-cekatai-superpower}/*.md (role subagents) + profiles/*.json (`--settings` overlays, incl. `work-cekatai-default.json` for the cekat gateway) + scripts/ (claude-roles, claude-profile, claude-work) + settings.json, linked to ~/.claude/ and ~/.local/bin/
-rtk/           rtk.ts (pi + omp extension, upstream v1.0.0) + RTK.md (Claude awareness note), linked to ~/.pi/agent/extensions/, ~/.omp/agent/extensions/ and ~/.claude/
-git/           .gitconfig, .gitconfig-personal, .gitconfig-work
-zsh/           aliases.zsh, functions.zsh, completions.zsh, .zshrc.local.example
-.zshrc         Shell entry point
-starship.toml  Prompt config
-setup.sh       Installs everything and symlinks configs into place
-development-tools.sh  Optional DevOps toolchain (see below) — layered on top of setup.sh
-```
-
-Each tool's folder is self-contained — open it, and everything relevant to
-that tool is inside.
-
-## Prerequisites
-
-A completely fresh Mac has neither `git` nor a compiler — both come from
-Xcode's Command Line Tools, which `git clone` below needs first:
-
-```sh
-xcode-select --install
-```
-
-This pops a GUI installer dialog — click through it (there's no silent
-flag). Already installed? `xcode-select -p` prints a path instead of
-erroring, so you can skip straight to Install.
-
-[Homebrew](https://brew.sh) is the only other thing this setup depends on,
-but there's no separate step for it — `setup.sh` checks for it and installs
-it automatically (`brew` already on PATH? it just skips ahead). Install it
-yourself first only if you'd rather review
-[Homebrew's install script](https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)
-before running it, or already manage it separately:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+| Tool | Role |
+|---|---|
+| [AeroSpace](https://github.com/nikitabobko/aerospace) | i3-style tiling window manager (no SIP changes, native Spaces untouched) |
+| [JankyBorders](https://github.com/FelixKratz/JankyBorders) | Active/inactive window outlines |
+| [SketchyBar](https://github.com/FelixKratz/SketchyBar) | Status bar in Lua, synced with AeroSpace workspaces |
+| [WezTerm](https://wezterm.org) | GPU terminal, Lua config, built-in pane splits |
+| [tmux](https://github.com/gpakosz/.tmux) | Multiplexer ("Oh my tmux!" plus a local override layer) |
+| [Neovim](https://neovim.io) | Editor on lazy.nvim, with LSP/format/lint for Lua, Bash, C/C++, Go, TS/JS, Python, YAML, JSON, Terraform |
+| [Starship](https://starship.rs) / zsh | Prompt and framework-free shell |
+| [fastfetch](https://github.com/fastfetch-cli/fastfetch), [yazi](https://yazi-rs.github.io), [htop](https://htop.dev), [btop](https://github.com/aristocratos/btop) | System info, file manager, process monitors |
+| git + [delta](https://dandavison.github.io/delta) | Identity and SSH key switch by directory ([details](docs/devops.md)) |
+| [Obsidian](https://obsidian.md) | Notes (`alt+shift+o`) |
+| Claude Code, opencode, omp, pi, [Orca](https://www.onorca.dev), [Herdr](https://herdr.dev) | AI coding agents, workflow, model roles and MCP servers ([details](docs/agents.md)) |
 
 ## Install
 
+A fresh Mac needs Xcode's Command Line Tools first (a GUI dialog, no silent
+flag). If `xcode-select -p` prints a path, skip this.
+
 ```sh
+xcode-select --install
 git clone <this-repo-url> ~/dotfiles-macos
 cd ~/dotfiles-macos
 ./setup.sh
 ```
 
-`setup.sh`:
-1. Installs Homebrew if it's missing.
-2. Installs every formula/cask this repo needs (window management stack,
-   WezTerm, Neovim, Starship, modern CLI tools, yazi, htop, fastfetch,
-   Claude Code, opencode, omp, pi, bun, Herdr, jq, Orca, a Nerd Font).
-3. Builds [SbarLua](https://github.com/FelixKratz/SbarLua), the Lua API
-   SketchyBar's config is written against, and vendors
-   [Oh my tmux!](https://github.com/gpakosz/.tmux) into
-   `~/.local/share/tmux/oh-my-tmux`.
-4. Symlinks each folder into `~/.config/<tool>` (`.zshrc`/`starship.toml`
-   to their expected locations; `omp/config.yml`+`omp/models.yml`+
-   `omp/mcp.json` to `~/.omp/agent/` and
-   `pi/settings.json`+`pi/models.json`+`pi/mcp-adapter.json` to
-   `~/.pi/agent/`, since neither agent uses an XDG config path;
-   `omp/themes/` to `~/.omp/agent/themes/`; and
-   `omp/model-profiles/`+`pi/profiles/` to `~/.omp/model-profiles/`+
-   `~/.pi/profiles/`) — existing files in the way are backed up to
-   `~/.dotfiles-backup/<timestamp>/`, never deleted.
-5. Installs the [omp-model-profiles](https://github.com/rezhajulio/omp-model-profiles)
-   plugin via `omp plugin install` (needs `bun`, tapped/installed in step 2)
- +
-   so `/profile edith-default`, `/profile edith-superpower` and `/profile work-cekatai-default` are
-   available inside omp.
-6. Installs pi's [pi-model-roles](https://github.com/spksoft/pi-model-roles),
-   [pi-profile](https://github.com/Eddie0521/pi-profile),
-   ten vendored switchable themes in `pi/themes/` (eight from
-   [pi-extensions](https://github.com/luongnv89/pi-extensions), two from
-   [awesome-pi-themes](https://github.com/isashi/awesome-pi-themes)),
-   [timestamp-pi](https://github.com/luongnv89/pi-extensions),
-   [pi-subagents](https://github.com/tintinweb/pi-subagents), and
-   [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) packages
-   via `pi install`, plus the vendored `pi/extensions/subagents-pi/` fleet
-   panel from a local path, then deploys the work-cekatai-default model-roles config
-   and runs `herdr integration install pi` / `omp` (see "Herdr superagent").
-   It also installs Node.js and Browser Relay's local CLI/service and shared
-   agent skill (see "pi model-role switching", "pi status & subagent
-   extensions", "Browser Relay for pi", and "Datadog MCP" below).
-7. Copies `zsh/.zshrc.local.example` to `~/.zshrc.local` on first run
-   (git-ignored — put machine-specific overrides there).
-8. Hides the native macOS menu bar (`defaults write NSGlobalDomain
-   _HIHideMenuBar -bool true`, no SIP involved) so SketchyBar is the only
-   bar on screen — log out/in if it's still visible afterwards.
-9. Starts AeroSpace, Borders, and SketchyBar.
+`setup.sh` is idempotent, so re-run it after pulling changes. It:
 
-It's idempotent — re-run it any time after pulling changes.
+1. Installs Homebrew if missing, then every formula and cask this repo needs.
+2. Builds [SbarLua](https://github.com/FelixKratz/SbarLua) and vendors Oh my tmux! into `~/.local/share/tmux/oh-my-tmux`.
+3. Symlinks each folder into `~/.config/<tool>`. The agents are the exception, since they don't use XDG paths: omp links into `~/.omp/agent/`, pi into `~/.pi/agent/`, Claude Code into `~/.claude/`. Existing files are backed up to `~/.dotfiles-backup/<timestamp>/`, never deleted.
+4. Installs the omp and pi plugins, extensions and themes, plus Node.js and Browser Relay. See [docs/agents.md](docs/agents.md).
+5. Copies `zsh/.zshrc.local.example` to `~/.zshrc.local` on first run. It is git-ignored, so put machine-specific overrides and secrets there.
+6. Hides the native menu bar (no SIP involved; log out and in if it's still visible), then starts AeroSpace, Borders and SketchyBar.
 
-## Optional: DevOps toolchain
+Optional DevOps toolchain (kubectl, helm, OpenTofu, gcloud, aws and more):
 
 ```sh
-./development-tools.sh
+./development-tools.sh   # run setup.sh first
 ```
 
-A separate, also-idempotent script (run `setup.sh` first) for a DevOps-flavored
-toolchain that not everyone using this repo needs:
+Neovim's Go, Node/TS/JS, Python and Terraform support needs this script's
+`go`, `node` and `python`. Without them only those language servers fail to
+install in Mason. See [docs/devops.md](docs/devops.md).
 
-| Tool | What it does |
-|---|---|
-| [VS Code](https://code.visualstudio.com) | Editor, for the times a full IDE beats Neovim |
-| [gvm](https://gvm.sh) | Go version manager — installed via its own installer (no Homebrew formula exists), `gvm install latest` to get Go itself |
-| [OpenTofu](https://opentofu.org) / [Terragrunt](https://terragrunt.gruntwork.io) | Infrastructure as code — used deliberately instead of HashiCorp's `terraform` CLI (BSL license); Neovim's Terraform formatter is wired to `tofu fmt` for the same reason |
-| [Ansible](https://www.ansible.com) | Config management (`ansible-vault` ships as a subcommand) |
-| [kubectl](https://kubernetes.io/docs/reference/kubectl/) / [kubectx](https://github.com/ahmetb/kubectx) | Kubernetes CLI + fast context/namespace switching (`kubectx`/`kubens`) |
-| [k9s](https://k9scli.io) | Terminal Kubernetes UI — themed Catppuccin Mocha (transparent), matching WezTerm/Neovim (`k9s/`) |
-| [sofka](https://sofka.rs) | Kubernetes TUI (Rust, k9s-inspired) — Flux/Argo CD built in, native incident view, themed Catppuccin Mocha, matching WezTerm/Neovim/k9s (`sofka/`); `Ctrl-T` opens a pane (a Tern block split inside Tern, else a WezTerm pane) with `kubectl`/`helm` pinned to Sofka’s active context and namespace, including from tmux sessions with stale WezTerm socket state |
-| [Helm](https://helm.sh) + [helm-diff](https://github.com/databus23/helm-diff) | Kubernetes package manager + `helm diff upgrade`/`helm diff rollback` plugin (previews changes before applying) |
-| [Freelens](https://freelens.app) | Kubernetes IDE — open-source Lens fork |
-| [lazygit](https://github.com/jesseduffield/lazygit) | Terminal git UI |
-| [jq](https://jqlang.org) / [yq](https://github.com/mikefarah/yq) | JSON / YAML processors |
-| [Google Cloud CLI](https://cloud.google.com/cli) / [AWS CLI v2](https://aws.amazon.com/cli) | `gcloud`/`gsutil`/`bq` and `aws` — `gke-gcloud-auth-plugin` is installed alongside gcloud (`kubectl` needs it to auth against GKE clusters); AWS has two SSO profiles (`cekataiofficial`/`personal`) that auto-switch by directory, same pattern as git identity — see below |
-| [Python](https://www.python.org) / [Node](https://nodejs.org) / [pnpm](https://pnpm.io) | Runtimes — `npm` ships with Node |
-| [HTTPie](https://httpie.io) | `http`/`https` CLI (friendlier curl) plus the [HTTPie for Desktop](https://httpie.io/product) GUI companion |
-| [Apidog](https://apidog.com) | API development platform — design, mock, test, and document APIs in one GUI app |
+## Repo layout
 
-`kubectl`, `yq`, `tofu`, and `aws` completions are wired into
-`zsh/completions.zsh` automatically once those binaries are on PATH — no
-extra setup.
-
-**Neovim's language coverage needs this script too.** `setup.sh` alone gets
-you LSP/format/lint for Lua, Bash, and C/C++. Go, Node/TS/JS, Python, and
-Terraform additionally need `go` (via `gvm install latest`, above), `node`,
-and `python` on PATH before Neovim can install their language servers —
-without them, Mason logs a failed install for just those servers (`:Mason`
-or `:MasonLog` to check) and everything else keeps working.
-
-## git identity switching
-
-`git/.gitconfig` uses `includeIf "gitdir:...` to load a different identity
-and SSH key depending on which directory a repo lives under, no manual
-`git config` per-repo needed:
-
-| Directory | Identity file | Used for |
-|---|---|---|
-| `~/Artifacts/labs/` | `.gitconfig-personal` | Personal repos, pushes as `davidsugianto` |
-| `~/Artifacts/work/` | `.gitconfig-work` | Work repos, rewrites `github.com/cekataiofficial/*` to SSH |
-
-Both currently share the same email/SSH key (`~/.ssh/personal.david.sugianto.pem`)
-— split `.gitconfig-work` once a separate work identity/key exists; it's a
-plain `[user]`/`[core]` block, nothing else depends on it matching personal.
-
-**Security note carried over from the original config**: `core.sshCommand`
-in both identity files sets `StrictHostKeyChecking=no`, which skips SSH host
-key verification (accepts any host key without prompting or checking
-`known_hosts`). That's weaker than the default and was already the case
-before this repo — tighten it if you'd rather have the prompt back.
-
-## AWS profile switching
-
-`zsh/functions.zsh` sets `AWS_PROFILE` automatically based on directory, via
-a `chpwd` hook — same directory split as git identity above:
-
-| Directory | AWS profile | Used for |
-|---|---|---|
-| `~/Artifacts/work/cekataiofficial/` | `cekataiofficial` | Work AWS account |
-| `~/Artifacts/labs/` | `personal` | Personal AWS account |
-
-Outside both trees `AWS_PROFILE` is unset rather than left stale, so `aws`
-commands fail closed instead of silently hitting the wrong account. Both
-profiles authenticate via AWS SSO (IAM Identity Center) — set up once per
-machine with `aws configure sso --profile cekataiofficial` and
-`aws configure sso --profile personal` (interactive; not part of `setup.sh`
-since it needs a browser login), then re-auth per session with
-`aws sso login --profile <name>` when the cached SSO token expires.
-
-## pi model-role switching
-
-`pi/` mirrors `omp/`'s modelRoles concept using two vanilla-`pi` extensions,
-since `pi` itself has no built-in role system:
-
-| Mechanism | Extension | What it does |
-|---|---|---|
-| Automatic task routing | [pi-model-roles](https://github.com/spksoft/pi-model-roles) | Classifies each submitted task and auto-picks its model/effort from `~/.pi/agent/extensions/pi-model-roles/config.yaml` — the `default`/`smol`/`slow`/`plan`/`commit`/`task`/`web` split, same tiering as `omp/config.yml` |
-| Manual identity switch | [pi-profile](https://github.com/Eddie0521/pi-profile) | `/profile <name>` inside pi — one profile per role (`pi/profiles/`) plus `work-cekatai-default`/`work-cekatai-superpower` account switches |
-
-Swapping the whole work role set (the `pi-model-roles` equivalent
-of omp's `/profile <name>`) needs a
-shell command, not a slash command: `pi-model-roles` refuses to save through
-a symlinked `config.yaml`, so `pi/model-roles/*.yaml` are copied into place
-rather than linked.
-
-```sh
-pi-roles work-default    # cekat gateway (office GPT-6.1 Terra / GPT-6.1 Sol) — work-cekatai-default
-pi-roles work-superpower # cekat gateway, Sol-heavy — work-cekatai-superpower (Sol for default/slow/plan/task, Terra for smol:high/commit/web)
+```
+aerospace/ borders/ sketchybar/   window manager, window outlines, status bar
+wezterm/ tmux/ nvim/              terminal, multiplexer, editor
+fastfetch/ yazi/ k9s/ sofka/      system info, file manager, Kubernetes TUIs
+git/ zsh/ .zshrc starship.toml    git identities, shell, prompt
+claude/ omp/ pi/ opencode/        AI agent configs
+agent/ herdr/ rtk/                shared agent skills, Herdr, rtk hooks
+docs/                             guides (see below)
+setup.sh                          install and symlink everything
+development-tools.sh              optional DevOps toolchain
 ```
 
-pi only runs the cekat (work) models; the Anthropic role sets and profiles live
-in omp and Claude Code. Pi's global startup default is
-`cekat/azure_ai/gpt-6.1-terra` at `high` effort (Terra supports thinking). This startup default is independent
-of the copied model-role set (`pi-roles work-default` / `work-superpower`). omp's `:auto`
-effort has no pi equivalent and custom roles can't `inherit`, so `:auto` maps
-to `medium`.
+Each folder is self-contained: everything for a tool lives inside it.
 
-Run `/reload` in every open `pi` session afterwards — `pi-model-roles` has
-no file watcher. `pi-roles` is a plain script (`pi/scripts/pi-roles`,
-linked to `~/.local/bin/pi-roles`), so `git diff` in this repo always shows
-exactly which role set is checked in as the machine default.
+## Keybindings
 
-## Cekat model tool-call routing
+- **AeroSpace**: `alt` is the modifier. `hjkl` moves focus, `alt+shift+hjkl` moves windows, `alt+1..9` switches workspace.
+- **WezTerm**: `ctrl+a` is the leader for pane splits and navigation, `cmd+1..9` switches tabs.
+- **tmux**: keeps `ctrl+b`, so it doesn't collide with WezTerm's leader when nested.
 
-The Cekat LiteLLM gateway rejects function-tool requests for `azure_ai/gpt-6-luna`,
-`azure_ai/gpt-6-sol`, and `azure_ai/gpt-6.1-sol` on `/v1/chat/completions`: LiteLLM
-attaches a server-side `reasoning_effort` value, even when the client omits it.
-Setting `compat.supportsReasoningEffort: false` or sending
-`reasoning_effort: "none"` does not avoid this gateway behavior. Route these
-models through the Responses API instead by setting `api: openai-responses` on
-their model entries in both `pi/models.json` and `omp/models.yml`. Keep the
-provider default as `openai-completions` for the other models. (`gpt-6.1-sol`
-and `gpt-6.1-terra` were given the same routing by assumption, not verified
-against the gateway.) `azure_ai/gpt-6-luna` is no longer served to the key
-(403); the work sets moved to `azure_ai/gpt-6.1-terra`.
-
-The pi model catalog reloads when `/model` is opened; use `/reload` in open
-sessions if needed. After changing pi model-role sets with `pi-roles work-default`
-or `pi-roles work-superpower`, run `/reload` in each open session to load the copied role
-config.
-
-## pi status & subagent extensions
-
-All from [luongnv89/pi-extensions](https://github.com/luongnv89/pi-extensions)
-(MIT):
-
-| Extension | What you get | Source |
-|---|---|---|
-| [timestamp-pi](https://github.com/luongnv89/pi-extensions/tree/main/extensions/timestamp-pi) | Timestamp under every message + a prompt-cache TTL countdown in the footer | npm |
-| [@tintinweb/pi-subagents](https://github.com/tintinweb/pi-subagents) | Orchestration engine — spawning, FleetView, the `Agent` tool | npm |
-| [statusline](pi/extensions/statusline) | Two-line footer in the Claude statusline style, fixed Catppuccin Mocha colours: repo/branch/dirty, model · thinking, cost, profile, ctx bar, CPU/MEM, roles state, MCP count | **in-repo**, loaded via `extensions` in `pi/settings.json` |
-| [subagents-pi](pi/extensions/subagents-pi) | Fleet metrics panel (context, TPS, model, thinking) per managed subagent — companion to the extension above | **vendored**, not on npm |
-
-`subagents-pi` isn't published to npm (confirmed against the npm registry,
-not just its own README, which briefly claimed otherwise) — its own
-install instructions are a local path into a clone of its monorepo. That
-doesn't survive `setup.sh`'s idempotent re-runs on its own, so the exact
-upstream `extensions/subagents-pi/` directory is vendored straight into
-this repo (`pi/extensions/subagents-pi/`, byte-identical to upstream) and
-installed as a local package: `pi install <path>`. Pi stores that as a
-path relative to `~/.pi/agent` (not to this repo's `pi/` directory, even
-though `settings.json` is symlinked there) — portable as long as
-`setup.sh` (which recomputes it) runs on every machine, not just a
-`git pull`. Re-sync the vendored copy by hand if upstream changes; nothing
-here pulls updates automatically.
-
-Toggle commands once installed: `/statusline` (in-repo footer, `pi/extensions/statusline`),
-`/timestamp-pi`, `/subagents-pi`, `/subagents-pi-refresh`.
-
-## Claude Code workflow (mirrors pi)
-
-`claude/` gives Claude Code the same workflow, prompt templates, model roles
-and model profiles as `pi/`, using Claude Code's own features. Full guide:
-[docs/claude-workflow-guide.md](docs/claude-workflow-guide.md).
-
-| pi | Claude Code |
-|---|---|
-| `PI.md` | `claude/CLAUDE.md` → `~/.claude/CLAUDE.md` |
-| `pi/prompts/*.md` | `claude/commands/*.md` → `/plan`, `/plan-deep`, `/execute`, `/superagent`, `/delegate`, `/review`, `/fix`, `/test`, `/commit`, `/do-handoff`, `/work-on-handoff`, `/handoff` |
-| pi-model-roles + `pi-roles` | role subagents `smol`/`slow`/`plan`/`commit`/`task`/`web` in `claude/model-roles/<set>/`; `claude-roles edith-default\|edith-superpower\|work-cekatai-default\|work-cekatai-superpower` (aliases `default`, `personal`, `work-default`, `work-superpower`) repoints `~/.claude/agents`; the work set has no `web` role |
-| pi-profile `/profile` | `claude-profile <name>` (`claude --settings claude/profiles/<name>.json`); aliases `ccp`, `ccplan`, `ccslow`, `ccsmol`; `claude-work` runs Claude through the cekat gateway with `profiles/work-cekatai-default.json`, or `claude-work work-superpower` for `work-cekatai-superpower.json` (needs `$CEKAT_API_KEY`) |
-
-The default setup is Anthropic-only (`/login` subscription); the opt-in
-`work-cekatai-default` role set + `claude-work` route a session through the
-internal cekat LiteLLM gateway instead (see the guide). Sonnet/Opus 5.5 run
-with 1M context (`[1m]`), and `settings.json` sets 128K max output and a
-922K auto-compact window to match the cekat work models in `pi/models.json`.
-`setup.sh` also links every shared skill (`~/.agents/skills`, which also holds
-the `agent/skills` and `pi/skills` entries) into `~/.claude/skills/` one by one, so claude.ai's `synced/` dir is left alone.
-
-## rtk (Claude Code + pi + omp)
-
-[rtk](https://github.com/rtk-ai/rtk) rewrites an agent's shell commands to
-`rtk <cmd>` (`git status` -> `rtk git status`) so the model reads condensed
-output; upstream claims 60-90% fewer tokens on common dev commands. Only
-Bash tool calls are affected, not Read/Grep/Glob.
-
-- Edition: `rtk-ai/tap/rtk-oss` (Apache-2.0 only, hooks + filters, no BUSL
-  compression engine), installed by `setup.sh`. `rtk-proxy` and `rtk claude`
-  are not used.
-- Claude Code: `claude/settings.json` has a `PreToolUse` `Bash` hook running
-  `rtk hook claude`; `claude/CLAUDE.md` ends with `@RTK.md` (`rtk/RTK.md`
-  linked to `~/.claude/RTK.md`). The hook only auto-allows a rewritten command
-  when one of your allow rules matches; otherwise Claude still prompts.
-- pi and omp share `rtk/rtk.ts` (verbatim from upstream `hooks/pi/rtk.ts` at
-  v1.0.0), linked into both `extensions/` dirs; omp loads it through its
-  pi-compat layer. The extension is fail-open and shows "RTK disabled" in the
-  status line if `rtk` is missing or older than 0.23.0.
-- **Do not run `rtk init -g`.** It rewrites `~/.claude/settings.json`
-  atomically, which can replace the repo symlink with a plain file. The hand
-  wiring above matches its layout, so `rtk init -g --dry-run` reports nothing to
-  change. To upgrade the extension, copy the new upstream file over `rtk/rtk.ts`.
-- Usage: `rtk gain` / `rtk gain --history` (savings), `rtk bypass <cmd>` (one
-  unfiltered command), `RTK_DISABLED=1` (pi/omp extension off). Telemetry is off
-  by default; leave it.
-
-## Herdr superagent (pi + omp + claude)
-
-[Herdr](https://herdr.dev) runs agents in persistent workspaces/tabs/panes and
-exposes them through the `herdr` CLI. Start `herdr`, then `pi` or `omp` in a
-pane. Step-by-step usage (plan → execute/superagent → review → fix → test →
-commit, with an end-to-end example): [docs/pi-workflow-guide.md](docs/pi-workflow-guide.md);
-every prompt annotated: [docs/pi-prompts.md](docs/pi-prompts.md).
-
-omp has its own `/superagent` that runs workers in Tern tabs instead of Herdr; see [docs/omp-workflow-guide.md](docs/omp-workflow-guide.md).
-
-| Command / file | What it does |
-|---|---|
-| `/superagent <plan>` | Slices an approved plan into file-disjoint workers, starts one pi/omp worker per tab in a new `sa-<id>` workspace, waits, re-runs validation, closes the workspace. Stops at the plan GATE first. |
-| `/delegate [constraints]` | Same, using the open `/todos` items as slices; toggles each todo after its worker is verified. |
-| `/herdr-agents` | Lists live Herdr agents. The footer shows `sa ● N working · ◐ N blocked · ✓ N ready` while workers run, with a warning when one blocks. |
-| `/todos`, `/handoff`, `/do-handoff`, `/work-on-handoff` | Session todo list; handoff docs in `~/.pi/agent/handoffs` (`/handoff` archives `status: done` ones). |
-| `agent/skills/herdr-delegate/SKILL.md` | The orchestration procedure both agents follow. Briefs/results live in `$TMPDIR/superagent/<id>/`. |
-| `agent/skills/herdr/SKILL.md` | Vendored `herdr --skill` output plus `LOCAL:` edits — re-sync after `brew upgrade herdr`. |
-
-pi workers pick their model by role (`task` default, `slow`, `smol`): the
-orchestrator runs `pi-worker-model <role>`, which reads the active `pi-roles`
-set and prints the provider, model and thinking effort to pass at start. omp
-workers and roles that don't resolve inherit `defaultModel`; a model named in
-the command wins over the role.
-
-Herdr's agent-state integrations (`~/.pi/agent/extensions/herdr-agent-state.ts`,
-`~/.omp/agent/extensions/herdr-omp-agent-state.ts`) are owned by Herdr and
-installed by `setup.sh`; don't vendor them. `notify.ts` sends OSC 777 desktop
-notifications only outside Herdr (inside, Herdr's own toasts apply).
-
-Herdr reports pi's project-trust dialog as `idle`, not `blocked`, and a
-prompt sent to it presses Enter on **Trust**. The delegate skill checks each
-worker's screen before dispatching; workers started in an already-trusted
-repo never see the dialog.
-
-## Browser Relay for pi
-
-[Browser Relay](https://github.com/reliefeai/browser-relay) lets pi work in
-existing, logged-in Google Chrome tabs using its `browser-relay` CLI and a
-skill installed at `~/.agents/skills/browser-relay` (shared with pi through
-`~/.pi/agent/skills`). `setup.sh` installs Node.js, the CLI and its macOS
-launchd service, and the skill. It is **not** a `pi install` package; no
-separate browser or API key is needed. Only the localhost relay is used;
-**do not enable Remote Relay** in the extension unless you intend to expose
-browser control through a remote service and manage its device credential.
-
-Finish the browser setup manually after running `setup.sh`:
-
-1. Run `browser-relay path` to print the unpacked Chrome extension directory.
-2. Open `chrome://extensions`, enable **Developer mode**, choose **Load
-   unpacked**, and select that directory. Approve the extension's debugger
-   access only for tabs you want the agent to control.
-3. Run `browser-relay doctor` and `browser-relay tabs` to verify that the
-   local service and extension are connected and at least one tab is attached.
-   If launchd is unavailable, run `browser-relay` in a separate terminal and
-   retry. Restart pi (or `/reload`) to load the new skill.
-
-Browser Relay can read pages and act using your logged-in browser privileges.
-Start with a read-only prompt such as "Use Browser Relay to tell me the title
-and URL of my current Chrome tab; do not navigate." Do not attach tabs with
-sensitive data unless you trust the agent with that data.
-
-## Datadog MCP
-
-omp and pi both talk to Datadog's hosted
-[MCP server](https://docs.datadoghq.com/mcp_server/setup/) (logs, metrics,
-traces, monitors, incidents, dashboards) over Streamable HTTP, defined as a
-`datadog` server in `omp/mcp.json` (→ `~/.omp/agent/mcp.json`, native omp
-MCP) and `pi/mcp-adapter.json` (→ `~/.pi/agent/mcp-adapter.json`, read by the
-[pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) package —
-pi has no built-in MCP), and `claude/mcp.json` for Claude Code. Each agent has its
-own loader, so keep the server entries identical across all three.
-
-Claude Code keeps its user-scope servers in `~/.claude.json` (runtime state,
-never linked), so `claude/mcp.json` is registered with
-`claude-mcp-sync` (`claude mcp add-json -s user`, run by `setup.sh`;
-`--force` re-adds after editing). Login: `/mcp` → server → Authenticate.
-
-Auth is browser OAuth — the same Datadog login you use in the web app
-(e.g. Google SSO); no API/application keys. Datadog supports dynamic client
-registration and accepts omp's/pi's localhost callbacks, so no org
-allow-listing is needed. Tokens are stored per agent (omp: its `agent.db`;
-pi: the macOS keychain), never in this repo, and refresh automatically.
-
-The endpoint is pinned to the org's site, US5
-(`https://mcp.us5.datadoghq.com/v1/mcp`, login at
-`us5.datadoghq.com`), directly in both files — not via an env var, so omp/pi
-launched from anywhere (Orca, an old shell) always hit the right site. For
-another site swap the host (`mcp.datadoghq.com` = US1, `mcp.us3.datadoghq.com`,
-`mcp.datadoghq.eu`, `mcp.ap1.datadoghq.com`, …) in both files and re-login.
-
-First login, once per agent:
-
-- omp: `/mcp reauth datadog` → browser opens → sign in → `/mcp test datadog`.
-- pi: `/mcp-auth datadog` (or `/mcp`, Enter on the server) → browser → sign in.
-- Claude Code: `/mcp` → `datadog` → Authenticate → browser → sign in.
-  Servers connect lazily on first tool call — the agent finds tools via
-  `mcp({ search: "logs" })`.
-
-Both agents enable all generally available toolsets with `?toolsets=all`,
-including write-capable product toolsets. Datadog permissions still control
-which actions the signed-in user can perform. To limit exposure, replace
-`all` with a comma-separated list such as `core,alerting,dashboards` in both
-files. If your org signs in through a custom subdomain, append
-`&subdomain=<name>` too.
-
-## Jira MCP
-
-All three agents also talk to Atlassian's hosted Rovo
-[MCP server](https://support.atlassian.com/atlassian-ai-gateway/docs/get-started-with-the-atlassian-remote-mcp-server/)
-(`https://mcp.atlassian.com/v1/mcp/authv2`, Streamable HTTP) as a `jira`
-server in `omp/mcp.json`, `pi/mcp-adapter.json` and `claude/mcp.json` — keep
-the three entries identical. The old `/v1/sse` endpoint is deprecated.
-
-Auth is browser OAuth 2.1 with your Atlassian Cloud login (incl. SSO). Like
-Datadog (unlike Slack) it supports dynamic client registration, so there is no
-app, client ID/secret, API token or env var. Tokens are stored per agent (omp:
-`agent.db`; pi and Claude Code: the macOS keychain), never in this repo. On
-first login you pick the Atlassian site to grant access to.
-
-The one server exposes Jira **and** Confluence and Compass tools (scopes
-include read/write:jira-work, Confluence page/comment read/write, Compass).
-There is no toolset filter like Datadog's `?toolsets=`; the signed-in user's
-Atlassian permissions bound what it can do, including writes. An org/site
-admin can disable the Rovo MCP server or restrict allowed clients/domains, and
-first-time access may need admin approval — if login fails after the browser
-step, that is the likely cause.
-
-If an agent's OAuth client can't follow RFC 9728 discovery to
-`auth.atlassian.com`, use `https://mcp.atlassian.com/v1/mcp` (legacy
-discovery, also DCR) for that agent.
-
-First login, once per agent:
-
-- omp: `/mcp reload`, then `/mcp reauth jira` → browser → approve →
-  `/mcp test jira`.
-- pi: `/reload`, then `/mcp-auth jira` → browser → approve.
-- Claude Code: `claude-mcp-sync` (registers only missing servers; no
-  `--force` needed), then `/mcp` → `jira` → Authenticate.
-
-## Slack MCP
-
-omp and pi also talk to Slack's hosted MCP server
-(`https://mcp.slack.com/mcp`: search, read channels/threads, send messages,
-canvases, lists) as a `slack` server in the same two files as Datadog
-(`omp/mcp.json`, `pi/mcp-adapter.json`, `claude/mcp.json`; keep them identical).
-
-Unlike Datadog, Slack does **not** support dynamic client registration — it
-needs a pre-registered Slack app (internal or directory-published) with a
-fixed client ID/secret. Client credentials are never committed: both files
-reference `${SLACK_MCP_CLIENT_ID}` and `${SLACK_MCP_CLIENT_SECRET}`, which you
-export in the git-ignored `~/.zshrc.local` (template in
-`zsh/.zshrc.local.example`). Tokens are stored per agent like Datadog's
-(omp: `agent.db`; pi: macOS keychain).
-
-One-time setup:
-
-1. [api.slack.com/apps](https://api.slack.com/apps) → create an app in your
-   workspace → **OAuth & Permissions**:
-   - Redirect URL: `http://localhost:3118/callback` (both agents use this
-     exact URL via `oauth.redirectUri`; only one can be mid-login at a time).
-   - **User Token Scopes** for the tools you want: `search:read.public`,
-     `search:read.private`, `search:read.mpim`, `search:read.im`,
-     `search:read.files`, `search:read.users`, `channels:history`,
-     `groups:history`, `mpim:history`, `im:history`, `channels:read`,
-     `groups:read`, `im:read`, `mpim:read`, `users:read`, `users:read.email`,
-     `chat:write`, `reactions:read`, `reactions:write`, `canvases:read`,
-     `canvases:write`, `lists:read`, `lists:write`, `files:read`,
-     `files:write`, `emoji:read`, `channels:write`, `groups:write`,
-     `im:write`, `mpim:write`. Drop write scopes for a read-only setup.
-   - Slack only allows MCP for internal or directory-published apps; a
-     workspace admin may need to approve the app.
-2. Copy Client ID/Secret (**Basic Information**) into `~/.zshrc.local` as
-   `SLACK_MCP_CLIENT_ID` / `SLACK_MCP_CLIENT_SECRET`, then `exec zsh`.
-3. Login, once per agent (restart the agent so it sees the env vars):
-   - omp: `/mcp reauth slack` → browser → approve → `/mcp test slack`.
-   - pi: `/mcp-auth slack` → browser → approve.
-   - Claude Code: `claude-mcp-sync` (it registers Slack only once the env
-     vars are set, and hands the secret to Claude via `MCP_CLIENT_SECRET`, which
-     stores it in the keychain and not in JSON), then `/mcp` → `slack` → Authenticate.
-     Claude's `oauth.callbackPort: 3118` matches the same redirect URL.
-
-## Cloudflare MCP
-
-All three agents also talk to Cloudflare's hosted API
-[MCP server](https://github.com/cloudflare/mcp)
-(`https://mcp.cloudflare.com/mcp`, Streamable HTTP) as a `cloudflare` server
-in `omp/mcp.json`, `pi/mcp-adapter.json` and `claude/mcp.json` — keep the
-three entries identical.
-
-Auth is browser OAuth with your Cloudflare login. Dynamic client registration
-is supported, so there is no app, API token or env var. At login you pick the
-account and permission scopes; if a call needs a scope you didn't grant, the
-server asks to re-authorize with it added. Tokens are stored per agent (omp:
-`agent.db`; pi and Claude Code: the macOS keychain), never in this repo.
-
-The server runs in code mode by default: the whole Cloudflare API is exposed
-through a search tool and an execute tool rather than one tool per endpoint.
-Append `?codemode=false` to the URL to disable it — change it in all three
-files.
-
-First login, once per agent:
-
-- omp: `/mcp reload`, then `/mcp reauth cloudflare` → browser → approve →
-  `/mcp test cloudflare`.
-- pi: `/reload`, then `/mcp-auth cloudflare` → browser → approve.
-- Claude Code: `claude-mcp-sync` (registers only missing servers), then
-  `/mcp` → `cloudflare` → Authenticate.
-
-## Orca agent defaults
-
-Orca has no config file of its own to track in this repo — all its settings
-live in one Electron app-state blob
-(`~/Library/Application Support/orca/profiles/local-default/orca-data.json`)
-that also holds live session/account state, so it's deliberately **not**
-symlinked here (unlike `omp/`/`opencode/`). Orca just spawns whichever CLI
-you point it at, so "multiple models" comes for free from those CLIs' own
-provider config:
-
-- `settings.defaultTuiAgent` is set to `omp`, so a new Orca tab opens omp by
-  default — which already has the "cekat" office LLM gateway wired in
-  (`omp/models.yml`, same as `opencode/opencode.json`).
-- Personal Claude Code is still available any time, just not the default:
-  `orca terminal create --worktree active --command "claude"`, or pick
-  Claude from Orca's agent picker.
-
-If Orca is reinstalled or its app data is reset, redo this by hand (with
-the Orca app quit first): flip `settings.defaultTuiAgent` from `"claude"`
-to `"omp"` in the file above.
-
-## Keybindings at a glance
-
-AeroSpace uses `alt` as the primary modifier (vim-style `hjkl` for focus,
-`alt+shift+hjkl` to move windows, `alt+1..9` for workspaces). WezTerm
-leaves `alt` alone and uses `ctrl+a` as a leader for pane splits/navigation,
-plus `cmd+1..9` for tabs. tmux keeps its default `ctrl+b` prefix (not
-`ctrl+a`) precisely so it doesn't collide with WezTerm's leader when you run
-tmux inside it. See `aerospace/aerospace.toml`, `wezterm/config/keys.lua`,
-and `tmux/tmux.conf.local` — all commented inline.
+Sources are commented inline: `aerospace/aerospace.toml`, `wezterm/config/keys.lua`, `tmux/tmux.conf.local`.
 
 ## Customizing
 
-- **Colors**: `sketchybar/colors.lua`, `borders/bordersrc`,
-  `wezterm/config/appearance.lua`, `tmux/tmux.conf.local`, and
-  `nvim/lua/plugins/colorscheme.lua` all use Catppuccin Mocha — swap the
-  flavour/hex values in one place at a time, or add a shared palette file
-  if you outgrow copy-paste. `fastfetch/config.jsonc` and `yazi/yazi.toml`
-  don't hardcode colors at all — they inherit whatever WezTerm's ANSI
-  palette is, so they follow automatically.
-- **Per-app window rules**: `aerospace/aerospace.toml`, under
-  `[[on-window-detected]]`.
-- **Bar items**: `sketchybar/items/` — one file per item, `items/init.lua`
-  controls load/render order.
-- **Neovim plugins**: `nvim/lua/plugins/` — one file per plugin or concern,
-  auto-loaded by lazy.nvim. New LSP server → `plugins/lsp.lua`'s
-  `ensure_installed`; new formatter → `plugins/formatting.lua`'s
-  `formatters_by_ft`; new linter → `plugins/linting.lua`'s `linters_by_ft`.
+- **Colors**: Catppuccin Mocha is set in `sketchybar/colors.lua`, `borders/bordersrc`, `wezterm/config/appearance.lua`, `tmux/tmux.conf.local` and `nvim/lua/plugins/colorscheme.lua`. `fastfetch` and `yazi` inherit WezTerm's ANSI palette.
+- **Window rules**: `aerospace/aerospace.toml`, under `[[on-window-detected]]`.
+- **Bar items**: `sketchybar/items/`, one file per item. `items/init.lua` sets the load order.
+- **Neovim**: `nvim/lua/plugins/`, one file per plugin, auto-loaded. Add LSP servers in `lsp.lua` (`ensure_installed`), formatters in `formatting.lua` (`formatters_by_ft`), linters in `linting.lua` (`linters_by_ft`).
 
-## Operations
+## More docs
 
-Reload commands, updating, vendored-dependency refresh, known gotchas,
-backups, and uninstalling all live in [OPERATIONS.md](OPERATIONS.md).
+| Doc | Covers |
+|---|---|
+| [OPERATIONS.md](OPERATIONS.md) | Reloading, updating, vendored dependencies, known gotchas, backups, uninstalling |
+| [docs/agents.md](docs/agents.md) | Claude Code, opencode, omp, pi: model roles, rtk, Herdr superagent, Browser Relay, Orca |
+| [docs/mcp.md](docs/mcp.md) | Datadog, Jira, Slack and Cloudflare MCP servers: setup and login |
+| [docs/devops.md](docs/devops.md) | DevOps toolchain, git identity and AWS profile switching |
+| [docs/claude-workflow-guide.md](docs/claude-workflow-guide.md), [pi](docs/pi-workflow-guide.md), [omp](docs/omp-workflow-guide.md) | Step-by-step workflow guides |
+| [docs/model-profiles.md](docs/model-profiles.md), [docs/pi-prompts.md](docs/pi-prompts.md) | Model profiles and annotated prompts |
