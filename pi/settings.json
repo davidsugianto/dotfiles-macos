@@ -2,7 +2,7 @@
   "defaultProvider": "cekat",
   "defaultModel": "azure_ai/gpt-6.1-terra",
   "defaultThinkingLevel": "high",
-  "theme": "alien-candy",
+  "theme": "petrol-peony",
   "packages": [
     "git:github.com/spksoft/pi-model-roles",
     "npm:pi-profile",
