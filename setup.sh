@@ -262,82 +262,59 @@ link "$DOTFILES_DIR/btop/themes"     "$HOME/.config/btop/themes"
 link "$DOTFILES_DIR/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 link "$DOTFILES_DIR/herdr/sounds"      "$HOME/.config/herdr/sounds"
 
-# Herdr.app owns shared.json and can overwrite external edits while running.
-# Seed only an empty Actions list, without changing its other UI state.
+# Herdr.app owns shared.json and rewrites it while running, which would drop
+# or clobber an external edit. So seed only an empty Actions list, only while the
+# app is closed. pgrep exits 1 for "no such process"; any other status (running,
+# or pgrep itself failing) counts as not safe.
+herdr_app_stopped() {
+  local rc=0
+  pgrep -x Herdr >/dev/null 2>&1 || rc=$?
+  [[ "$rc" -eq 1 ]]
+}
+
 seed_herdr_actions() {
-  local app_dir="${HERDR_APP_DIR:-$HOME/.config/herdr-app}"
-  local seed="$DOTFILES_DIR/herdr-app/actions.json" shared="$app_dir/shared.json"
-  local tmp count pgrep_status jq_status
+  local dir="${HERDR_APP_DIR:-$HOME/.config/herdr-app}"
+  local seed="$DOTFILES_DIR/herdr-app/actions.json" shared="$dir/shared.json" state tmp count
 
   step "Seeding Herdr desktop Actions"
-  if [[ ! -f "$seed" ]]; then
-    skip "Herdr Actions seed not found at $seed"
-    return 0
+  [[ -f "$seed" ]] || { skip "Herdr Actions seed not found at $seed"; return 0; }
+  command -v jq >/dev/null 2>&1 || { skip "jq is unavailable"; return 0; }
+  [[ -f "$shared" ]] || { skip "open Herdr.app once, then re-run"; return 0; }
+  herdr_app_stopped || { skip "quit Herdr.app and re-run"; return 0; }
+
+  # One verdict: set (list already has actions), empty (safe to seed), else invalid.
+  state="$(jq -r '(.["t3-actions"] // {}) as $a
+    | if (type != "object") or ($a | type != "object") or (($a.list // []) | type != "array") then "invalid"
+      elif ($a.list // []) | length > 0 then "set" else "empty" end' "$shared" 2>/dev/null)" || state=invalid
+  case "$state" in
+    empty) ;;
+    set) skip "Actions already set"; return 0 ;;
+    *) skip "shared.json is invalid or has unexpected Actions state"; return 0 ;;
+  esac
+
+  # Build next to shared.json so the final mv is an atomic rename.
+  tmp="$(mktemp "$dir/.shared-actions.XXXXXX")" || { skip "couldn't create a temporary file"; return 0; }
+  if ! jq --arg dotfiles "$DOTFILES_DIR" --slurpfile seed "$seed" '
+      ($seed[0]["t3-actions"].list) as $list
+      | if ($list | type) != "array" or ($list | any(type != "object")) then error("invalid Actions seed") else . end
+      | .["t3-actions"].list = ($list | map(
+          if (.cwd | type) == "string" then .cwd |= (split("__DOTFILES__") | join($dotfiles)) else . end))' \
+      "$shared" >"$tmp" 2>/dev/null; then
+    rm -f -- "$tmp"; skip "couldn't build the Herdr Actions state (is the seed valid?)"; return 0
   fi
-  if ! command -v jq >/dev/null 2>&1; then
-    skip "jq is unavailable"
-    return 0
-  fi
-  if [[ ! -f "$shared" ]]; then
-    skip "open Herdr.app once, then re-run"
-    return 0
-  fi
-  if ! command -v pgrep >/dev/null 2>&1; then
-    skip "pgrep is unavailable; cannot check whether Herdr.app is running"
-    return 0
-  fi
-  if pgrep -x Herdr >/dev/null 2>&1; then
-    skip "quit Herdr.app and re-run"
-    return 0
+  # Cosmetic only: under set -e a failure here must not abort the whole setup.
+  count="$(jq '.["t3-actions"].list | length' "$tmp")" || count=
+
+  # Re-check right before writing: the app may have started while we built.
+  # Not a lock, but it shrinks the window to the backup and rename below.
+  # Each seed keeps its own timestamped backup, so a re-seed never loses an earlier one.
+  if herdr_app_stopped \
+    && cp -- "$shared" "$shared.bak-before-actions-$(date +%Y%m%d-%H%M%S)" \
+    && mv -- "$tmp" "$shared"; then
+    ok "seeded ${count:+$count }Herdr Actions"
   else
-    pgrep_status=$?
-    if [[ "$pgrep_status" -ne 1 ]]; then
-      skip "couldn't check whether Herdr.app is running"
-      return 0
-    fi
+    rm -f -- "$tmp"; skip "Herdr.app started or the write failed; nothing changed, quit the app and re-run"
   fi
-  if jq -e '(.["t3-actions"].list // []) | length > 0' "$shared" >/dev/null 2>&1; then
-    skip "Actions already set"
-    return 0
-  else
-    jq_status=$?
-    if [[ "$jq_status" -ne 1 ]]; then
-      skip "couldn't read the Herdr Actions state"
-      return 0
-    fi
-  fi
-  # Do not replace malformed or unexpected state even if the list check failed.
-  if ! jq -e -s 'length == 1 and (.[0] | type == "object" and
-    ((.["t3-actions"] == null) or (.["t3-actions"] | type == "object")) and
-    ((.["t3-actions"].list == null) or (.["t3-actions"].list | type == "array")))' \
-    "$shared" >/dev/null 2>&1; then
-    skip "shared.json is invalid or has unexpected Actions state"
-    return 0
-  fi
-  if ! cp -- "$shared" "$shared.bak-before-actions"; then
-    skip "couldn't back up shared.json"
-    return 0
-  fi
-  if ! tmp="$(mktemp "$app_dir/.shared-actions.XXXXXX")"; then
-    skip "couldn't create a temporary Actions file"
-    return 0
-  fi
-  if ! jq -s --arg dotfiles "$DOTFILES_DIR" --slurpfile seed "$seed" '
-    if ($seed | length) != 1 or ($seed[0]["t3-actions"].list | type) != "array"
-      or ([$seed[0]["t3-actions"].list[] | select(type != "object")] | length) != 0
-    then error("invalid Actions seed")
-    else .[0] | .["t3-actions"].list = ($seed[0]["t3-actions"].list | map(
-      if (.cwd | type) == "string" then .cwd |= (split("__DOTFILES__") | join($dotfiles))
-      else . end))
-    end' "$shared" > "$tmp" \
-    || ! jq -e . "$tmp" >/dev/null \
-    || ! count="$(jq -e '.["t3-actions"].list | length' "$tmp")" \
-    || ! mv -- "$tmp" "$shared"; then
-    rm -f -- "$tmp" || true
-    skip "couldn't seed Herdr Actions"
-    return 0
-  fi
-  ok "seeded $count Herdr Actions"
 }
 seed_herdr_actions
 
