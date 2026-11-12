@@ -309,13 +309,31 @@ done; wait
 
 `hc send --wait` waits for the turn that this send started, so do not follow it with a standalone `hc wait`.
 
+**Not-started retry.** The paste can land in a worker's input editor without being submitted (seen intermittently with pi, with and without the Herdr status extension; the cause is unproven). `hc send` then reports `"started": false` and the text stays in the editor. For each worker whose `$RUN_DIR/$name.wait.json` has `.started == false`, press Enter once, and only if the worker's own prompt (its brief file name) is visibly sitting in the editor; otherwise do not type anything and report it. After Enter, wait for the turn to begin before the standalone `hc wait` (it returns at once while the worker is still `idle`), with the same capture:
+
+```bash
+for name in <names>; do
+  [ "$(jq -r '.started' "$RUN_DIR/$name.wait.json" 2>/dev/null)" = false ] || continue
+  if hc read "$name" --lines 30 | grep -qF "$name.brief.md"; then
+    { hc keys "$name" enter >/dev/null 2>&1
+      for _ in $(seq 30); do [ "$(hc get "$name" --json | jq -r '.status.state')" = working ] && break; sleep 0.5; done
+      hc wait "$name" --timeout 3500 --json >"$RUN_DIR/$name.wait.json" 2>"$RUN_DIR/$name.wait.err"
+      echo $? >"$RUN_DIR/$name.wait.rc"; } &
+  else
+    echo "$name: send did not start and its prompt is not in the editor; run: hc read $name --lines 60" >&2
+  fi
+done; wait
+```
+
+Retry at most once per send. If it still does not start, treat the worker as not finished (12.5).
+
 ### 12.5 Collect and resume
 
 Per worker, read `$RUN_DIR/$name.wait.json`:
 
 - `.wait.ended == true` and `.wait.status` is `idle` or `done`: the turn finished. Read `$RUN_DIR/$name.result.md`; a missing file means not done, and `status: blocked` means relay its Notes/Questions to the user.
 - `.wait.status == "blocked"`: `hc read <name> --lines 120`, relay the question to the user, do not answer for them.
-- Anything else is not a finished turn: `.wait.ended == false`, `.wait.reason` of `timeout`, `exit` or `error`, a null or unknown `.wait.status`, or a non-zero `$RUN_DIR/$name.wait.rc`. Run `hc get <name> --json` and `hc read <name> --lines 120` before anything else, report to the user what the worker did (still running, exited, or errored), and never resend the prompt blindly.
+- Anything else is not a finished turn: `.wait.ended == false`, `.wait.reason` of `timeout`, `exit` or `error`, a null or unknown `.wait.status`, `.started == false` that the 12.4 retry did not resolve, or a non-zero `$RUN_DIR/$name.wait.rc`. Run `hc get <name> --json` and `hc read <name> --lines 120` before anything else, report to the user what the worker did (still running, exited, or errored), and never resend the prompt blindly.
 
 Resuming a blocked worker:
 
