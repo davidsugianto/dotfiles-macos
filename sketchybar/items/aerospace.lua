@@ -33,7 +33,26 @@ local icon_overrides = {
   -- Tern (terminal) has no glyph either; ":eagle:" is the closest bird the
   -- font ships (a tern is a seabird).
   ["Tern"] = ":eagle:",
+  -- Herdr (desktop terminal multiplexer for agents; logo is a ram with a
+  -- shell prompt): the real logo lives in the patched app font below; if
+  -- that font isn't installed, ":terminal:" matches its role.
+  ["Herdr"] = ":terminal:",
 }
+
+-- Custom glyphs sketchybar-app-font lacks. sketchybar/tools/patch-app-font.py
+-- (run by setup.sh) injects them into a renamed copy of the font, so the
+-- Homebrew-managed one stays untouched. Use the patched family only when its
+-- file exists, otherwise labels would fall back to the system font and show
+-- the raw ":herdr:" text.
+local APP_FONT = "sketchybar-app-font"
+local PATCHED_APP_FONT = "sketchybar-app-font-custom"
+local patched_font_file = io.open(os.getenv("HOME") .. "/Library/Fonts/" .. PATCHED_APP_FONT .. ".ttf", "r")
+if patched_font_file then
+  patched_font_file:close()
+  APP_FONT = PATCHED_APP_FONT
+  icon_overrides["Herdr"] = ":herdr:"
+end
+
 for app, glyph in pairs(icon_overrides) do
   icon_map[app] = glyph
 end
@@ -53,7 +72,7 @@ for i = 1, WORKSPACE_COUNT do
     label = {
       string = "",
       drawing = false,
-      font = "sketchybar-app-font:Regular:12.0",
+      font = APP_FONT .. ":Regular:12.0",
       padding_left = 2,
       padding_right = 8,
       color = colors.text,

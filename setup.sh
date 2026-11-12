@@ -166,6 +166,41 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+# Patched app font — sketchybar-app-font plus glyphs it doesn't ship (Herdr),
+# written under a new family name so the cask's own font file stays untouched.
+# items/aerospace.lua uses it when present and falls back to the stock font.
+# Rebuilt when the cask font, an SVG or the script is newer than the output.
+# ------------------------------------------------------------------------------
+step "Building patched sketchybar-app-font (custom app glyphs)"
+STOCK_FONT="$HOME/Library/Fonts/sketchybar-app-font.ttf"
+PATCHED_FONT="$HOME/Library/Fonts/sketchybar-app-font-custom.ttf"
+FONT_TOOL="$DOTFILES_DIR/sketchybar/tools/patch-app-font.py"
+FONT_VENV="$HOME/.local/share/sketchybar/venv"
+if [[ ! -f "$STOCK_FONT" ]]; then
+  skip "stock sketchybar-app-font not found at $STOCK_FONT — Herdr will use the :terminal: icon"
+elif [[ -f "$PATCHED_FONT" && "$PATCHED_FONT" -nt "$STOCK_FONT" && "$PATCHED_FONT" -nt "$FONT_TOOL" \
+  && "$PATCHED_FONT" -nt "$DOTFILES_DIR/sketchybar/assets/herdr.svg" ]]; then
+  skip "patched font already up to date"
+else
+  # The whole chain sits in the `if` condition so a failure at any point (no
+  # python3, venv, pip, the script) takes the fallback instead of tripping
+  # `set -e` and aborting the rest of setup. pip is only needed when fonttools
+  # isn't in the venv yet, so an offline re-run still rebuilds.
+  if { [[ -x "$FONT_VENV/bin/python" ]] \
+    || { mkdir -p -- "$(dirname -- "$FONT_VENV")" && python3 -m venv "$FONT_VENV"; }; } \
+    && { "$FONT_VENV/bin/python" -c 'import fontTools' 2>/dev/null \
+      || "$FONT_VENV/bin/pip" install --quiet --disable-pip-version-check "fonttools==4.68.0"; } \
+    && "$FONT_VENV/bin/python" "$FONT_TOOL" \
+      --base "$STOCK_FONT" --out "$PATCHED_FONT" \
+      --family sketchybar-app-font-custom \
+      --glyph "herdr=$DOTFILES_DIR/sketchybar/assets/herdr.svg"; then
+    ok "patched font installed ($PATCHED_FONT)"
+  else
+    skip "couldn't build the patched font — Herdr will use the :terminal: icon"
+  fi
+fi
+
+# ------------------------------------------------------------------------------
 # Oh my tmux! — vendored upstream, customized via tmux/tmux.conf.local.
 # https://github.com/gpakosz/.tmux
 # ------------------------------------------------------------------------------
