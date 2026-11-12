@@ -1,6 +1,6 @@
 ---
 name: herdr-delegate
-description: "Delegate work to registered claude/pi/omp worker agents in a dedicated Herdr workspace (one tab per worker), with disjoint file ownership, file-based briefs and results, and verified integration. Use only when the user explicitly asks to delegate/spawn/parallelize, or when /superagent or /delegate invokes it. Never delegate ordinary requests proactively."
+description: "Delegate work to registered claude/pi/omp worker agents in a dedicated Herdr workspace (one tab per worker) or, in the Herdr desktop app, as labelled hc terminals, with disjoint file ownership, file-based briefs and results, and verified integration. Use only when the user explicitly asks to delegate/spawn/parallelize, or when /superagent or /delegate invokes it. Never delegate ordinary requests proactively."
 license: MIT
 ---
 
@@ -8,16 +8,32 @@ license: MIT
 
 Orchestrate parallel claude/pi/omp workers through Herdr. You (the orchestrator) slice the work, write briefs, start and prompt workers, wait, verify, and integrate. Workers share the current git tree; safety comes from disjoint file ownership, not isolation.
 
+Two backends run the same procedure. The `herdr` backend (Herdr TUI) is described in sections 2-11. The `hc` backend (Herdr desktop app) is section 12, which replaces the steps listed in the table in section 2.
+
 ## 1. When
 
 Only on an explicit delegation request from the user, `/superagent`, or `/delegate`. Delegation never decides anything that requires user approval: approvals, trust dialogs, scope changes, and open questions go back to the user.
 
 ## 2. Preconditions
 
-- `test "${HERDR_ENV:-}" = 1` must pass. Otherwise tell the user to start this agent inside `herdr` and stop.
-- `command -v jq` must succeed (all Herdr responses are parsed with jq).
+- Pick the backend, first match wins:
+  1. `test "${HERDR_ENV:-}" = 1` passes: backend `herdr`. Follow sections 3-11 as written.
+  2. `HC_TERMINAL_SOCKET` and `HC_TERMINAL_ID` are both set (Herdr desktop app): backend `hc`. Follow section 12 wherever the table below says so.
+  3. Neither: tell the user to start this agent inside `herdr` or in the Herdr desktop app, and stop.
+- `command -v jq` must succeed (all Herdr and hc responses are parsed with jq). For backend `hc`, `command -v hc` must succeed too.
 - Record a baseline snapshot of the working tree to `$RUN_DIR/baseline.tree` (done in step 5) so worker changes can be attributed.
 - Load the `herdr` skill for CLI semantics (IDs, states, read sources, safety rules).
+
+Backend `hc` replaces these steps with section 12; every other step (4 Slice, 6 Briefs, 10 Verify) is shared:
+
+| Step | `herdr` | `hc` |
+|---|---|---|
+| 3 Worker kind | `herdr agent get "$HERDR_PANE_ID"` | 12.1 |
+| 5 Run setup | workspace + one tab per worker | 12.2 (no workspace) |
+| 7 Start | `herdr agent start` | 12.3 |
+| 8 Dispatch and wait | `herdr agent prompt --wait` | 12.4 |
+| 9 Collect and resume | `herdr agent get/read/wait` | 12.5 |
+| 11 Cleanup | `herdr workspace close` | 12.6 |
 
 ## 3. Worker kind
 
@@ -93,7 +109,7 @@ else
 fi
 ```
 
-Shell variables do not persist between tool calls everywhere: carry the printed values forward literally.
+Shell variables do not persist between tool calls everywhere: carry the printed values forward literally. (Backend `hc` uses the same script without the `WS_*`/`ROOT_*` lines; see 12.2, and keep the two in step.)
 
 - Worker names: `sa-$RUN_ID-<n>` for n = 1..N (fits `[a-z][a-z0-9_-]{0,31}`).
 - Worker 1 uses `ROOT_PANE`: `herdr tab rename "$ROOT_TAB" "sa-$RUN_ID-1"`.
@@ -225,3 +241,105 @@ Resuming a blocked worker:
 - Any worker blocked/working/failed, or the user asked to keep it → leave the workspace; print `WS_ID` and the agent names.
 - Keep `$RUN_DIR`: briefs and results are the audit trail.
 - Never close panes, tabs, or workspaces this run did not create.
+
+## 12. Backend `hc` (Herdr desktop app)
+
+Use only when section 2 selected backend `hc`. The desktop app has no workspace/tab/pane CLI; its terminals are controlled with `hc` (`hc <cmd> --help` is the authority). Each worker is one terminal named `sa-$RUN_ID-<n>` and labelled `sa=$RUN_ID`. Slice (4), Briefs (6) and Verify (10) are unchanged; in the step-10 summary table the Tab column is the terminal name. Never use `hc send --force`: it types into a blocked worker's dialog.
+
+### 12.1 Worker kind
+
+```bash
+case "$(hc get "$HC_TERMINAL_ID" --json | jq -r '.status.app // empty')" in
+  claude-code) KIND=claude ;; omp) KIND=omp ;; *) KIND=pi ;; esac
+```
+
+Roles, `--agent <role>`, `pi-worker-model` and `--model` handling are exactly as in section 3. The agent argv is: `claude --agent <role> [--model <model-id>]`, `pi [--provider <provider> --model <id> [--thinking <effort>]]`, or `omp`.
+
+### 12.2 Run setup
+
+Same as section 5 without any workspace. One shell call:
+
+```bash
+SA_ROOT="${TMPDIR:-/tmp}/superagent"; mkdir -p "$SA_ROOT"
+RUN_DIR=
+for _ in $(seq 50); do RUN_ID=$(openssl rand -hex 2); mkdir "$SA_ROOT/$RUN_ID" 2>/dev/null && { RUN_DIR="$SA_ROOT/$RUN_ID"; break; }; done
+if [ -n "$RUN_DIR" ]; then
+  if git rev-parse --git-dir >/dev/null 2>&1; then
+    cp "$(git rev-parse --git-path index)" "$RUN_DIR/index" 2>/dev/null || true
+    GIT_INDEX_FILE="$RUN_DIR/index" git add -A && GIT_INDEX_FILE="$RUN_DIR/index" git write-tree > "$RUN_DIR/baseline.tree"
+  fi
+  printf 'RUN_ID=%s RUN_DIR=%s\n' "$RUN_ID" "$RUN_DIR"
+else
+  echo "ABORT: cannot create a run dir under $SA_ROOT" >&2
+fi
+```
+
+Carry the printed values forward literally. Worker names are `sa-$RUN_ID-<n>`.
+
+### 12.3 Start
+
+`hc run` has no `--env`, so the worker variables go through `env`. Everything after `--` is the worker's argv. Start all workers before prompting any:
+
+```bash
+hc run --bg --name sa-$RUN_ID-<n> --label sa=$RUN_ID --cwd "$PWD" --no-notify --outlive-parent \
+  -- env SUPERAGENT_RUN="$RUN_ID" SUPERAGENT_WORKER=1 <agent argv from 12.1>
+```
+
+`--no-notify` stops `hc` typing completion notes into your input (you wait explicitly in 12.4). `--outlive-parent` keeps workers alive if your own program ends. Then, per worker:
+
+```bash
+hc wait <name> --timeout 60 --json
+hc get <name> --json | jq -r '.status.state'
+hc read <name> --lines 40
+```
+
+The state must be `idle` and the screen must show the empty input editor. If the wait times out, the state is `blocked`/`unknown`, or the screen shows a dialog or selection menu (including a "Trust project folder?" prompt, which is not reported as blocked), do not prompt that worker. Show the screen to the user and ask them to resolve it (`hc attach <name>`; ctrl+\ detaches), then re-check. Never answer approval or trust dialogs yourself.
+
+### 12.4 Dispatch and wait
+
+Same shape as section 8, one shell call with the tool timeout at 3600 s where supported:
+
+```bash
+for name in <names>; do
+  { hc send "$name" "Read and execute the task brief at $RUN_DIR/$name.brief.md exactly." \
+      --wait --timeout 3500 --json >"$RUN_DIR/$name.wait.json" 2>"$RUN_DIR/$name.wait.err"
+    echo $? >"$RUN_DIR/$name.wait.rc"; } &
+done; wait
+```
+
+`hc send --wait` waits for the turn that this send started, so do not follow it with a standalone `hc wait`.
+
+### 12.5 Collect and resume
+
+Per worker, read `$RUN_DIR/$name.wait.json`:
+
+- `.wait.ended == true` and `.wait.status` is `idle` or `done`: the turn finished. Read `$RUN_DIR/$name.result.md`; a missing file means not done, and `status: blocked` means relay its Notes/Questions to the user.
+- `.wait.status == "blocked"`: `hc read <name> --lines 120`, relay the question to the user, do not answer for them.
+- Anything else is not a finished turn: `.wait.ended == false`, `.wait.reason` of `timeout`, `exit` or `error`, a null or unknown `.wait.status`, or a non-zero `$RUN_DIR/$name.wait.rc`. Run `hc get <name> --json` and `hc read <name> --lines 120` before anything else, report to the user what the worker did (still running, exited, or errored), and never resend the prompt blindly.
+
+Resuming a blocked worker:
+
+- **Question in the result file or chat:** write the answer verbatim to `$RUN_DIR/$name.answer.md` with the file-writing tool, then send it with the 12.4 form and collect again:
+  ```bash
+  { hc send "$name" "Read the user's answer at $RUN_DIR/$name.answer.md, continue the brief at $RUN_DIR/$name.brief.md, and rewrite $RUN_DIR/$name.result.md." \
+      --wait --timeout 3500 --json >"$RUN_DIR/$name.wait.json" 2>"$RUN_DIR/$name.wait.err"
+    echo $? >"$RUN_DIR/$name.wait.rc"; }
+  ```
+- **Approval/trust dialog in the worker's UI:** the user answers it (`hc attach <name>`). Do not send a new prompt; wait with the same capture:
+  ```bash
+  { hc wait "$name" --timeout 3500 --json >"$RUN_DIR/$name.wait.json" 2>"$RUN_DIR/$name.wait.err"
+    echo $? >"$RUN_DIR/$name.wait.rc"; }
+  ```
+
+### 12.6 Cleanup
+
+Only terminals this run created, found by label:
+
+```bash
+hc ls --label sa=$RUN_ID --json | jq -r '.terminals[].name'
+```
+
+- Every worker `done` and every result read: for each name, `hc kill <name>` then `hc rm <name>` (the kill leaves a finished entry that `hc rm` removes).
+- Any worker blocked/working/failed, or the user asked to keep it: leave the terminals; print the names and `hc attach <name>`.
+- Keep `$RUN_DIR`: briefs and results are the audit trail.
+- Never kill or remove a terminal without the `sa=$RUN_ID` label of this run.

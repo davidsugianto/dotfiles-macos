@@ -193,7 +193,9 @@ herdr                           # launches or re-attaches the persistent session
 claude                          # in the Herdr pane (or `claude-profile <name>`)
 ```
 
-- `/superagent` and `/delegate` only work inside Herdr (`HERDR_ENV=1`).
+- `/superagent` and `/delegate` only work inside Herdr: the `herdr` TUI (`HERDR_ENV=1`) or the Herdr desktop app
+  (`HC_TERMINAL_SOCKET`, driven through the `hc` CLI; workers are `sa-<id>-<n>` terminals, list them with
+  `hc ls --label sa=<id>`, take one over with `hc attach <name>`).
 - Answer Claude's "Do you trust the files in this folder?" dialog first.
   Herdr reports it as idle, so a worker started in an untrusted folder would
   have its prompt typed into that dialog. The delegate skill checks each
