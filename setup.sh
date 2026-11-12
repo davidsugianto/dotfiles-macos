@@ -261,6 +261,86 @@ link "$DOTFILES_DIR/btop/themes"     "$HOME/.config/btop/themes"
 # session.json in ~/.config/herdr, so the directory is never linked wholesale.
 link "$DOTFILES_DIR/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 link "$DOTFILES_DIR/herdr/sounds"      "$HOME/.config/herdr/sounds"
+
+# Herdr.app owns shared.json and can overwrite external edits while running.
+# Seed only an empty Actions list, without changing its other UI state.
+seed_herdr_actions() {
+  local app_dir="${HERDR_APP_DIR:-$HOME/.config/herdr-app}"
+  local seed="$DOTFILES_DIR/herdr-app/actions.json" shared="$app_dir/shared.json"
+  local tmp count pgrep_status jq_status
+
+  step "Seeding Herdr desktop Actions"
+  if [[ ! -f "$seed" ]]; then
+    skip "Herdr Actions seed not found at $seed"
+    return 0
+  fi
+  if ! command -v jq >/dev/null 2>&1; then
+    skip "jq is unavailable"
+    return 0
+  fi
+  if [[ ! -f "$shared" ]]; then
+    skip "open Herdr.app once, then re-run"
+    return 0
+  fi
+  if ! command -v pgrep >/dev/null 2>&1; then
+    skip "pgrep is unavailable; cannot check whether Herdr.app is running"
+    return 0
+  fi
+  if pgrep -x Herdr >/dev/null 2>&1; then
+    skip "quit Herdr.app and re-run"
+    return 0
+  else
+    pgrep_status=$?
+    if [[ "$pgrep_status" -ne 1 ]]; then
+      skip "couldn't check whether Herdr.app is running"
+      return 0
+    fi
+  fi
+  if jq -e '(.["t3-actions"].list // []) | length > 0' "$shared" >/dev/null 2>&1; then
+    skip "Actions already set"
+    return 0
+  else
+    jq_status=$?
+    if [[ "$jq_status" -ne 1 ]]; then
+      skip "couldn't read the Herdr Actions state"
+      return 0
+    fi
+  fi
+  # Do not replace malformed or unexpected state even if the list check failed.
+  if ! jq -e -s 'length == 1 and (.[0] | type == "object" and
+    ((.["t3-actions"] == null) or (.["t3-actions"] | type == "object")) and
+    ((.["t3-actions"].list == null) or (.["t3-actions"].list | type == "array")))' \
+    "$shared" >/dev/null 2>&1; then
+    skip "shared.json is invalid or has unexpected Actions state"
+    return 0
+  fi
+  if ! cp -- "$shared" "$shared.bak-before-actions"; then
+    skip "couldn't back up shared.json"
+    return 0
+  fi
+  if ! tmp="$(mktemp "$app_dir/.shared-actions.XXXXXX")"; then
+    skip "couldn't create a temporary Actions file"
+    return 0
+  fi
+  if ! jq -s --arg dotfiles "$DOTFILES_DIR" --slurpfile seed "$seed" '
+    if ($seed | length) != 1 or ($seed[0]["t3-actions"].list | type) != "array"
+      or ([$seed[0]["t3-actions"].list[] | select(type != "object")] | length) != 0
+    then error("invalid Actions seed")
+    else .[0] | .["t3-actions"].list = ($seed[0]["t3-actions"].list | map(
+      if (.cwd | type) == "string" then .cwd |= (split("__DOTFILES__") | join($dotfiles))
+      else . end))
+    end' "$shared" > "$tmp" \
+    || ! jq -e . "$tmp" >/dev/null \
+    || ! count="$(jq -e '.["t3-actions"].list | length' "$tmp")" \
+    || ! mv -- "$tmp" "$shared"; then
+    rm -f -- "$tmp" || true
+    skip "couldn't seed Herdr Actions"
+    return 0
+  fi
+  ok "seeded $count Herdr Actions"
+}
+seed_herdr_actions
+
 link "$DOTFILES_DIR/opencode/tui.json"      "$HOME/.config/opencode/tui.json"
 link "$DOTFILES_DIR/opencode/themes"        "$HOME/.config/opencode/themes"
 link "$DOTFILES_DIR/opencode/opencode.json" "$HOME/.config/opencode/opencode.json"

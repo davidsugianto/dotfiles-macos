@@ -15,6 +15,7 @@ Everything about the agent CLIs (Claude Code, opencode, omp, pi), their workflow
 ## Config layout
 
 - `herdr/` — config.toml (Dracula theme, keys, sidebar/tab bar, session resume) + sounds/{done,request}.mp3 (synthesized agent-done / needs-input chimes), linked to ~/.config/herdr/ (only these two — herdr keeps sockets/logs/session.json there)
+- `herdr-app/` — desktop Actions seed only (`actions.json`), merged into `~/.config/herdr-app/shared.json` by `setup.sh`, not symlinked
 - `agent/` — skills/ (skills shared as one file by Claude Code, pi and omp: herdr, herdr-delegate, prompt-forge, prompt-openbot), linked into ~/.agents/skills/ by setup.sh; agent-selection.md (planner/executor/scanner model tiers, the AGENT_SELECTION_FILE of the core-ai-skills handlers, read by absolute path)
 - `omp/` — config.yml (modelRoles, webSearchOrder) + models.yml (custom "cekat" provider) + mcp.json (Datadog + Jira + Slack + Cloudflare MCP servers) + themes/*.json (custom omp themes, e.g. atom-one-dark) + model-profiles/*.yml (edith-default, edith-superpower, work-cekatai-default, work-cekatai-superpower) + commands/ (omp-only slash commands: /superagent via Tern) + skills/ (symlinks to the pi/skills sre handlers datadog-investigate and jira-space-keeper, plus tern-delegate), linked to ~/.omp/agent/ (incl. themes/, commands/, skills/) and ~/.omp/model-profiles/
 - `pi/` — settings.json + models.json (custom "cekat" provider) + mcp-adapter.json (Datadog + Jira + Slack + Cloudflare MCP servers, via pi-mcp-adapter) + themes/*.json (switchable Pi themes) + model-roles/*.yaml (work-cekatai-default, work-cekatai-superpower) + profiles/*.json + prompts/*.md (slash commands) + skills/ (core-ai-skills handlers) + extensions/ (subagents-pi vendored, not on npm; statusline footer, herdr-agent, notify, todo, manage-handoff), linked to ~/.pi/agent/ and ~/.pi/profiles/
@@ -166,6 +167,23 @@ hc ls                      # working/idle during a turn
 ```
 
 If a Herdr update changes the OSC 7501 protocol the status silently disappears; re-run the `hc get` check after `hc update`.
+
+### Herdr desktop Actions (top bar)
+
+Herdr.app uses the `herdr-t3` layout: its `t3-actions` mod adds an Actions button to the top tab row (`▶ <primary action> | ▾`), with a menu to run other actions and an Add/Edit dialog for name, command, icon, folder and run location (tab, right split or down split). Saved Actions live under `t3-actions` in `~/.config/herdr-app/shared.json`, written by the app rather than hand-edited. The repo seed `herdr-app/actions.json` contains:
+
+| Action | Run location | Command | Folder |
+|---|---|---|---|
+| Lazygit | Right split | `lazygit` | focused terminal's |
+| K9s | Tab | `k9s` | focused terminal's |
+| Btop | Tab | `btop` | focused terminal's |
+| Yazi | Right split | `yazi` | focused terminal's |
+| Shellcheck | Down split | `shellcheck -e SC2088 setup.sh development-tools.sh` | repo |
+| Herdr config check | Down split | `herdr config check` | repo |
+
+Commands are wrapped in `zsh -lc '...'` because the app uses `sh -c`, which skips the login profile and Homebrew PATH. The app closes a pane when its program exits, so the two one-shot actions end with `printf '[exit N] press Enter to close'; read` to keep their output on screen; `bash herdr-app/tests/actions.sh` checks that (and the seed's schema). Shellcheck excludes SC2088 (`~` inside quoted display messages in `setup.sh`, a false positive). `setup.sh` replaces the `__DOTFILES__` placeholder in `cwd` with the repo path. Its "Seeding Herdr desktop Actions" step merges the seed only when `t3-actions.list` is empty or absent **and** Herdr.app is not running (`pgrep -x Herdr`); it backs up `shared.json` to `shared.json.bak-before-actions`, changes only `t3-actions` and preserves other keys. Otherwise it skips with a message, so UI edits are not overwritten. `HERDR_APP_DIR` overrides the app directory for testing.
+
+To re-seed, quit Herdr.app, delete the `t3-actions` key from `shared.json` (`cd ~/.config/herdr-app && jq 'del(.["t3-actions"])' shared.json > shared.json.new && mv -f shared.json.new shared.json`; `-f` because `mv` is aliased to `mv -i`), rerun `./setup.sh` and reopen the app. Only the seed is tracked; the layout (`~/.config/herdr-app/layouts/herdr-t3.json`) and mods are app-owned, not vendored. After `hc update`, re-check with `herdr-app check ~/.config/herdr-app/mods/t3-actions`.
 
 omp has its own `/superagent` that runs workers in Tern tabs instead of Herdr; see [docs/omp-workflow-guide.md](omp-workflow-guide.md).
 
