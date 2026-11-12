@@ -60,7 +60,7 @@ wezterm/ tmux/ nvim/              terminal, multiplexer, editor
 fastfetch/ yazi/ k9s/ sofka/      system info, file manager, Kubernetes TUIs
 git/ zsh/ .zshrc starship.toml    git identities, shell, prompt
 claude/ omp/ pi/ opencode/        AI agent configs
-agent/ herdr/ rtk/                shared agent skills, Herdr, rtk hooks
+agent/ herdr/ herdr-app/ rtk/     shared agent skills, Herdr, rtk hooks
 docs/                             guides (see below)
 setup.sh                          install and symlink everything
 development-tools.sh              optional DevOps toolchain

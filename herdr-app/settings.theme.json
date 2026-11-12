@@ -1,0 +1,7 @@
+{
+  "theme": "catppuccin-mocha",
+  "colors": {
+    "canvas": "#1e1e2ecc",
+    "chrome": "#181825cc"
+  }
+}
