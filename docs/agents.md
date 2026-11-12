@@ -158,12 +158,22 @@ every prompt annotated: [docs/pi-prompts.md](pi-prompts.md).
 
 The Herdr desktop app (`Herdr.app`) is not managed by the `herdr` TUI server: its panes set `HC_TERMINAL_SOCKET`/`HC_TERMINAL_ID` and are driven with `hc`. `herdr-delegate` detects that and runs section 12 (workers as `sa-<id>-<n>` terminals labelled `sa=<id>`, no workspace/tab); the pi `/herdr-agents` command and footer need the `herdr` TUI.
 
+The desktop app does not detect agents by process name: a program reports its own status with an OSC 7501 escape (`ESC ] 7501 ; state=idle|working|done|blocked|error : app=<name> : msg=<base64> ESC \`; `state=clear` removes it). Claude Code emits this natively, so it already shows in the sidebar. pi did not (`hc get <terminal>` showed `reported: false`), so `pi/extensions/hc-status.ts` (registered in `pi/settings.json`) emits it: `idle` on start, `working` while the agent runs, `idle` when settled, `clear` on exit. A `blocked` (kind question) report is wired to the `herdr:blocked` event, but nothing emits that event in this setup today, so pi never reports `blocked` in the desktop app yet. `msg` uses fixed labels only ("Working", "Idle", "Needs input"), never prompt text. It only runs when `HC_TERMINAL_SOCKET` is set, `HERDR_ENV` is not `1` and pi is in TUI mode, so the `herdr` TUI (where Herdr's `herdr-agent-state.ts` keeps owning state) and other terminals are unaffected. omp is not covered yet.
+
+```sh
+hc get <terminal> --json   # reported: true, status.app: "pi"
+hc ls                      # working/idle during a turn
+```
+
+If a Herdr update changes the OSC 7501 protocol the status silently disappears; re-run the `hc get` check after `hc update`.
+
 omp has its own `/superagent` that runs workers in Tern tabs instead of Herdr; see [docs/omp-workflow-guide.md](omp-workflow-guide.md).
 
 | Command / file | What it does |
 |---|---|
 | `/superagent <plan>` | Slices an approved plan into file-disjoint workers, starts one pi/omp worker per tab in a new `sa-<id>` workspace, waits, re-runs validation, closes the workspace. Stops at the plan GATE first. |
 | `/delegate [constraints]` | Same, using the open `/todos` items as slices; toggles each todo after its worker is verified. |
+| `pi/extensions/hc-status.ts` | Reports pi's idle/working state to the Herdr desktop app sidebar (OSC 7501); no-op outside the desktop app. Tested by `pi/tests/hc-status.sh`. |
 | `/herdr-agents` | Lists live Herdr agents. The footer shows `sa ● N working · ◐ N blocked · ✓ N ready` while workers run, with a warning when one blocks. |
 | `/todos`, `/handoff`, `/do-handoff`, `/work-on-handoff` | Session todo list; handoff docs in `~/.pi/agent/handoffs` (`/handoff` archives `status: done` ones). |
 | `agent/skills/herdr-delegate/SKILL.md` | The orchestration procedure both agents follow. Briefs/results live in `$TMPDIR/superagent/<id>/`. |

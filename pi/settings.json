@@ -21,6 +21,7 @@
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/herdr-agent",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/statusline",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/notify.ts",
+    "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/hc-status.ts",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/todo.ts",
     "../../Artifacts/labs/src/dotfiles-macos/pi/extensions/manage-handoff.ts"
   ]

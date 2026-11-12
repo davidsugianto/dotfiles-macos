@@ -7,9 +7,10 @@
  *   every 3 s and shows a footer summary of the `sa-*` workers started by the
  *   herdr-delegate skill, plus a warning when a worker becomes blocked.
  *
- * Agent state reporting to Herdr itself is Herdr's own managed integration
- * (~/.pi/agent/extensions/herdr-agent-state.ts, `herdr integration install pi`);
- * this extension only reads.
+ * Agent state reporting to Herdr itself is Herdr's own managed integration in
+ * the herdr TUI (~/.pi/agent/extensions/herdr-agent-state.ts,
+ * `herdr integration install pi`) and ../hc-status.ts in the Herdr desktop app
+ * (OSC 7501); this extension only reads.
  */
 
 import { accessSync, constants } from "node:fs";
