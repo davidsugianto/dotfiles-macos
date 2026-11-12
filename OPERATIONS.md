@@ -224,6 +224,7 @@ design). To pick up upstream changes, delete and re-run `setup.sh`:
 | SbarLua (SketchyBar's Lua API) | `~/.local/share/sketchybar_lua` | `rm -rf ~/.local/share/sketchybar_lua && ./setup.sh` |
 | Oh my tmux! | `~/.local/share/tmux/oh-my-tmux` | `rm -rf ~/.local/share/tmux/oh-my-tmux && ./setup.sh` (then `git -C ~/.local/share/tmux/oh-my-tmux pull` also works, without a full re-clone) |
 | sketchybar-app-font icon map | `~/.local/share/sketchybar/icon_map.lua` | `rm ~/.local/share/sketchybar/icon_map.lua && ./setup.sh` |
+| Patched app font (adds the Herdr icon) | `~/Library/Fonts/sketchybar-app-font-custom.ttf`, built from the cask's font by `sketchybar/tools/patch-app-font.py` in a venv at `~/.local/share/sketchybar/venv` | `./setup.sh` (rebuilds when the cask font, an SVG or the script is newer; **re-run it after `brew upgrade --cask font-sketchybar-app-font`**, or the copy stays on the old glyph set). Force with `rm ~/Library/Fonts/sketchybar-app-font-custom.ttf && ./setup.sh`. Tests: `sketchybar/tools/test-patch-app-font.sh` |
 | gvm (Go version manager) | `~/bin/gvm` | `gvm upgrade` (self-updates in place, no need to delete) |
 
 ## Homebrew tap trust

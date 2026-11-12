@@ -1,3 +1,12 @@
+# Handover — 2026-11-12 (Herdr SketchyBar icon, uncommitted until reviewed)
+
+Herdr gets its real ram logo in the workspace pills. `sketchybar-app-font` has no glyph for it, so `sketchybar/tools/patch-app-font.py` copies the cask font, adds `:herdr:` from `sketchybar/assets/herdr.svg`, and saves it as the family `sketchybar-app-font-custom` (the cask's own file is untouched). Files: `setup.sh` (new "Building patched sketchybar-app-font" step, fonttools pinned in a venv), `sketchybar/items/aerospace.lua` (uses the patched family only if its file exists, else `:terminal:`), `sketchybar/tools/{patch-app-font.py,test-patch-app-font.sh}`, `sketchybar/assets/`, `OPERATIONS.md` (refresh row).
+
+- The whole font step sits in one `if` condition on purpose: under `set -e` a failing venv/pip/script must fall back, not abort setup. `test-patch-app-font.sh` covers that.
+- Re-run `./setup.sh` after `brew upgrade --cask font-sketchybar-app-font`, or the patched copy goes stale.
+- `brew info` shows `font-sketchybar-app-font 2.0.76 → 3.0.23` pending (a major bump). The patch script assumes the first GSUB lookup holds the ligatures; after upgrading, run `sketchybar/tools/test-patch-app-font.sh` and `./setup.sh`. A changed layout exits with "unexpected GSUB layout" and the bar falls back to `:terminal:`. Refresh `icon_map.lua` too.
+- Open: `sketchybar/assets/` and `sketchybar/tools/` are untracked, so `git add` them. The SVG's licence is unverified (see `sketchybar/assets/README.md`).
+
 # Handover — 2026-10-14 (rtk, uncommitted until reviewed)
 
 rtk-oss 1.0.0 wired into Claude Code, pi and omp by hand (see docs/agents.md "rtk"). Files: `rtk/{rtk.ts,RTK.md}` (verbatim upstream v1.0.0), `setup.sh` (tap, formula, 3 links), `claude/settings.json` (`PreToolUse` `Bash` -> `rtk hook claude`), `claude/CLAUDE.md` (`@RTK.md`), `.gitignore` (`rtk/.rtk-agents`).
