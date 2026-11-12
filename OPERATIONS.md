@@ -94,6 +94,37 @@ just edit and assume correct).
   reload. Validate with `:LspInfo` / `:Lazy` or by actually triggering the
   new keymap, not just by re-reading the file.
 
+### Herdr desktop app
+
+- The desktop app (`Herdr.app`, config in `~/.config/herdr-app`) is separate
+  from the `herdr` TUI (`~/.config/herdr`, `herdr/config.toml`, still
+  Dracula, `panel_bg = reset`). The app keeps state, mods, layouts and
+  sockets in its dir, so the directory is never linked wholesale.
+- The repo owns two files there: `herdr-app/themes/catppuccin-mocha.json`
+  (symlinked into `~/.config/herdr-app/themes/` by `setup.sh`) and
+  `herdr-app/settings.theme.json` (a look-only `{theme, colors}` fragment
+  that `setup.sh` merges into `~/.config/herdr-app/settings.json` with
+  `jq`, preserving zoom, `font_size` and sounds). Palette: base `#1e1e2e`,
+  mantle `#181825`, text `#cdd6f4`, selection `#45475a`. Re-running
+  `setup.sh` re-applies `theme` and `colors`, so edit
+  `herdr-app/settings.theme.json`, not the live `settings.json`; other keys
+  in the live file are left alone.
+- Transparency: the active layout is the personal clone
+  `layouts/herdr-t3.json`, which already has `terminal_opacity: 0` over
+  `background: canvas`. The fragment gives `canvas` and `chrome` an alpha
+  (`#1e1e2ecc`, `#181825cc`, i.e. 80%) so the desktop shows through. If it
+  looks too faint or strong, tweak the hex alpha in
+  `herdr-app/settings.theme.json` and re-run `./setup.sh`.
+- Precedence (from the app's `AGENTS.md`): the layout's own look >
+  `settings.json` > defaults. A theme-picker pick (stored in
+  `~/.config/herdr-app/layouts/.state/`, never edit it by hand) overrides
+  both. Switch from the shell with
+  `herdr-app do app.theme '{"name":"catppuccin-mocha"}'`. After a fresh
+  install, run it once (with the app running): the layout state can start
+  with its own pick (`{light: paper, dark: graphite}` here before the
+  switch), which `setup.sh` cannot change and which may mask the
+  `settings.json` theme.
+
 ## Keybinding reference
 
 Current bindings as configured in this repo (not upstream defaults). If you

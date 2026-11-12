@@ -237,6 +237,46 @@ link() {
   ok "linked $dest -> $src"
 }
 
+# Merge a JSON fragment into a settings file with jq, keeping existing keys.
+# Idempotent: rewrites only when the merged result differs, via a temp file in
+# the same dir + mv so the file is never left truncated.
+merge_json_settings() {
+  local frag="$1" dest="$2" tmp
+  if ! command -v jq >/dev/null 2>&1; then
+    skip "jq not installed; not merging $(basename -- "$frag") into $dest"
+    return
+  fi
+  if [[ ! -e "$dest" ]]; then
+    mkdir -p -- "$(dirname -- "$dest")"
+    tmp="$(mktemp "$dest.XXXXXX")"
+    if jq . "$frag" >"$tmp"; then
+      mv -- "$tmp" "$dest"
+      ok "created $dest from $(basename -- "$frag")"
+    else
+      rm -f -- "$tmp"
+      skip "$frag is not valid JSON; $dest not created"
+    fi
+    return
+  fi
+  if ! jq empty "$dest" >/dev/null 2>&1; then
+    skip "$dest is not valid JSON; left untouched"
+    return
+  fi
+  tmp="$(mktemp "$dest.XXXXXX")"
+  if ! jq --slurpfile frag "$frag" '. * $frag[0]' "$dest" >"$tmp"; then
+    rm -f -- "$tmp"
+    skip "could not merge $(basename -- "$frag") into $dest; left untouched"
+    return
+  fi
+  if [[ "$(jq -S . "$tmp")" == "$(jq -S . "$dest")" ]]; then
+    rm -f -- "$tmp"
+    skip "$dest already has $(basename -- "$frag") settings"
+    return
+  fi
+  mv -- "$tmp" "$dest"
+  ok "merged $(basename -- "$frag") into $dest"
+}
+
 step "Symlinking configs into place"
 link "$DOTFILES_DIR/.zshrc"          "$HOME/.zshrc"
 link "$DOTFILES_DIR/zsh"             "$HOME/.config/zsh"
@@ -261,6 +301,12 @@ link "$DOTFILES_DIR/btop/themes"     "$HOME/.config/btop/themes"
 # session.json in ~/.config/herdr, so the directory is never linked wholesale.
 link "$DOTFILES_DIR/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 link "$DOTFILES_DIR/herdr/sounds"      "$HOME/.config/herdr/sounds"
+# The Herdr desktop app (~/.config/herdr-app) is separate from the herdr TUI
+# (~/.config/herdr above). Only the theme file is linked, never the directory:
+# the app keeps its state, mods, layouts and sockets there. Its settings.json
+# is app-owned too, so the theme keys are merged in (not linked) below.
+link "$DOTFILES_DIR/herdr-app/themes/catppuccin-mocha.json" "$HOME/.config/herdr-app/themes/catppuccin-mocha.json"
+merge_json_settings "$DOTFILES_DIR/herdr-app/settings.theme.json" "$HOME/.config/herdr-app/settings.json"
 link "$DOTFILES_DIR/opencode/tui.json"      "$HOME/.config/opencode/tui.json"
 link "$DOTFILES_DIR/opencode/themes"        "$HOME/.config/opencode/themes"
 link "$DOTFILES_DIR/opencode/opencode.json" "$HOME/.config/opencode/opencode.json"
