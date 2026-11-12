@@ -1,0 +1,50 @@
+{
+  "t3-actions": {
+    "list": [
+      {
+        "id": "lazygit",
+        "name": "Lazygit",
+        "command": "zsh -lc 'lazygit'",
+        "icon": "play",
+        "place": "right"
+      },
+      {
+        "id": "k9s",
+        "name": "K9s",
+        "command": "zsh -lc 'k9s'",
+        "icon": "debug",
+        "place": "tab"
+      },
+      {
+        "id": "btop",
+        "name": "Btop",
+        "command": "zsh -lc 'btop'",
+        "icon": "configure",
+        "place": "tab"
+      },
+      {
+        "id": "yazi",
+        "name": "Yazi",
+        "command": "zsh -lc 'yazi'",
+        "icon": "play",
+        "place": "right"
+      },
+      {
+        "id": "shellcheck",
+        "name": "Shellcheck",
+        "command": "zsh -lc 'shellcheck -e SC2088 setup.sh development-tools.sh; s=$?; printf \"\\n[exit %s] press Enter to close \" \"$s\"; read -r _'",
+        "icon": "lint",
+        "place": "down",
+        "cwd": "__DOTFILES__"
+      },
+      {
+        "id": "herdr-config",
+        "name": "Herdr config check",
+        "command": "zsh -lc 'herdr config check; s=$?; printf \"\\n[exit %s] press Enter to close \" \"$s\"; read -r _'",
+        "icon": "test",
+        "place": "down",
+        "cwd": "__DOTFILES__"
+      }
+    ]
+  }
+}
