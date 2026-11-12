@@ -1,8 +1,8 @@
 ---
 name: herdr
-description: "Control Herdr (workspaces, tabs, panes, and the coding agents inside them) through the herdr CLI: inspect layout, split panes, run commands, read output, start and prompt other agents, wait for state. Use when the user mentions Herdr, or when the herdr-delegate skill, /superagent, or /delegate needs Herdr primitives. Requires HERDR_ENV=1."
+description: "Control Herdr (workspaces, tabs, panes, and the coding agents inside them) through the herdr CLI: inspect layout, split panes, run commands, read output, start and prompt other agents, wait for state. Use when the user mentions Herdr, or when the herdr-delegate skill, /superagent, or /delegate needs Herdr primitives. Requires HERDR_ENV=1 (herdr TUI) or, in the Herdr desktop app, HC_TERMINAL_SOCKET (controlled with the hc CLI)."
 ---
-<!-- Vendored from herdr 0.9.3 via `herdr --skill`. Re-sync after `brew upgrade herdr`, then re-apply the LOCAL paragraphs. -->
+<!-- Vendored from herdr 0.9.3 via `herdr --skill`. Re-sync after `brew upgrade herdr`, then re-apply the LOCAL paragraphs (including the one after the `HERDR_ENV` check, the "Requires ..." wording in the description, and the "Herdr desktop app (hc)" section at the end). -->
 
 # Herdr
 
@@ -15,6 +15,8 @@ test "${HERDR_ENV:-}" = 1
 ```
 
 If the check fails, say that you are not running inside Herdr and stop. Do not inspect or control the focused Herdr session from outside Herdr.
+
+LOCAL: Panes of the Herdr desktop app do not set `HERDR_ENV`; they set `HC_TERMINAL_SOCKET` and `HC_TERMINAL_ID` and are controlled with the `hc` CLI, not `herdr`. If `HERDR_ENV` is not `1` but both `HC_*` variables are set, you are inside the desktop app: skip every `herdr ...` command in this file and use the "Herdr desktop app (hc)" section at the end. If none of them is set, say you are not running inside Herdr and stop.
 
 When the check passes, the `herdr` binary in `PATH` talks to the current session. Use it to inspect neighboring work, create terminal layout, start agents and commands, read output, and wait for state changes.
 
@@ -215,3 +217,27 @@ If a larger recent read still does not reveal the completed response, ask the ag
 - Never run `herdr server stop` from an active session unless the user explicitly intends to stop the server and its pane processes.
 - Never kill the main Herdr process. Use named test sessions for experiments that need an isolated server.
 - CLI server errors are JSON on stderr with exit status 1. CLI syntax errors exit with status 2.
+
+## Herdr desktop app (hc)
+
+LOCAL: Use only when the check at the top selected the desktop app (`HC_TERMINAL_SOCKET` and `HC_TERMINAL_ID` set, `HERDR_ENV` not 1). Terminals are addressed by `t7`-style addresses or a unique name (`a-z0-9-_`, up to 32 characters). Most commands accept `--json`; it is the default when piped. `hc <command> --help` is the authority.
+
+```bash
+hc get "$HC_TERMINAL_ID" --json        # this terminal; .status.app is the agent, .status.state idle|working|blocked
+hc ls --json [--label k=v] [--all]     # live terminals (--all: finished too)
+hc run --bg --name w1 --cwd "$PWD" -- <program> [args]   # start in a new terminal, come back at once
+hc send w1 "text" --wait --timeout 180 # paste text + Enter, wait for the turn it started
+hc wait w1 --timeout 60                # wait until an agent stops working
+hc read w1 --lines 40                  # screen plus history
+hc keys w1 esc                         # press keys (enter, esc, up, ctrl+c)
+hc interrupt w1                        # press the stop key and report
+hc attach w1                           # take it over (ctrl+\ detaches)
+hc kill w1 && hc rm w1                 # end its program, then remove the finished entry
+```
+
+- By default a terminal started with `hc run` has the calling terminal as its parent: `hc` types completion notes into the parent and ends the child when the parent's program ends. Use `--no-notify` and `--outlive-parent` for background workers.
+- `hc run` has no `--env`; set variables with `-- env K=V <program>`.
+- `hc send` waits while a person has an unfinished draft in the terminal. Never add `--force`: it types into a blocked agent's dialog. Treat `blocked` like `herdr`: read the screen and ask the user.
+- `--wait` and `hc wait` follow agent status. A plain shell reports none, so they time out; that is not a failure.
+- Only `kill`/`rm` terminals you started; there is no workspace or tab to close.
+- For delegation, follow the herdr-delegate skill, section 12.

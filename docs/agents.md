@@ -156,6 +156,8 @@ pane. Step-by-step usage (plan → execute/superagent → review → fix → tes
 commit, with an end-to-end example): [docs/pi-workflow-guide.md](pi-workflow-guide.md);
 every prompt annotated: [docs/pi-prompts.md](pi-prompts.md).
 
+The Herdr desktop app (`Herdr.app`) is not managed by the `herdr` TUI server: its panes set `HC_TERMINAL_SOCKET`/`HC_TERMINAL_ID` and are driven with `hc`. `herdr-delegate` detects that and runs section 12 (workers as `sa-<id>-<n>` terminals labelled `sa=<id>`, no workspace/tab); the pi `/herdr-agents` command and footer need the `herdr` TUI.
+
 omp has its own `/superagent` that runs workers in Tern tabs instead of Herdr; see [docs/omp-workflow-guide.md](omp-workflow-guide.md).
 
 | Command / file | What it does |

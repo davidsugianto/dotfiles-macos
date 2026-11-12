@@ -54,8 +54,9 @@ herdr            # launches or re-attaches the persistent session
 pi               # in the Herdr pane (or `omp`)
 ```
 
-- `/superagent` and `/delegate` only work inside Herdr (`HERDR_ENV=1`). Plain
-  `/plan`, `/execute`, and subagents work anywhere.
+- `/superagent` and `/delegate` only work inside Herdr: the `herdr` TUI (`HERDR_ENV=1`) or the Herdr desktop app
+  (`HC_TERMINAL_SOCKET`, driven through the `hc` CLI; workers are `sa-<id>-<n>` terminals, list them with
+  `hc ls --label sa=<id>`). Plain `/plan`, `/execute`, and subagents work anywhere.
 - Trust the project in pi first (the "Trust project folder?" dialog) if it has
   a `.pi/` directory. Workers started later inherit that trust; see
   [Blocked workers](#blocked-workers) for why this matters.
